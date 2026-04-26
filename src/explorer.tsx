@@ -1,6 +1,9 @@
 import { SiGithub } from '@icons-pack/react-simple-icons';
-import type { TreeDataItem, WorkspaceRef } from 'idecn';
-import { Workspace } from 'idecn';
+import type {
+  TreeDataItem,
+  WorkspaceProps,
+  WorkspaceRef,
+} from 'idecn';
 import {
   AlertTriangle,
   Moon,
@@ -10,7 +13,12 @@ import {
   X,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { useEffect, useRef, useState } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ComponentType,
+} from 'react';
 import { toast } from 'sonner';
 import {
   downloadFile,
@@ -48,6 +56,19 @@ const Explorer = ({
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme, setTheme } = useTheme();
   const ref = useRef<WorkspaceRef>(null);
+  const [Workspace, setWorkspace] = useState<ComponentType<
+    WorkspaceProps & { ref?: React.Ref<WorkspaceRef> }
+  > | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void import('idecn').then((mod) => {
+      if (!cancelled) setWorkspace(() => mod.Workspace);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     setRepo(initialRepo);
@@ -139,35 +160,47 @@ const Explorer = ({
           </button>
         </div>
       ) : null}
-      <Workspace
-        className="flex-1"
-        expandDepth={2}
-        expandExclude={EXPAND_EXCLUDE}
-        fileActions={{
-          onDownload: async (path) => {
-            const file = await downloadFile(repo, path).catch(() => null);
-            if (file) {
-              triggerDownload(file.base64, file.name);
-              toast(`Downloaded ${file.name}`);
-              return;
-            }
-            const folder = await downloadFolder(repo, path).catch(() => null);
-            if (folder) {
-              triggerDownload(folder.base64, `${folder.name}.zip`);
-              toast(`Downloaded ${folder.name}.zip`);
-              return;
-            }
-            toast.error(`Failed to download "${path}"`);
-          },
-        }}
-        initialFiles={initialFiles}
-        onOpenFile={async (item) => {
-          const content = await fetchFile(repo, item.path).catch(() => null);
-          return content;
-        }}
-        ref={ref}
-        tree={tree}
-      />
+      {Workspace ? (
+        <Workspace
+          className="flex-1"
+          expandDepth={2}
+          expandExclude={EXPAND_EXCLUDE}
+          fileActions={{
+            onDownload: async (path) => {
+              const file = await downloadFile(repo, path).catch(() => null);
+              if (file) {
+                triggerDownload(file.base64, file.name);
+                toast(`Downloaded ${file.name}`);
+                return;
+              }
+              const folder = await downloadFolder(repo, path).catch(() => null);
+              if (folder) {
+                triggerDownload(folder.base64, `${folder.name}.zip`);
+                toast(`Downloaded ${folder.name}.zip`);
+                return;
+              }
+              toast.error(`Failed to download "${path}"`);
+            },
+          }}
+          initialFiles={initialFiles}
+          onOpenFile={async (item) => {
+            const content = await fetchFile(repo, item.path).catch(() => null);
+            return content;
+          }}
+          ref={ref}
+          tree={tree}
+        />
+      ) : (
+        <div
+          aria-busy="true"
+          className="bg-muted/30 flex flex-1 animate-pulse flex-col gap-2 p-3"
+          role="status"
+        >
+          <span className="sr-only">Loading editor</span>
+          <div className="bg-muted h-8 max-w-md rounded-md" />
+          <div className="bg-muted flex min-h-0 flex-1 rounded-md" />
+        </div>
+      )}
     </div>
   );
 };

@@ -1,5 +1,5 @@
 # Build static assets (Vite + TypeScript)
-FROM oven/bun:1 AS builder
+FROM oven/bun:1.3.13 AS builder
 WORKDIR /app
 
 COPY package.json bun.lock ./
@@ -9,7 +9,7 @@ COPY . .
 RUN bun run build
 
 # Serve dist/
-FROM oven/bun:1
+FROM oven/bun:1.3.13
 WORKDIR /app
 COPY --from=builder /app/dist ./dist
 
