@@ -13,15 +13,25 @@ FROM oven/bun:1.3.13
 WORKDIR /app
 COPY --from=builder /app/dist ./dist
 
-EXPOSE 80
+EXPOSE 3000
 CMD ["bun", "--eval", "\
 const dir = import.meta.dir + '/dist';\
 Bun.serve({\
   port: 3000,\
   fetch(req) {\
     const url = new URL(req.url);\
-    let path = dir + url.pathname;\
-    let file = Bun.file(path);\
+    let p = decodeURIComponent(url.pathname);\
+    if (!p || p === '/') p = '/index.html';\
+    else if (p.endsWith('/')) p = p.slice(0, -1) || '/index.html';\
+    let abs = dir + p;\
+    let filePath = abs;\
+    try {\
+      const st = Bun.statSync(abs);\
+      if (st.isDirectory()) filePath = abs + '/index.html';\
+    } catch {\
+      filePath = dir + '/index.html';\
+    }\
+    let file = Bun.file(filePath);\
     if (!file.size) file = Bun.file(dir + '/index.html');\
     return new Response(file);\
   },\
