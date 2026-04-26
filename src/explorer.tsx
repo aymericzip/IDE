@@ -57,7 +57,7 @@ const Explorer = ({
   const { resolvedTheme, setTheme } = useTheme();
   const ref = useRef<WorkspaceRef>(null);
   const [Workspace, setWorkspace] = useState<ComponentType<
-    WorkspaceProps & { ref?: React.Ref<WorkspaceRef> }
+    WorkspaceProps
   > | null>(null);
 
   useEffect(() => {

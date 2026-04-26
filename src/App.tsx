@@ -1,8 +1,9 @@
 import { AlertTriangle } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 
-import Explorer from './explorer';
 import { Providers } from './providers';
+
+const Explorer = lazy(() => import('./explorer'));
 import { fetchTree } from './repo-api';
 import { filesFromSearch, repoFromSearch } from './url-utils';
 
@@ -39,6 +40,11 @@ function IdeApp() {
     tree: Awaited<ReturnType<typeof fetchTree>>;
   } | null>(null);
   const [loadError, setLoadError] = useState<null | string>(null);
+
+  useEffect(() => {
+    if (!initialRepo) return;
+    void import('./explorer');
+  }, [initialRepo]);
 
   useEffect(() => {
     if (!initialRepo) return;
@@ -87,11 +93,20 @@ function IdeApp() {
   }
 
   return (
-    <Explorer
-      initialFiles={initialFiles}
-      initialRepo={entry.repo}
-      initialTree={entry.tree}
-    />
+    <Suspense
+      fallback={
+        <div className="text-muted-foreground flex h-full flex-col items-center justify-center gap-2 p-4 text-sm">
+          <span className="border-muted-foreground/30 size-6 animate-spin rounded-full border-2 border-t-transparent" />
+          Loading editor…
+        </div>
+      }
+    >
+      <Explorer
+        initialFiles={initialFiles}
+        initialRepo={entry.repo}
+        initialTree={entry.tree}
+      />
+    </Suspense>
   );
 }
 

@@ -17,7 +17,7 @@ EXPOSE 80
 CMD ["bun", "--eval", "\
 const dir = import.meta.dir + '/dist';\
 Bun.serve({\
-  port: 80,\
+  port: 3000,\
   fetch(req) {\
     const url = new URL(req.url);\
     let path = dir + url.pathname;\
@@ -26,5 +26,5 @@ Bun.serve({\
     return new Response(file);\
   },\
 });\
-console.log('Listening on port 80');\
+console.log('Listening on port 3000');\
 "]
