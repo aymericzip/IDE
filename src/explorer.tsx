@@ -98,9 +98,11 @@ const Explorer = ({
     setInput(parsed);
     setRepo(parsed);
     const params = new URLSearchParams(window.location.search);
-    params.set('repo', parsed);
+    params.delete('repo');
     params.delete('url');
-    window.history.replaceState(null, '', `?${params.toString()}`);
+    const q = params.toString();
+    const path = `/${parsed}`;
+    window.history.replaceState(null, '', q ? `${path}?${q}` : path);
   };
 
   return (

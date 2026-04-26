@@ -1,12 +1,29 @@
 const GITHUB = /github\.com\/([^/]+)\/([^/]+?)(?:\.git)?(?:\/|$)/i;
 const OWNER_REPO = /^[\w.-]+\/[\w.-]+$/;
 
+/** Second path segment looks like a built asset, not a repo name. */
+const STATIC_SEGMENT = /\.(js|mjs|cjs|css|map|json|ico|svg|png|jpe?g|gif|webp|woff2?|ttf|eot|html?)$/i;
+
+const RESERVED_PATH_ROOTS = new Set(['assets', '_vite']);
+
 export const repoFromInput = (input: string): string | null => {
   const v = input.trim();
   const m = v.match(GITHUB);
   if (m) return `${m[1]}/${m[2]}`;
   if (OWNER_REPO.test(v)) return v;
   return null;
+};
+
+/** `owner/repo` from pathname `/owner/repo` (exactly two segments). */
+export const repoFromPathname = (pathname: string): string | null => {
+  const trimmed = pathname.replace(/\/+$/, '') || '/';
+  const parts = trimmed.split('/').filter(Boolean);
+  if (parts.length !== 2) return null;
+  const [a, b] = parts;
+  if (RESERVED_PATH_ROOTS.has(a)) return null;
+  if (STATIC_SEGMENT.test(b)) return null;
+  const candidate = `${a}/${b}`;
+  return OWNER_REPO.test(candidate) ? candidate : null;
 };
 
 export const repoFromSearch = (search: string): string | null => {
@@ -22,6 +39,13 @@ export const repoFromSearch = (search: string): string | null => {
   if (OWNER_REPO.test(url)) return url;
   return null;
 };
+
+/** Path `/owner/repo` first; otherwise `?repo=` / `?url=` (legacy). */
+export const repoFromLocation = (
+  pathname: string,
+  search: string
+): string | null =>
+  repoFromPathname(pathname) ?? repoFromSearch(search);
 
 export const filesFromSearch = (search: string): string[] => {
   const q = new URLSearchParams(

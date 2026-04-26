@@ -5,7 +5,7 @@ import { Providers } from './providers';
 
 const Explorer = lazy(() => import('./explorer'));
 import { fetchTree } from './repo-api';
-import { filesFromSearch, repoFromSearch } from './url-utils';
+import { filesFromSearch, repoFromLocation } from './url-utils';
 
 import './ide.css';
 
@@ -15,12 +15,12 @@ function NoRepo() {
       <AlertTriangle className="size-8 text-amber-500" />
       <p className="text-sm font-medium">No repository specified</p>
       <p className="text-muted-foreground text-xs">
-        Add{' '}
-        <code className="bg-muted rounded px-1">?repo=owner/name</code> or{' '}
-        <code className="bg-muted rounded px-1">
-          ?url=https://github.com/…
-        </code>{' '}
-        to the URL
+        Open{' '}
+        <code className="bg-muted rounded px-1">/owner/repo</code> (e.g.{' '}
+        <code className="bg-muted rounded px-1">/facebook/react</code>
+        ), or use legacy{' '}
+        <code className="bg-muted rounded px-1">?repo=owner/name</code> /{' '}
+        <code className="bg-muted rounded px-1">?url=https://github.com/…</code>
       </p>
     </div>
   );
@@ -28,7 +28,7 @@ function NoRepo() {
 
 function IdeApp() {
   const initialRepo = useMemo(
-    () => repoFromSearch(window.location.search),
+    () => repoFromLocation(window.location.pathname, window.location.search),
     []
   );
   const initialFiles = useMemo(
@@ -73,12 +73,9 @@ function IdeApp() {
         <AlertTriangle className="size-8 text-amber-500" />
         <p className="text-destructive text-sm font-medium">{loadError}</p>
         <p className="text-muted-foreground text-xs">
-          Add{' '}
-          <code className="bg-muted rounded px-1">?repo=owner/name</code> or{' '}
-          <code className="bg-muted rounded px-1">
-            ?url=https://github.com/…
-          </code>{' '}
-          to the URL
+          Check <code className="bg-muted rounded px-1">/owner/repo</code> or
+          legacy <code className="bg-muted rounded px-1">?repo=</code> /{' '}
+          <code className="bg-muted rounded px-1">?url=</code>
         </p>
       </div>
     );

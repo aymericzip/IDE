@@ -15,7 +15,11 @@ COPY --from=builder /app/dist ./dist
 
 EXPOSE 3000
 CMD ["bun", "--eval", "\
-const dir = import.meta.dir + '/dist';\
+const dir = process.cwd() + '/dist';\
+const looksLikeStatic = (path) => {\
+  const seg = path.slice(path.lastIndexOf('/') + 1);\
+  return seg.includes('.') && !/\\.html?$/i.test(seg);\
+};\
 Bun.serve({\
   port: 3000,\
   fetch(req) {\
@@ -29,10 +33,14 @@ Bun.serve({\
       const st = Bun.statSync(abs);\
       if (st.isDirectory()) filePath = abs + '/index.html';\
     } catch {\
+      if (looksLikeStatic(p)) return new Response('Not Found', { status: 404 });\
       filePath = dir + '/index.html';\
     }\
     let file = Bun.file(filePath);\
-    if (!file.size) file = Bun.file(dir + '/index.html');\
+    if (!file.size) {\
+      if (looksLikeStatic(p)) return new Response('Not Found', { status: 404 });\
+      file = Bun.file(dir + '/index.html');\
+    }\
     return new Response(file);\
   },\
 });\
