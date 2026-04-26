@@ -118,9 +118,9 @@ export const fetchFile = async (
   repo: string,
   path: string
 ): Promise<null | string> => {
-  const branch = await getDefaultBranch(repo);
   const ext = path.split('.').at(-1)?.toLowerCase() ?? '';
-  const url = `https://raw.githubusercontent.com/${repo}/${branch}/${path}`;
+  // JSDelivr automatically resolves the default branch!
+  const url = `https://cdn.jsdelivr.net/gh/${repo}/${path}`;
   if (IMAGE_EXTS.has(ext)) {
     const res = await fetch(url);
     if (!res.ok) return null;

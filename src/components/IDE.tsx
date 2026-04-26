@@ -2268,7 +2268,10 @@ const Workspace = ({
               const p = api.panels.find((x) => x.id === panelPath);
               if (!p) return;
               if (fileContent === null) {
-                api.removePanel(p);
+                p.api.updateParameters({
+                  content: '// Failed to load file from repository. It might be empty, or you might be rate limited.',
+                  loading: undefined,
+                });
                 log(`Load failed: ${panelPath}`);
               } else {
                 if (fileContent.length > FILE_SIZE_WARN)
@@ -2290,7 +2293,12 @@ const Workspace = ({
           .catch(() => {
             try {
               const p = api.panels.find((x) => x.id === panelPath);
-              if (p) api.removePanel(p);
+              if (p) {
+                p.api.updateParameters({
+                  content: '// Error loading file.',
+                  loading: undefined,
+                });
+              }
               log(`Load error: ${panelPath}`);
             } catch {
               /* Panel already removed */
