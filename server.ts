@@ -28,9 +28,12 @@ const server = serve({
       }
     } catch {
       if (looksLikeStatic(p)) {
-        return new Response("Not Found", {
+        const cType = p.endsWith(".js")
+          ? "application/javascript"
+          : "text/plain";
+        return new Response("/* Not Found */", {
           status: 404,
-          headers: { "Content-Type": "text/plain" },
+          headers: { "Content-Type": cType },
         });
       }
       filePath = distDir + "/index.html";
@@ -41,9 +44,12 @@ const server = serve({
 
     if (bunFile.size === 0) {
       if (looksLikeStatic(p)) {
-        return new Response("Not Found", {
+        const cType = p.endsWith(".js")
+          ? "application/javascript"
+          : "text/plain";
+        return new Response("/* Not Found */", {
           status: 404,
-          headers: { "Content-Type": "text/plain" },
+          headers: { "Content-Type": cType },
         });
       }
       filePath = distDir + "/index.html";
@@ -52,6 +58,17 @@ const server = serve({
     }
 
     const headers = new Headers();
+
+    // Crucial fix: passing a custom Headers object in Bun overrides automatic MIME inference!
+    // We MUST specify Content-Type explicitly.
+    if (bunFile.type) {
+      headers.set("Content-Type", bunFile.type);
+    } else if (p.endsWith(".js")) {
+      headers.set("Content-Type", "application/javascript");
+    } else if (p.endsWith(".css")) {
+      headers.set("Content-Type", "text/css");
+    }
+
     headers.set("X-Frame-Options", "SAMEORIGIN");
     headers.set("X-XSS-Protection", "1; mode=block");
     headers.set("X-Content-Type-Options", "nosniff");
