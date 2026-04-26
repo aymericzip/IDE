@@ -14,12 +14,23 @@ export const repoFromInput = (input: string): string | null => {
   return null;
 };
 
-/** `owner/repo` from pathname `/owner/repo` (exactly two segments). */
 export const repoFromPathname = (pathname: string): string | null => {
   const trimmed = pathname.replace(/\/+$/, '') || '/';
   const parts = trimmed.split('/').filter(Boolean);
-  if (parts.length !== 2) return null;
-  const [a, b] = parts;
+  if (parts.length < 2) return null;
+
+  let a: string, b: string;
+  const p0 = parts[0].toLowerCase();
+  if (parts.length === 3 && (p0 === 'github' || p0 === 'github.com')) {
+    a = parts[1];
+    b = parts[2];
+  } else if (parts.length === 2) {
+    a = parts[0];
+    b = parts[1];
+  } else {
+    return null;
+  }
+
   if (RESERVED_PATH_ROOTS.has(a)) return null;
   if (STATIC_SEGMENT.test(b)) return null;
   const candidate = `${a}/${b}`;
@@ -44,18 +55,32 @@ export const repoFromSearch = (search: string): string | null => {
 export const repoFromLocation = (
   pathname: string,
   search: string
-): string | null =>
-  repoFromPathname(pathname) ?? repoFromSearch(search);
+): string | null => {
+  const repo = repoFromPathname(pathname) ?? repoFromSearch(search);
+  if (!repo) return null;
+  const owner = repo.split('/')[0]?.toLowerCase();
+  if (['aymericzip', 'intlayer_org', 'intlayer', 'intlayer-org'].includes(owner)) {
+    return repo;
+  }
+  return null;
+};
 
 export const filesFromSearch = (search: string): string[] => {
   const q = new URLSearchParams(
     search.startsWith('?') ? search : `?${search}`
   );
-  const raw = q.get('files') ?? '';
-  return raw
-    ? raw
-        .split(',')
-        .map((f) => f.trim())
-        .filter(Boolean)
-    : [];
+  const rawFiles = q.get('files') ?? '';
+  const rawFileArgs = q.getAll('file');
+
+  const allFiles: string[] = [];
+  if (rawFiles) {
+    allFiles.push(...rawFiles.split(',').map((f) => f.trim()).filter(Boolean));
+  }
+  for (const rawFile of rawFileArgs) {
+    const trimmed = rawFile.trim();
+    if (trimmed) {
+      allFiles.push(...trimmed.split(',').map((f) => f.trim()).filter(Boolean));
+    }
+  }
+  return allFiles;
 };
