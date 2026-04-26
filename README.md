@@ -1,73 +1,66 @@
-# React + TypeScript + Vite
+# IDE
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A high-performance web-based IDE designed to render and browse public repository code directly in your browser.
 
-Currently, two official plugins are available:
+![Screenshot](public/screenshot.png)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- **Monaco Editor**: Industry-standard code editing experience.
+- **Syntax Highlighting**: Beautiful code rendering powered by [Shiki](https://shiki.style/).
+- **Flexible Layout**: Multi-tab interface and resizable panels powered by [Dockview](https://dockview.dev/).
+- **File Exploration**: Browse repository structures with familiar Material Icon Theme.
+- **Public Repo Rendering**: Instantly load and view any public repository.
+- **Modern Stack**: Built with React 19, Vite, Tailwind CSS 4, and Jotai.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Origin
 
-## Expanding the ESLint configuration
+This project is a fork of [1qh/idecn](https://github.com/1qh/idecn).
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Getting Started
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Prerequisites
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+You need [Bun](https://bun.sh/) installed on your machine.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Installation
+
+```bash
+bun install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Development
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Run the development server:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+bun run dev
 ```
+
+### Building for Production
+
+```bash
+bun run build
+```
+
+The production-ready assets will be in the `dist` directory.
+
+## Deployment
+
+### Docker
+
+You can run the IDE using Docker:
+
+```bash
+docker build -t ide .
+docker run -p 3000:3000 ide
+```
+
+## Technologies
+
+- **Framework**: React 19
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS 4
+- **Editor**: Monaco Editor
+- **State Management**: Jotai
+- **Icons**: Lucide React & Material Icon Theme
