@@ -11,7 +11,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      '@a/ui': path.join(here, 'src', 'a-ui'),
+      '@': path.join(here, 'src'),
       idecn: path.join(here, 'src', 'components', 'IDE.tsx'),
     },
   },

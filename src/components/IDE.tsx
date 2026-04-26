@@ -20,7 +20,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@a/ui/breadcrumb';
+} from './breadcrumb';
 import {
   ContextMenu,
   ContextMenuContent,
@@ -28,13 +28,13 @@ import {
   ContextMenuSeparator,
   ContextMenuShortcut,
   ContextMenuTrigger,
-} from '@a/ui/context-menu';
-import { Dialog, DialogContent } from '@a/ui/dialog';
-import { Popover, PopoverContent, PopoverTrigger } from '@a/ui/popover';
-import { Skeleton } from '@a/ui/skeleton';
-import { Toaster } from '@a/ui/sonner';
+} from './context-menu';
+import { Dialog, DialogContent } from './dialog';
+import { Popover, PopoverContent, PopoverTrigger } from './popover';
+import { Skeleton } from './skeleton';
+import { Toaster } from './sonner';
 import { Accordion } from '@base-ui/react/accordion';
-import { cn } from '@a/ui/lib/utils';
+import { cn } from './lib/utils';
 import type { Monaco } from '@monaco-editor/loader';
 import type { EditorProps } from '@monaco-editor/react';
 import { Editor, loader } from '@monaco-editor/react';
@@ -56,9 +56,6 @@ import {
   ChevronsDownUp,
   ClipboardCopy,
   Download,
-  FilePlus,
-  FolderPlus,
-  Pencil,
   Pin,
   PinOff,
   Search,
@@ -92,7 +89,7 @@ const ICON_CLASS_HOVER = `${ICON_CLASS} group-hover:scale-125`;
 const ICON_CLASS_TAB_HOVER = `${ICON_CLASS} group-hover/tab:scale-125`;
 
 const ITEM_CLASS =
-  'group flex w-full items-center gap-[7px] py-[1px] pr-2 text-left text-sm leading-6 cursor-pointer whitespace-nowrap hover:bg-accent';
+  'group flex w-full items-center gap-[7px] py-[1px] pr-2 text-left text-xs leading-5 cursor-pointer whitespace-nowrap hover:bg-accent';
 
 const CENTER = 'flex h-full items-center justify-center';
 
@@ -101,7 +98,7 @@ const EDITOR_OPTIONS: NonNullable<EditorProps['options']> = {
   cursorSmoothCaretAnimation: 'on',
   cursorWidth: 5,
   fontLigatures: true,
-  fontSize: 16,
+  fontSize: 14,
   letterSpacing: -0.8,
   lineHeight: 1.1,
   minimap: {
@@ -124,6 +121,7 @@ const EDITOR_OPTIONS: NonNullable<EditorProps['options']> = {
 const TAB_TYPE = Symbol('idecn-tab');
 
 const EXT_TO_LANG: Record<string, string> = {
+  astro: 'astro',
   cjs: 'javascript',
   css: 'css',
   go: 'go',
@@ -131,12 +129,16 @@ const EXT_TO_LANG: Record<string, string> = {
   js: 'javascript',
   json: 'json',
   jsx: 'javascriptreact',
+  less: 'less',
   md: 'markdown',
   mjs: 'javascript',
   py: 'python',
   rs: 'rust',
+  sass: 'sass',
+  scss: 'scss',
   sh: 'shellscript',
   sql: 'sql',
+  styl: 'stylus',
   svelte: 'svelte',
   toml: 'toml',
   ts: 'typescript',
@@ -147,18 +149,23 @@ const EXT_TO_LANG: Record<string, string> = {
 };
 
 const LANG: Record<string, string> = {
+  astro: 'astro',
   css: 'css',
   go: 'go',
   html: 'html',
   js: 'javascript',
   json: 'json',
   jsx: 'javascript',
+  less: 'less',
   md: 'markdown',
   mjs: 'javascript',
   py: 'python',
   rs: 'rust',
+  sass: 'sass',
+  scss: 'scss',
   sh: 'shell',
   sql: 'sql',
+  styl: 'stylus',
   toml: 'toml',
   ts: 'typescript',
   tsx: 'typescript',
@@ -294,17 +301,22 @@ const CORE_LANGS = [
 ] as const;
 
 const ALL_LANGS = [
+  'astro',
   'css',
   'go',
   'html',
   'javascript',
   'json',
   'jsx',
+  'less',
   'markdown',
   'python',
   'rust',
+  'sass',
+  'scss',
   'shell',
   'sql',
+  'stylus',
   'toml',
   'tsx',
   'typescript',
@@ -540,15 +552,9 @@ const resolveLanguageIcon = (language: string): string => {
 
 const virtualFileId = (name: string) => `${VIRTUAL_PREFIX}${name}`;
 interface FileActions {
-  onCreateFile?: (parentPath: string, name: string) => Promise<void> | void;
-  onCreateFolder?: (parentPath: string, name: string) => Promise<void> | void;
-  onDelete?: (paths: string[]) => Promise<void> | void;
   onDownload?: (path: string) => Promise<void> | void;
-  onRename?: (path: string, newName: string) => Promise<void> | void;
-  onUpload?: (parentPath: string, files: FileList) => Promise<void> | void;
 }
 interface TreeContextValue {
-  creatingIn: null | { parentPath: string; type: 'file' | 'folder' };
   expandDepth: number;
   expandExclude?: string[];
   fileActions?: FileActions;
@@ -556,16 +562,10 @@ interface TreeContextValue {
   log?: (msg: string) => void;
   navRef: React.RefObject<HTMLElement | null>;
   onSelect?: (item: { id: string; name: string; path: string }) => void;
-  renamingId: null | string;
   selectedId: null | string;
   selectedIds: Set<string>;
-  setCreatingIn: (
-    state: null | { parentPath: string; type: 'file' | 'folder' }
-  ) => void;
-  setRenamingId: (id: null | string) => void;
   setSelectedId: (id: string) => void;
   setSelectedIds: (ids: Set<string>) => void;
-  triggerUpload?: (parentPath: string) => void;
 }
 interface TreeDataItem {
   actions?: ReactNode;
@@ -574,7 +574,6 @@ interface TreeDataItem {
   disabled?: boolean;
   icon?: ComponentType<{ className?: string }> | string;
   id: string;
-  mutable?: boolean;
   name: string;
   onClick?: () => void;
   path: string;
@@ -588,15 +587,11 @@ interface WorkspaceRef {
 const EMPTY_SET = new Set<string>();
 
 const TreeContext = createContext<TreeContextValue>({
-  creatingIn: null,
   expandDepth: 0,
   indent: 16,
   navRef: { current: null },
-  renamingId: null,
   selectedId: null,
   selectedIds: EMPTY_SET,
-  setCreatingIn: () => undefined,
-  setRenamingId: () => undefined,
   setSelectedId: () => undefined,
   setSelectedIds: () => undefined,
 });
@@ -615,7 +610,6 @@ const useTreeItem = ({
   path?: string;
 }) => {
   const {
-    creatingIn,
     expandDepth,
     expandExclude,
     fileActions,
@@ -625,12 +619,8 @@ const useTreeItem = ({
     selectedId,
     navRef,
     selectedIds,
-    renamingId,
-    setCreatingIn,
-    setRenamingId,
     setSelectedId,
     setSelectedIds,
-    triggerUpload,
   } = use(TreeContext);
 
   const depth = use(DepthContext);
@@ -673,7 +663,6 @@ const useTreeItem = ({
     }
   };
   return {
-    creatingIn,
     depth,
     expandDepth,
     expandExclude,
@@ -685,12 +674,8 @@ const useTreeItem = ({
     itemId,
     log: treeLog,
     pl,
-    renamingId,
     select,
     selectedIds,
-    setCreatingIn,
-    setRenamingId,
-    triggerUpload,
   };
 };
 
@@ -739,7 +724,6 @@ const Tree = ({
   log: treePropLog,
   onSelect,
   selectedId: controlledSelectedId,
-  triggerUpload,
   ...props
 }: ComponentProps<'nav'> & {
   expandDepth?: number;
@@ -749,20 +733,12 @@ const Tree = ({
   log?: (msg: string) => void;
   onSelect?: (item: { id: string; name: string; path: string }) => void;
   selectedId?: null | string;
-  triggerUpload?: (parentPath: string) => void;
 }) => {
   const [internalSelectedId, setInternalSelectedId] = useState<null | string>(
     null
   );
 
-  const [creatingIn, setCreatingIn] = useState<null | {
-    parentPath: string;
-    type: 'file' | 'folder';
-  }>(null);
-
   const [selectedIds, setSelectedIds] = useState<Set<string>>(EMPTY_SET);
-
-  const [renamingId, setRenamingId] = useState<null | string>(null);
 
   const navRef = useRef<HTMLElement>(null);
 
@@ -770,7 +746,6 @@ const Tree = ({
 
   const ctx = useMemo(
     () => ({
-      creatingIn,
       expandDepth,
       expandExclude,
       fileActions,
@@ -778,27 +753,20 @@ const Tree = ({
       log: treePropLog,
       navRef,
       onSelect,
-      renamingId,
       selectedId,
       selectedIds,
-      setCreatingIn,
-      setRenamingId,
       setSelectedId: setInternalSelectedId,
       setSelectedIds,
-      triggerUpload,
     }),
     [
-      creatingIn,
       expandDepth,
       expandExclude,
       fileActions,
       indent,
       treePropLog,
       onSelect,
-      renamingId,
       selectedId,
       selectedIds,
-      triggerUpload,
     ]
   );
   return (
@@ -809,7 +777,7 @@ const Tree = ({
         role="tree"
         {...props}
         className={cn(
-          'select-none overflow-auto text-sm [scrollbar-color:color-mix(in_oklch,var(--color-foreground,var(--foreground))_15%,transparent)_transparent] [scrollbar-width:thin]',
+          'select-none overflow-auto text-xs [scrollbar-color:color-mix(in_oklch,var(--color-foreground,var(--foreground))_15%,transparent)_transparent] [scrollbar-width:thin]',
           props.className
         )}
         onKeyDownCapture={(e) => {
@@ -840,124 +808,12 @@ const Tree = ({
   );
 };
 
-const InlineInput = ({
-  depth,
-  indent,
-  onCancel,
-  onSubmit,
-  type,
-}: {
-  depth: number;
-  indent: number;
-  onCancel: () => void;
-  onSubmit: (name: string) => void;
-  type: 'file' | 'folder';
-}) => {
-  const [value, setValue] = useState('');
-
-  const inputRef = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    requestAnimationFrame(() => inputRef.current?.focus());
-  }, []);
-
-  const submit = () => {
-    const trimmed = value.trim();
-    if (trimmed) onSubmit(trimmed);
-    else onCancel();
-  };
-  return (
-    <div
-      className={cn(ITEM_CLASS, 'gap-1')}
-      style={{ paddingLeft: `${String(depth * indent + 8)}px` }}
-    >
-      {type === 'folder' ? (
-        <FolderIcon className={ICON_CLASS} name="new" />
-      ) : (
-        <FileIcon className={ICON_CLASS} name={value || 'untitled'} />
-      )}
-      <input
-        className="min-w-0 flex-1 rounded-sm border border-primary/50 bg-transparent px-1 text-sm outline-none"
-        onBlur={submit}
-        onChange={(e) => setValue(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') submit();
-          if (e.key === 'Escape') onCancel();
-        }}
-        placeholder={type === 'file' ? 'filename' : 'folder name'}
-        ref={inputRef}
-        type="text"
-        value={value}
-      />
-    </div>
-  );
-};
-
-const RenameInput = ({
-  currentName,
-  depth,
-  indent,
-  isFolder,
-  onCancel,
-  onSubmit,
-}: {
-  currentName: string;
-  depth: number;
-  indent: number;
-  isFolder: boolean;
-  onCancel: () => void;
-  onSubmit: (newName: string) => void;
-}) => {
-  const [value, setValue] = useState(currentName);
-
-  const inputRef = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    requestAnimationFrame(() => {
-      const el = inputRef.current;
-      if (!el) return;
-      el.focus();
-
-      const dot = currentName.lastIndexOf('.');
-      el.setSelectionRange(0, dot > 0 ? dot : currentName.length);
-    });
-  }, [currentName]);
-
-  const submit = () => {
-    const trimmed = value.trim();
-    if (trimmed && trimmed !== currentName) onSubmit(trimmed);
-    else onCancel();
-  };
-  return (
-    <div
-      className={cn(ITEM_CLASS, 'gap-1')}
-      style={{ paddingLeft: `${String(depth * indent + 8)}px` }}
-    >
-      {isFolder ? (
-        <FolderIcon className={ICON_CLASS} name={value || currentName} />
-      ) : (
-        <FileIcon className={ICON_CLASS} name={value || currentName} />
-      )}
-      <input
-        className="min-w-0 flex-1 rounded-sm border border-primary/50 bg-transparent px-1 text-sm outline-none"
-        onBlur={submit}
-        onChange={(e) => setValue(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') submit();
-          if (e.key === 'Escape') onCancel();
-        }}
-        ref={inputRef}
-        type="text"
-        value={value}
-      />
-    </div>
-  );
-};
 
 const TreeFolder = ({
   children,
   defaultOpen = false,
   disabled,
   id,
-  mutable,
   name,
   path,
   ...props
@@ -967,12 +823,10 @@ const TreeFolder = ({
   defaultOpen?: boolean;
   disabled?: boolean;
   id?: string;
-  mutable?: boolean;
   name: string;
   path?: string;
 }) => {
   const {
-    creatingIn,
     depth,
     expandDepth,
     expandExclude,
@@ -984,12 +838,7 @@ const TreeFolder = ({
     isSelected,
     itemId,
     pl,
-    renamingId,
     select,
-    selectedIds,
-    setCreatingIn,
-    setRenamingId,
-    triggerUpload,
   } = useTreeItem({
     id,
     name,
@@ -997,8 +846,6 @@ const TreeFolder = ({
   });
 
   const folderPath = path ?? name;
-
-  const isRenaming = renamingId === itemId;
 
   const excluded = expandExclude?.some((ex) => folderPath.startsWith(ex));
 
@@ -1008,11 +855,6 @@ const TreeFolder = ({
 
   const isOpen = open.includes(itemId);
 
-  const showingInput = creatingIn?.parentPath === folderPath;
-
-  const ensureOpen = () => {
-    if (!isOpen) setOpen([itemId]);
-  };
   return (
     <Accordion.Root
       onValueChange={(v) => {
@@ -1022,139 +864,49 @@ const TreeFolder = ({
       value={open}
     >
       <Accordion.Item value={itemId}>
-        {isRenaming ? (
-          <RenameInput
-            currentName={name.split('/').at(-1) ?? name}
-            depth={depth}
-            indent={indent}
-            isFolder
-            onCancel={() => setRenamingId(null)}
-            onSubmit={(newName) => {
-              fileActions?.onRename?.(folderPath, newName);
-              setRenamingId(null);
-            }}
-          />
-        ) : (
-          <ContextMenu>
-            <ContextMenuTrigger>
-              <Accordion.Trigger
-                className={cn(
-                  ITEM_CLASS,
-                  (isSelected || isMultiSelected) && 'bg-accent',
-                  disabled && 'pointer-events-none opacity-50',
-                  props.className
-                )}
-                data-item-id={itemId}
-                onClick={(e) => select(e)}
-                role="treeitem"
-                style={{ paddingLeft: pl }}
-              >
-                <FolderIcon className={iconClass} name={name} open={isOpen} />
-                {name}
-              </Accordion.Trigger>
-            </ContextMenuTrigger>
-            <ContextMenuContent>
-              {mutable && fileActions?.onCreateFile ? (
-                <ContextMenuItem
-                  onClick={() => {
-                    ensureOpen();
-                    setCreatingIn({ parentPath: folderPath, type: 'file' });
-                  }}
-                >
-                  <FilePlus /> New File
-                </ContextMenuItem>
-              ) : null}
-              {mutable && fileActions?.onCreateFolder ? (
-                <ContextMenuItem
-                  onClick={() => {
-                    ensureOpen();
-                    setCreatingIn({ parentPath: folderPath, type: 'folder' });
-                  }}
-                >
-                  <FolderPlus /> New Folder
-                </ContextMenuItem>
-              ) : null}
-              {mutable && fileActions?.onUpload && triggerUpload ? (
-                <ContextMenuItem onClick={() => triggerUpload(folderPath)}>
-                  <Download className="rotate-180" /> Upload
-                </ContextMenuItem>
-              ) : null}
-              {mutable &&
-              (fileActions?.onCreateFile ||
-                fileActions?.onCreateFolder ||
-                (fileActions?.onUpload && triggerUpload)) ? (
-                <ContextMenuSeparator />
-              ) : null}
-              {mutable && fileActions?.onRename ? (
-                <ContextMenuItem onClick={() => setRenamingId(itemId)}>
-                  <Pencil /> Rename
-                </ContextMenuItem>
-              ) : null}
-              {mutable && fileActions?.onDelete ? (
-                <ContextMenuItem
-                  className="text-destructive focus:text-destructive"
-                  onClick={() => {
-                    const paths: string[] =
-                      selectedIds.size > 1 && selectedIds.has(itemId)
-                        ? [...selectedIds]
-                        : [folderPath];
-                    fileActions.onDelete?.(paths);
-                  }}
-                >
-                  <Trash2 /> Delete
-                  {selectedIds.size > 1 && selectedIds.has(itemId)
-                    ? ` (${String(selectedIds.size)})`
-                    : ''}
-                </ContextMenuItem>
-              ) : null}
-              {fileActions?.onDownload ? (
-                <ContextMenuItem
-                  onClick={() => {
-                    fileActions.onDownload?.(folderPath);
-                  }}
-                >
-                  <Download /> Download
-                </ContextMenuItem>
-              ) : null}
-              {(mutable && (fileActions?.onRename || fileActions?.onDelete)) ||
-              fileActions?.onDownload ? (
-                <ContextMenuSeparator />
-              ) : null}
-              <ContextMenuItem
-                onClick={() => {
-                  navigator.clipboard
-                    .writeText(folderPath)
-                    .then(() => toast('Copied to clipboard'))
-                    .catch(() => undefined);
-                }}
-              >
-                <ClipboardCopy /> Copy Path
+        <ContextMenu>
+          <ContextMenuTrigger>
+            <Accordion.Trigger
+              className={cn(
+                ITEM_CLASS,
+                (isSelected || isMultiSelected) && 'bg-accent',
+                disabled && 'pointer-events-none opacity-50',
+                props.className
+              )}
+              data-item-id={itemId}
+              onClick={(e) => select(e)}
+              role="treeitem"
+              style={{ paddingLeft: pl }}
+            >
+              <FolderIcon className={iconClass} name={name} open={isOpen} />
+              {name}
+            </Accordion.Trigger>
+          </ContextMenuTrigger>
+          <ContextMenuContent>
+            {fileActions?.onDownload ? (
+              <ContextMenuItem onClick={() => fileActions.onDownload?.(folderPath)}>
+                <Download /> Download
               </ContextMenuItem>
-            </ContextMenuContent>
-          </ContextMenu>
-        )}
+            ) : null}
+            {fileActions?.onDownload ? <ContextMenuSeparator /> : null}
+            <ContextMenuItem
+              onClick={() => {
+                navigator.clipboard
+                  .writeText(folderPath)
+                  .then(() => toast('Copied to clipboard'))
+                  .catch(() => undefined);
+              }}
+            >
+              <ClipboardCopy /> Copy Path
+            </ContextMenuItem>
+          </ContextMenuContent>
+        </ContextMenu>
         <Accordion.Panel className="relative h-(--accordion-panel-height) overflow-hidden transition-[height] duration-150 ease-out data-ending-style:h-0 data-starting-style:h-0">
           <span
             className="absolute top-0 bottom-0 w-px bg-accent"
             style={{ left: `${String(depth * indent + 16)}px` }}
           />
           <DepthContext value={depth + 1}>
-            {showingInput ? (
-              <InlineInput
-                depth={depth + 1}
-                indent={indent}
-                onCancel={() => setCreatingIn(null)}
-                onSubmit={(n) => {
-                  const cb =
-                    creatingIn.type === 'file'
-                      ? fileActions?.onCreateFile
-                      : fileActions?.onCreateFolder;
-                  cb?.(folderPath, n);
-                  setCreatingIn(null);
-                }}
-                type={creatingIn.type}
-              />
-            ) : null}
             {children}
           </DepthContext>
         </Accordion.Panel>
@@ -1167,7 +919,6 @@ const TreeFile = ({
   disabled,
   icon,
   id,
-  mutable,
   name,
   path,
   ...props
@@ -1175,23 +926,17 @@ const TreeFile = ({
   disabled?: boolean;
   icon?: ComponentType<{ className?: string }> | string;
   id?: string;
-  mutable?: boolean;
   name: string;
   path?: string;
 }) => {
   const {
-    depth,
     fileActions,
     iconClass,
-    indent,
     isMultiSelected,
     isSelected,
     itemId,
     pl,
-    renamingId,
     select,
-    selectedIds,
-    setRenamingId,
   } = useTreeItem({
     id,
     name,
@@ -1200,22 +945,7 @@ const TreeFile = ({
 
   const CustomIcon = typeof icon === 'function' ? icon : undefined;
 
-  const isRenaming = renamingId === itemId;
   useIconsReady();
-  if (isRenaming)
-    return (
-      <RenameInput
-        currentName={name}
-        depth={depth}
-        indent={indent}
-        isFolder={false}
-        onCancel={() => setRenamingId(null)}
-        onSubmit={(newName) => {
-          fileActions?.onRename?.(path ?? name, newName);
-          setRenamingId(null);
-        }}
-      />
-    );
   return (
     <ContextMenu>
       <ContextMenuTrigger>
@@ -1250,41 +980,12 @@ const TreeFile = ({
         </button>
       </ContextMenuTrigger>
       <ContextMenuContent>
-        {mutable && fileActions?.onRename ? (
-          <ContextMenuItem onClick={() => setRenamingId(itemId)}>
-            <Pencil /> Rename
-          </ContextMenuItem>
-        ) : null}
         {fileActions?.onDownload ? (
-          <ContextMenuItem
-            onClick={() => {
-              fileActions.onDownload?.(path ?? name);
-            }}
-          >
+          <ContextMenuItem onClick={() => fileActions.onDownload?.(path ?? name)}>
             <Download /> Download
           </ContextMenuItem>
         ) : null}
-        {mutable && fileActions?.onDelete ? (
-          <ContextMenuItem
-            className="text-destructive focus:text-destructive"
-            onClick={() => {
-              const deletePaths: string[] =
-                selectedIds.size > 1 && selectedIds.has(itemId)
-                  ? [...selectedIds]
-                  : [path ?? name];
-              fileActions.onDelete?.(deletePaths);
-            }}
-          >
-            <Trash2 /> Delete
-            {selectedIds.size > 1 && selectedIds.has(itemId)
-              ? ` (${String(selectedIds.size)})`
-              : ''}
-          </ContextMenuItem>
-        ) : null}
-        {(mutable && (fileActions?.onRename || fileActions?.onDelete)) ||
-        fileActions?.onDownload ? (
-          <ContextMenuSeparator />
-        ) : null}
+        {fileActions?.onDownload ? <ContextMenuSeparator /> : null}
         <ContextMenuItem
           onClick={() => {
             navigator.clipboard
@@ -1318,7 +1019,6 @@ const renderItems = ({
           disabled={item.disabled}
           id={item.id}
           key={item.id}
-          mutable={item.mutable}
           name={name}
           path={item.path}
         >
@@ -1332,7 +1032,6 @@ const renderItems = ({
           icon={item.icon}
           id={item.id}
           key={item.id}
-          mutable={item.mutable}
           name={item.name}
           onClick={() => {
             item.onClick?.();
@@ -1356,7 +1055,6 @@ const FileTree = ({
   onDoubleClick: onDoubleClickProp,
   onSelectChange,
   selectedId: controlledId,
-  triggerUpload,
 }: {
   className?: string;
   data: TreeDataItem | TreeDataItem[];
@@ -1368,7 +1066,6 @@ const FileTree = ({
   onDoubleClick?: (item: TreeDataItem) => void;
   onSelectChange?: (item: TreeDataItem | undefined) => void;
   selectedId?: null | string;
-  triggerUpload?: (parentPath: string) => void;
 }) => {
   const items = Array.isArray(data) ? data : [data];
   return (
@@ -1379,7 +1076,6 @@ const FileTree = ({
       fileActions={fileActions}
       log={fileTreeLog}
       selectedId={controlledId ?? initialSelectedItemId}
-      triggerUpload={triggerUpload}
     >
       <div className="min-w-max">
         {renderItems({
@@ -1436,7 +1132,7 @@ const ImagePanel = ({ api, params }: IDockviewPanelProps<{ src: string }>) => {
   }, [api]);
   if (!src)
     return (
-      <div className={cn(CENTER, 'text-muted-foreground text-sm')}>
+      <div className={cn(CENTER, 'text-muted-foreground text-xs')}>
         Loading...
       </div>
     );
@@ -1540,7 +1236,7 @@ const FilePanel = ({
     );
   if (!content)
     return (
-      <div className={cn(CENTER, 'text-muted-foreground text-sm')}>
+      <div className={cn(CENTER, 'text-muted-foreground text-xs')}>
         Empty file
       </div>
     );
@@ -1637,7 +1333,7 @@ const TabHeader = ({ api, params }: IDockviewPanelHeaderProps) => {
     <ContextMenu>
       <ContextMenuTrigger
         className={cn(
-          'group/tab flex h-full items-center gap-[3px] py-[3px] pl-1 text-sm',
+          'group/tab flex h-full items-center gap-[3px] py-[3px] pl-1 text-xs',
           p?.headerClassName,
           active
             ? p?.activeClassName
@@ -1768,7 +1464,7 @@ const TabHeader = ({ api, params }: IDockviewPanelHeaderProps) => {
 };
 
 const WatermarkPanel = () => (
-  <div className={cn(CENTER, 'text-muted-foreground/30 text-sm')}>
+  <div className={cn(CENTER, 'text-muted-foreground/30 text-xs')}>
     Open a file
   </div>
 );
@@ -1957,12 +1653,12 @@ const QuickOpenDialog = ({
           <div className="flex items-center border-b px-3">
             <Search className="mr-2 size-4 shrink-0 opacity-50" />
             <Cmdk.Input
-              className="flex h-10 w-full bg-transparent py-3 text-sm outline-hidden placeholder:text-muted-foreground"
+              className="flex h-10 w-full bg-transparent py-3 text-xs outline-hidden placeholder:text-muted-foreground"
               placeholder="Search files..."
             />
           </div>
           <Cmdk.List className="max-h-[300px] overflow-y-auto overflow-x-hidden">
-            <Cmdk.Empty className="py-6 text-center text-sm">
+            <Cmdk.Empty className="py-6 text-center text-xs">
               No files found
             </Cmdk.Empty>
             {flatFiles.map((f) => {
@@ -1971,7 +1667,7 @@ const QuickOpenDialog = ({
                 : '';
               return (
                 <Cmdk.Item
-                  className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden data-[disabled=true]:pointer-events-none data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
+                  className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-xs outline-hidden data-[disabled=true]:pointer-events-none data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
                   key={f.id}
                   onSelect={() => {
                     logFn(`Quick open: ${f.name}`);
@@ -2128,7 +1824,7 @@ const Workspace = ({
   const mergedEditorOptions = useMemo(
     () => ({
       ...editorOptions,
-      fontSize: (EDITOR_OPTIONS.fontSize ?? 16) + fontSizeDelta,
+      fontSize: (EDITOR_OPTIONS.fontSize ?? 14) + fontSizeDelta,
       wordWrap: (internalWordWrap ? 'on' : 'off') satisfies NonNullable<
         EditorProps['options']
       >['wordWrap'],
@@ -2466,7 +2162,7 @@ const Workspace = ({
       const loadingNode = loading ? (
         loading(item)
       ) : (
-        <div className={cn(CENTER, 'text-muted-foreground text-sm')}>
+        <div className={cn(CENTER, 'text-muted-foreground text-xs')}>
           Loading...
         </div>
       );
@@ -2499,7 +2195,7 @@ const Workspace = ({
           params: {
             content: createElement(
               'div',
-              { className: cn(CENTER, 'h-full text-muted-foreground text-sm') },
+              { className: cn(CENTER, 'h-full text-muted-foreground text-xs') },
               'Binary file — cannot display'
             ),
             iconName: item.name,
@@ -2776,189 +2472,62 @@ const Workspace = ({
     return [...top, ...mid, ...(tree ?? []), ...bottom];
   }, [files, tree]);
 
-  const uploadInputRef = useRef<HTMLInputElement>(null);
-
-  const [uploadTarget, setUploadTarget] = useState('');
-
-  const [dragOver, setDragOver] = useState(false);
-
-  const [rootCreating, setRootCreating] = useState<null | {
-    type: 'file' | 'folder';
-  }>(null);
   if (!mounted) return null;
-
-  const handleUploadInput = (fileList: FileList | null) => {
-    if (fileList && fileActions?.onUpload)
-      fileActions.onUpload(uploadTarget, fileList);
-  };
-
-  const handleDrop = (e: React.DragEvent, parentPath: string) => {
-    e.preventDefault();
-    setDragOver(false);
-    if (e.dataTransfer.files.length > 0 && fileActions?.onUpload)
-      fileActions.onUpload(parentPath, e.dataTransfer.files);
-  };
 
   const sidebarContent = mergedTree ? (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between px-3 py-1.5">
-        <span className="text-muted-foreground text-sm text-xs uppercase">
+        <span className="text-muted-foreground text-xs uppercase">
           explorer
         </span>
-        <div className="flex items-center gap-0.5">
-          {fileActions?.onCreateFile ? (
-            <button
-              className="p-0.5 text-muted-foreground transition-colors hover:text-foreground"
-              onClick={() => setRootCreating({ type: 'file' })}
-              title="New File"
-              type="button"
-            >
-              <FilePlus className="size-4 stroke-1" />
-            </button>
-          ) : null}
-          {fileActions?.onCreateFolder ? (
-            <button
-              className="p-0.5 text-muted-foreground transition-colors hover:text-foreground"
-              onClick={() => setRootCreating({ type: 'folder' })}
-              title="New Folder"
-              type="button"
-            >
-              <FolderPlus className="size-4 stroke-1" />
-            </button>
-          ) : null}
-          {fileActions?.onUpload ? (
-            <button
-              className="p-0.5 text-muted-foreground transition-colors hover:text-foreground"
-              onClick={() => {
-                setUploadTarget('');
-                uploadInputRef.current?.click();
-              }}
-              title="Upload"
-              type="button"
-            >
-              <Download className="size-4 rotate-180 stroke-1" />
-            </button>
-          ) : null}
-          <button
-            className="p-0.5 text-muted-foreground transition-colors hover:text-foreground"
-            onClick={() => {
-              log(treeCollapsed ? 'Tree expanded all' : 'Tree collapsed all');
-              setTreeCollapsed((c) => !c);
-              setTreeKey((k) => k + 1);
-            }}
-            title={treeCollapsed ? 'Expand All' : 'Collapse All'}
-            type="button"
-          >
-            {treeCollapsed ? (
-              <ChevronRight className="size-4 stroke-1" />
-            ) : (
-              <ChevronsDownUp className="size-4 stroke-1" />
-            )}
-          </button>
-        </div>
-      </div>
-      <input
-        className="hidden"
-        multiple
-        onChange={(e) => {
-          handleUploadInput(e.target.files);
-          e.target.value = '';
-        }}
-        ref={uploadInputRef}
-        type="file"
-      />
-      <ContextMenu>
-        <ContextMenuTrigger
-          className={cn(
-            'block min-h-0 flex-1 overflow-auto',
-            dragOver && 'ring-2 ring-primary/30 ring-inset'
-          )}
-          onDragLeave={() => setDragOver(false)}
-          onDragOver={(e) => {
-            e.preventDefault();
-            setDragOver(true);
+        <button
+          className="p-0.5 text-muted-foreground transition-colors hover:text-foreground"
+          onClick={() => {
+            log(treeCollapsed ? 'Tree expanded all' : 'Tree collapsed all');
+            setTreeCollapsed((c) => !c);
+            setTreeKey((k) => k + 1);
           }}
-          onDrop={(e) => handleDrop(e, '')}
+          title={treeCollapsed ? 'Expand All' : 'Collapse All'}
+          type="button"
         >
-          {rootCreating ? (
-            <InlineInput
-              depth={0}
-              indent={16}
-              onCancel={() => setRootCreating(null)}
-              onSubmit={(n) => {
-                const cb =
-                  rootCreating.type === 'file'
-                    ? fileActions?.onCreateFile
-                    : fileActions?.onCreateFolder;
-                cb?.('', n);
-                setRootCreating(null);
-              }}
-              type={rootCreating.type}
-            />
-          ) : null}
-          <FileTree
-            data={mergedTree}
-            expandDepth={treeCollapsed ? 0 : expandDepth}
-            expandExclude={expandExclude}
-            fileActions={fileActions}
-            key={treeKey}
-            log={log}
-            onDoubleClick={(item) => {
-              if (item.children) return;
-              if (!item.id.startsWith(VIRTUAL_PREFIX)) {
-                pinFile(item);
-                log(`Double-click pinned: ${item.name}`);
-              }
-            }}
-            onSelectChange={(item) => {
-              if (!item) return;
-              if (item.children) {
-                log(`Folder: ${item.name}`);
-                return;
-              }
-              if (item.id.startsWith(VIRTUAL_PREFIX)) {
-                const vf = files?.find(
-                  (f) => virtualFileId(f.name) === item.id
-                );
-                if (vf) openVirtualFile(vf);
-              } else openFile(item);
-            }}
-            selectedId={activeFileId}
-            triggerUpload={
-              fileActions?.onUpload
-                ? (parentPath: string) => {
-                    setUploadTarget(parentPath);
-                    uploadInputRef.current?.click();
-                  }
-                : undefined
+          {treeCollapsed ? (
+            <ChevronRight className="size-4 stroke-1" />
+          ) : (
+            <ChevronsDownUp className="size-4 stroke-1" />
+          )}
+        </button>
+      </div>
+      <div className="min-h-0 flex-1 overflow-auto">
+        <FileTree
+          data={mergedTree}
+          expandDepth={treeCollapsed ? 0 : expandDepth}
+          expandExclude={expandExclude}
+          fileActions={fileActions}
+          key={treeKey}
+          log={log}
+          onDoubleClick={(item) => {
+            if (item.children) return;
+            if (!item.id.startsWith(VIRTUAL_PREFIX)) {
+              pinFile(item);
+              log(`Double-click pinned: ${item.name}`);
             }
-          />
-        </ContextMenuTrigger>
-        <ContextMenuContent>
-          {fileActions?.onCreateFile ? (
-            <ContextMenuItem onClick={() => setRootCreating({ type: 'file' })}>
-              <FilePlus /> New File
-            </ContextMenuItem>
-          ) : null}
-          {fileActions?.onCreateFolder ? (
-            <ContextMenuItem
-              onClick={() => setRootCreating({ type: 'folder' })}
-            >
-              <FolderPlus /> New Folder
-            </ContextMenuItem>
-          ) : null}
-          {fileActions?.onUpload ? (
-            <ContextMenuItem
-              onClick={() => {
-                setUploadTarget('');
-                uploadInputRef.current?.click();
-              }}
-            >
-              <Download className="rotate-180" /> Upload
-            </ContextMenuItem>
-          ) : null}
-        </ContextMenuContent>
-      </ContextMenu>
+          }}
+          onSelectChange={(item) => {
+            if (!item) return;
+            if (item.children) {
+              log(`Folder: ${item.name}`);
+              return;
+            }
+            if (item.id.startsWith(VIRTUAL_PREFIX)) {
+              const vf = files?.find(
+                (f) => virtualFileId(f.name) === item.id
+              );
+              if (vf) openVirtualFile(vf);
+            } else openFile(item);
+          }}
+          selectedId={activeFileId}
+        />
+      </div>
     </div>
   ) : (
     sidebarChildren

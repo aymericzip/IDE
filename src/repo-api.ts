@@ -42,6 +42,21 @@ function u8ToBase64(bytes: Uint8Array): string {
   return btoa(binary);
 }
 
+const branchCache = new Map<string, string>();
+
+const getDefaultBranch = async (repo: string): Promise<string> => {
+  const cached = branchCache.get(repo);
+  if (cached) return cached;
+  const r = await fetch(`https://api.github.com/repos/${repo}`);
+  if (r.ok) {
+    const d = (await r.json()) as { default_branch?: string };
+    const branch = d.default_branch ?? 'main';
+    branchCache.set(repo, branch);
+    return branch;
+  }
+  return 'main';
+};
+
 const jsdelivrToTree = (files: JsdelivrFile[], prefix = ''): TreeDataItem[] => {
   const items: TreeDataItem[] = [];
   const sorted = [...files].toSorted((a, b) => {
@@ -81,15 +96,16 @@ const treeFromGitHubFlat = (
 };
 
 export const fetchTree = async (repo: string): Promise<TreeDataItem[]> => {
+  const branch = await getDefaultBranch(repo);
   const r = await fetch(
-    `https://data.jsdelivr.com/v1/packages/gh/${repo}@main`
+    `https://data.jsdelivr.com/v1/packages/gh/${repo}@${branch}`
   );
   if (r.ok) {
     const d = (await r.json()) as { files?: JsdelivrFile[] };
     if (d.files && d.files.length) return jsdelivrToTree(d.files);
   }
   const gh = await fetch(
-    `https://api.github.com/repos/${repo}/git/trees/main?recursive=1`
+    `https://api.github.com/repos/${repo}/git/trees/${branch}?recursive=1`
   );
   if (gh.ok) {
     const d = (await gh.json()) as { tree?: { path: string; type: string }[] };
@@ -102,18 +118,16 @@ export const fetchFile = async (
   repo: string,
   path: string
 ): Promise<null | string> => {
+  const branch = await getDefaultBranch(repo);
   const ext = path.split('.').at(-1)?.toLowerCase() ?? '';
+  const url = `https://raw.githubusercontent.com/${repo}/${branch}/${path}`;
   if (IMAGE_EXTS.has(ext)) {
-    const res = await fetch(
-      `https://raw.githubusercontent.com/${repo}/main/${path}`
-    );
+    const res = await fetch(url);
     if (!res.ok) return null;
     const buf = new Uint8Array(await res.arrayBuffer());
     return `data:${MIME[ext] ?? 'application/octet-stream'};base64,${u8ToBase64(buf)}`;
   }
-  const res = await fetch(
-    `https://raw.githubusercontent.com/${repo}/main/${path}`
-  );
+  const res = await fetch(url);
   return res.ok ? res.text() : null;
 };
 
@@ -121,8 +135,9 @@ export const downloadFile = async (
   repo: string,
   path: string
 ): Promise<null | { base64: string; name: string }> => {
+  const branch = await getDefaultBranch(repo);
   const res = await fetch(
-    `https://raw.githubusercontent.com/${repo}/main/${path}`
+    `https://raw.githubusercontent.com/${repo}/${branch}/${path}`
   );
   if (!res.ok) return null;
   const buf = new Uint8Array(await res.arrayBuffer());
@@ -136,28 +151,29 @@ export const downloadFolder = async (
   repo: string,
   path: string
 ): Promise<null | { base64: string; name: string }> => {
+  const branch = await getDefaultBranch(repo);
   const r = await fetch(
-    `https://api.github.com/repos/${repo}/git/trees/main?recursive=1`
+    `https://api.github.com/repos/${repo}/git/trees/${branch}?recursive=1`
   );
   if (!r.ok) return null;
   const d = (await r.json()) as { tree?: { path: string; type: string }[] };
   if (!d.tree) return null;
   const pre = path.endsWith('/') ? path : `${path}/`;
   const blobs = d.tree.filter(
-    (t) => t.type === 'blob' && t.path.startsWith(pre) && t.path.length > pre.length
+    (t) =>
+      t.type === 'blob' &&
+      t.path.startsWith(pre) &&
+      t.path.length > pre.length
   );
   if (blobs.length === 0) return null;
   const entries: { input: Uint8Array; name: string }[] = [];
   for (const t of blobs) {
     const raw = await fetch(
-      `https://raw.githubusercontent.com/${repo}/main/${t.path}`
+      `https://raw.githubusercontent.com/${repo}/${branch}/${t.path}`
     );
     if (!raw.ok) continue;
     const buf = new Uint8Array(await raw.arrayBuffer());
-    entries.push({
-      input: buf,
-      name: t.path.slice(pre.length),
-    });
+    entries.push({ input: buf, name: t.path.slice(pre.length) });
   }
   if (entries.length === 0) return null;
   const z = await downloadZip(entries);

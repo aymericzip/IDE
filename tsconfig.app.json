@@ -5,8 +5,7 @@
     "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
-      "@a/ui": ["./src/a-ui/index.ts"],
-      "@a/ui/*": ["./src/a-ui/*"],
+      "@/*": ["./src/*"],
       "idecn": ["./src/components/IDE.tsx"]
     },
     "lib": ["ES2023", "DOM"],

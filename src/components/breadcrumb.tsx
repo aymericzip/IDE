@@ -1,4 +1,4 @@
-import { cn } from '@a/ui/lib/utils';
+import { cn } from './lib/utils';
 import { mergeProps } from '@base-ui/react/merge-props';
 import { useRender } from '@base-ui/react/use-render';
 import { ChevronRightIcon, MoreHorizontalIcon } from 'lucide-react';

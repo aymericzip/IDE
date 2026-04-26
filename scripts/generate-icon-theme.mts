@@ -50,7 +50,7 @@ const main = () => {
     }
   }
 
-  const outDir = join(fileURLToPath(new URL('..', import.meta.url)), 'src', '_generated');
+  const outDir = join(fileURLToPath(new URL('..', import.meta.url)), 'src', 'components', '_generated');
   mkdirSync(outDir, { recursive: true });
   const payload = {
     manifest: {
