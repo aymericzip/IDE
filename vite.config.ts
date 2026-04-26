@@ -18,4 +18,7 @@ export default defineConfig({
   optimizeDeps: {
     include: ['@monaco-editor/react', 'jotai', 'shiki', 'dockview-react'],
   },
+  preview: {
+    allowedHosts: true,
+  },
 });
