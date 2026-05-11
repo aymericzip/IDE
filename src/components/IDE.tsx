@@ -122,7 +122,6 @@ export const Workspace = ({
   theme?: string | { dark: string; light: string };
   tree?: TreeDataItem[];
 }) => {
-  const [mounted, setMounted] = useState(false);
   const [activeFileId, setActiveFileId] = useState<null | string>(null);
   const [treeCollapsed, setTreeCollapsed] = useState(false);
   const [treeKey, setTreeKey] = useState(0);
@@ -215,7 +214,6 @@ export const Workspace = ({
   }, [mergedEditorOptions]);
 
   useEffect(() => {
-    setMounted(true);
     const observer = new MutationObserver(() => {
       log(
         `Theme: ${document.documentElement.getAttribute("data-theme") ?? "unknown"}`,
@@ -823,8 +821,6 @@ export const Workspace = ({
     });
     return items;
   }, [children]);
-
-  if (!mounted) return null;
 
   const sidebarContent = mergedTree ? (
     <div className="flex h-full flex-col">

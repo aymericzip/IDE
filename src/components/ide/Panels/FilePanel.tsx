@@ -33,7 +33,7 @@ export const FilePanel = ({
   const [editorOpts, setEditorOpts] = useState(params.editorOptions);
   const [ready, setReady] = useState(!shikiSetup);
   const { resolvedTheme } = useTheme();
-  const dark = resolvedTheme === "dark";
+  const dark = resolvedTheme !== "light";
 
   useEffect(() => {
     if (shikiSetup)
