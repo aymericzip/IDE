@@ -218,7 +218,7 @@ export const Workspace = ({
     setMounted(true);
     const observer = new MutationObserver(() => {
       log(
-        `Theme: ${document.documentElement.classList.contains("dark") ? "dark" : "light"}`,
+        `Theme: ${document.documentElement.getAttribute("data-theme") ?? "unknown"}`,
       );
     });
     observer.observe(document.documentElement, {

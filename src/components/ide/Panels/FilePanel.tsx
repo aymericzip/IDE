@@ -1,6 +1,7 @@
 import { Editor } from "@monaco-editor/react";
 import type { IDockviewPanelProps } from "dockview-react";
 import { useSetAtom } from "jotai";
+import { useTheme } from "next-themes";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import {
   Breadcrumb,
@@ -31,22 +32,12 @@ export const FilePanel = ({
   const [loadingState, setLoadingState] = useState(params.loading);
   const [editorOpts, setEditorOpts] = useState(params.editorOptions);
   const [ready, setReady] = useState(!shikiSetup);
-  const [dark, setDark] = useState(() =>
-    document.documentElement.getAttribute("data-theme") === "dark",
-  );
+  const { resolvedTheme } = useTheme();
+  const dark = resolvedTheme === "dark";
 
   useEffect(() => {
     if (shikiSetup)
       shikiSetup.then(() => setReady(true)).catch(() => setReady(true));
-
-    const observer = new MutationObserver(() =>
-      setDark(document.documentElement.getAttribute("data-theme") === "dark"),
-    );
-    observer.observe(document.documentElement, {
-      attributeFilter: ["data-theme"],
-      attributes: true,
-    });
-    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
