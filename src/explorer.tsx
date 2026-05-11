@@ -1,46 +1,28 @@
-import { SiGithub } from '@icons-pack/react-simple-icons';
-import type {
-  TreeDataItem,
-  WorkspaceProps,
-  WorkspaceRef,
-} from 'idecn';
-import {
-  AlertTriangle,
-  Moon,
-  PanelLeft,
-  Search,
-  Sun,
-  X,
-} from 'lucide-react';
-import { useTheme } from 'next-themes';
-import {
-  useEffect,
-  useRef,
-  useState,
-  type ComponentType,
-} from 'react';
-import { toast } from 'sonner';
-import {
-  downloadFile,
-  downloadFolder,
-  fetchFile,
-  fetchTree,
-} from './repo-api';
-import { EXPAND_EXCLUDE } from './constants';
-import { repoFromInput } from './url-utils';
+import { SiGithub } from "@icons-pack/react-simple-icons";
+import type { TreeDataItem, WorkspaceProps, WorkspaceRef } from "idecn";
+import { AlertTriangle, PanelLeft, X } from "lucide-react";
+import { useTheme } from "next-themes";
+import { type ComponentType, useEffect, useRef, useState } from "react";
+import { SwitchThemeSwitcher } from "./components/switchTheme-switcher";
+import { toast } from "sonner";
+import { Link } from "./components/link";
+import { EXPAND_EXCLUDE } from "./constants";
+import { downloadFile, downloadFolder, fetchFile, fetchTree } from "./repo-api";
+import { repoFromInput } from "./url-utils";
+import { Button } from "./components/button";
 
 const triggerDownload = (base64: string, filename: string) => {
   const bytes = Uint8Array.from(atob(base64), (c) => c.codePointAt(0) ?? 0);
   const blob = new Blob([bytes]);
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
 };
 
-const Explorer = ({
+export const Explorer = ({
   initialRepo,
   initialTree,
   initialFiles,
@@ -56,13 +38,12 @@ const Explorer = ({
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme, setTheme } = useTheme();
   const ref = useRef<WorkspaceRef>(null);
-  const [Workspace, setWorkspace] = useState<ComponentType<
-    WorkspaceProps
-  > | null>(null);
+  const [Workspace, setWorkspace] =
+    useState<ComponentType<WorkspaceProps> | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    void import('idecn').then((mod) => {
+    void import("idecn").then((mod) => {
       if (!cancelled) setWorkspace(() => mod.Workspace);
     });
     return () => {
@@ -88,7 +69,7 @@ const Explorer = ({
     void (async () => {
       const t = await fetchTree(repo);
       setTree(t);
-      if (t.length === 0) setError('Failed to load repo tree');
+      if (t.length === 0) setError("Failed to load repo tree");
     })();
   }, [initialRepo, initialTree, repo]);
 
@@ -98,56 +79,52 @@ const Explorer = ({
     setInput(parsed);
     setRepo(parsed);
     const params = new URLSearchParams(window.location.search);
-    params.delete('repo');
-    params.delete('url');
+    params.delete("repo");
+    params.delete("url");
     const q = params.toString();
     const path = `/${parsed}`;
-    window.history.replaceState(null, '', q ? `${path}?${q}` : path);
+    window.history.replaceState(null, "", q ? `${path}?${q}` : path);
   };
 
   return (
     <div className="flex h-screen flex-col">
-      <div className="flex items-center *:transition-all *:duration-300">
-        <PanelLeft
-          className="-mr-2 size-8 shrink-0 cursor-pointer p-2 stroke-1 hover:bg-accent hover:p-1.5"
+      <div className="flex items-center gap-2 py-1 bg-muted/70 border-b *:transition-all *:duration-300">
+        <Button
+          Icon={PanelLeft}
+          label="Toggle sidebar"
+          size="icon-md"
+          variant="hoverable"
+          color="text"
+          className="-mr-2 ml-1 size-8 shrink-0 cursor-pointer stroke-1 p-2 hover:bg-accent hover:p-1.5"
           onClick={() => ref.current?.toggleSidebar()}
         />
-        <Search
-          className="size-8 shrink-0 cursor-pointer p-2 stroke-1 hover:bg-accent hover:p-1.5"
-          onClick={submit}
-        />
+
         <input
           autoComplete="off"
-          className="min-w-0 flex-1 bg-transparent text-xs outline-none"
+          className="ml-4 min-w-0 flex-1 bg-transparent text-xs outline-none"
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') submit();
+            if (e.key === "Enter") submit();
           }}
           placeholder="owner/repo or GitHub URL"
           type="search"
           value={input}
         />
-        <a
-          className="-mr-2 flex size-8 shrink-0 cursor-pointer items-center justify-center p-2 stroke-1 hover:bg-accent hover:p-1.5"
+        <Link
+          label="GitHub"
           href={`https://github.com/${repo}`}
-          rel="noopener noreferrer"
           target="_blank"
+          color="text"
+          variant="button-outlined"
+          roundedSize="full"
+          rel="noopener noreferrer nofollow"
+          className="flex px-0 aspect-square cursor-pointer items-center justify-center rounded-full border-[1.3px]"
         >
-          <SiGithub className="mb-0.5 size-full" />
-        </a>
-        <button
-          className="size-8 shrink-0 cursor-pointer p-1.5 stroke-1 hover:bg-accent hover:p-1"
-          onClick={() => {
-            setTheme(mounted && resolvedTheme === 'dark' ? 'light' : 'dark');
-          }}
-          type="button"
-        >
-          {mounted && resolvedTheme === 'dark' ? (
-            <Sun className="size-full stroke-1" />
-          ) : (
-            <Moon className="size-full stroke-1" />
-          )}
-        </button>
+          <SiGithub size={18} />
+        </Link>
+        <div className="mr-2">
+          <SwitchThemeSwitcher />
+        </div>
       </div>
       {error ? (
         <div className="flex items-center gap-2 border-border border-b bg-amber-500/10 px-3 py-2 text-amber-500 text-xs">
@@ -195,16 +172,14 @@ const Explorer = ({
       ) : (
         <div
           aria-busy="true"
-          className="bg-muted/30 flex flex-1 animate-pulse flex-col gap-2 p-3"
+          className="flex flex-1 animate-pulse flex-col gap-2 bg-muted/30 p-3"
           role="status"
         >
           <span className="sr-only">Loading editor</span>
-          <div className="bg-muted h-8 max-w-md rounded-md" />
-          <div className="bg-muted flex min-h-0 flex-1 rounded-md" />
+          <div className="h-8 max-w-md rounded-md bg-muted" />
+          <div className="flex min-h-0 flex-1 rounded-md bg-muted" />
         </div>
       )}
     </div>
   );
 };
-
-export default Explorer;

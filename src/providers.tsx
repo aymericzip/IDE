@@ -1,9 +1,9 @@
 import { ThemeProvider } from 'next-themes';
 import type { ReactNode } from 'react';
 
-const Providers = ({ children }: { children: ReactNode }) => (
+export const Providers = ({ children }: { children: ReactNode }) => (
   <ThemeProvider
-    attribute="class"
+    attribute="data-theme"
     defaultTheme="dark"
     disableTransitionOnChange
     enableSystem={false}
@@ -11,5 +11,3 @@ const Providers = ({ children }: { children: ReactNode }) => (
     {children}
   </ThemeProvider>
 );
-
-export { Providers };
