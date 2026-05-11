@@ -31,24 +31,33 @@ export const useTreeItem = ({
   const isSelected =
     selectedIds.size > 0 ? selectedIds.has(itemId) : selectedId === itemId;
   const isMultiSelected = selectedIds.has(itemId);
-  const pl = `${String(depth * indent + 8)}px`;
+  const paddingLeft = `${String(depth * indent + 8)}px`;
 
-  const select = (e?: { metaKey?: boolean; shiftKey?: boolean }) => {
-    if (e?.metaKey) {
-      const next = new Set(selectedIds);
-      if (next.size === 0 && selectedId) next.add(selectedId);
-      if (next.has(itemId)) next.delete(itemId);
-      else next.add(itemId);
-      setSelectedIds(next);
-    } else if (e?.shiftKey && selectedId && navRef.current) {
-      const els =
-        navRef.current.querySelectorAll<HTMLElement>('[data-item-id]');
-      const ids = [...els].map((el) => el.dataset.itemId ?? '');
-      const fromIdx = ids.indexOf(selectedId);
-      const toIdx = ids.indexOf(itemId);
-      if (fromIdx !== -1 && toIdx !== -1) {
-        const start = Math.min(fromIdx, toIdx);
-        const end = Math.max(fromIdx, toIdx);
+  const select = (event?: { metaKey?: boolean; shiftKey?: boolean }) => {
+    if (event?.metaKey) {
+      const nextSelectedIds = new Set(selectedIds);
+
+      if (nextSelectedIds.size === 0 && selectedId) {
+        nextSelectedIds.add(selectedId);
+      }
+
+      if (nextSelectedIds.has(itemId)) {
+        nextSelectedIds.delete(itemId);
+      } else {
+        nextSelectedIds.add(itemId);
+      }
+
+      setSelectedIds(nextSelectedIds);
+    } else if (event?.shiftKey && selectedId && navRef.current) {
+      const elements =
+        navRef.current.querySelectorAll<HTMLElement>("[data-item-id]");
+      const ids = [...elements].map((element) => element.dataset.itemId ?? "");
+      const fromIndex = ids.indexOf(selectedId);
+      const toIndex = ids.indexOf(itemId);
+
+      if (fromIndex !== -1 && toIndex !== -1) {
+        const start = Math.min(fromIndex, toIndex);
+        const end = Math.max(fromIndex, toIndex);
         setSelectedIds(new Set(ids.slice(start, end + 1)));
       }
     } else {
@@ -69,7 +78,7 @@ export const useTreeItem = ({
     isSelected,
     itemId,
     log: treeLog,
-    pl,
+    paddingLeft,
     select,
     selectedIds,
   };

@@ -10,8 +10,26 @@ A high-performance web-based IDE designed to render and browse public repository
 - **Syntax Highlighting**: Beautiful code rendering powered by [Shiki](https://shiki.style/).
 - **Flexible Layout**: Multi-tab interface and resizable panels powered by [Dockview](https://dockview.dev/).
 - **File Exploration**: Browse repository structures with familiar Material Icon Theme.
-- **Public Repo Rendering**: Instantly load and view any public repository.
+- **Public & Private Repos**: Instantly load and view any public repository. Support for private repositories via GitHub tokens.
 - **Modern Stack**: Built with React 19, Vite, Tailwind CSS 4, and Jotai.
+
+## GitHub Authentication
+
+To access private repositories, the IDE requires a GitHub Personal Access Token (PAT).
+
+### How to provide the token
+
+- **Automatic Prompt**: If you attempt to access a private repository without a token, the IDE will prompt you to enter one.
+- **Persistence**: Once entered, the token is securely stored in your browser's `localStorage` for future sessions.
+- **Manual Setting**: You can programmatically set the token by sending a `postMessage` to the IDE iframe:
+  ```javascript
+  window.postMessage(
+    { type: "INTLAYER_SET_TOKEN", token: "your_github_token" },
+    "*",
+  );
+  ```
+
+The token handling logic is implemented in `src/repo-api.ts`.
 
 ## Origin
 

@@ -41,7 +41,7 @@ export const initMonaco = async (): Promise<Monaco> => loader.init();
 
 export const defineThemes = (
   highlighter: Awaited<ReturnType<typeof createHighlighter>>,
-  m: { editor: { defineTheme: (name: string, data: unknown) => void } },
+  monaco: { editor: { defineTheme: (name: string, data: unknown) => void } },
 ) => {
   for (const name of highlighter.getLoadedThemes()) {
     const resolved = highlighter.getTheme(name);
@@ -50,6 +50,7 @@ export const defineThemes = (
     };
 
     const isDark = resolved.type === "dark";
+
     if (isDark) {
       converted.colors["editor.background"] = "#1e1e1e";
       converted.colors["editor.lineHighlightBackground"] = "#2c2c2c";
@@ -62,6 +63,7 @@ export const defineThemes = (
       converted.colors["editor.background"] = "#ffffff";
       converted.colors["minimap.background"] = "#ffffff";
     }
+
     converted.colors["scrollbar.shadow"] = "#00000000";
     converted.colors["scrollbarSlider.background"] = isDark
       ? "#ffffff15"
@@ -72,7 +74,8 @@ export const defineThemes = (
     converted.colors["scrollbarSlider.activeBackground"] = isDark
       ? "#ffffff50"
       : "#00000050";
-    m.editor.defineTheme(name, converted);
+
+    monaco.editor.defineTheme(name, converted);
   }
 };
 
@@ -85,6 +88,12 @@ export const shikiSetup =
         });
 
         const monaco = await initMonaco();
+        const restoreTheme = () => {
+          const dark =
+            document.documentElement.getAttribute("data-theme") !== "light";
+          (monaco as any).editor.setTheme(dark ? "dark-plus" : "light-plus");
+        };
+
         shikiToMonaco(highlighter, monaco);
         defineThemes(
           highlighter,
@@ -92,13 +101,15 @@ export const shikiSetup =
             editor: { defineTheme: (name: string, data: unknown) => void };
           },
         );
+        restoreTheme();
 
-        const remaining = ALL_LANGS.filter(
-          (l) => !CORE_LANGS.includes(l as (typeof CORE_LANGS)[number]),
+        const remainingLanguages = ALL_LANGS.filter(
+          (lang) => !CORE_LANGS.includes(lang as (typeof CORE_LANGS)[number]),
         );
-        if (remaining.length > 0)
+
+        if (remainingLanguages.length > 0) {
           highlighter
-            .loadLanguage(...remaining)
+            .loadLanguage(...remainingLanguages)
             .then(() => {
               shikiToMonaco(highlighter, monaco);
               defineThemes(
@@ -109,8 +120,10 @@ export const shikiSetup =
                   };
                 },
               );
+              restoreTheme();
             })
             .catch(() => undefined);
+        }
       })()
     : null;
 
@@ -118,22 +131,33 @@ export const getSvg = (name: string): string =>
   iconSvgs[name] ?? (iconManifest ? (iconSvgs[iconManifest.file] ?? "") : "");
 
 export const resolveFileIcon = (filename: string): string => {
-  if (!iconManifest) return "";
+  if (!iconManifest) {
+    return "";
+  }
 
-  const lower = filename.toLowerCase();
-  if (iconManifest.fileNames[lower]) return iconManifest.fileNames[lower];
+  const lowerFilename = filename.toLowerCase();
+  if (iconManifest.fileNames[lowerFilename]) {
+    return iconManifest.fileNames[lowerFilename];
+  }
 
-  const ext = lower.includes(".") ? lower.slice(lower.indexOf(".") + 1) : "";
-  if (ext && iconManifest.fileExtensions[ext])
-    return iconManifest.fileExtensions[ext];
+  const extensionWithDot = lowerFilename.includes(".")
+    ? lowerFilename.slice(lowerFilename.indexOf(".") + 1)
+    : "";
 
-  const lastExt = lower.split(".").at(-1) ?? "";
-  if (lastExt && iconManifest.fileExtensions[lastExt])
-    return iconManifest.fileExtensions[lastExt];
+  if (extensionWithDot && iconManifest.fileExtensions[extensionWithDot]) {
+    return iconManifest.fileExtensions[extensionWithDot];
+  }
 
-  const lang = EXT_TO_LANG[lastExt];
-  if (lang && iconManifest.languageIds[lang])
-    return iconManifest.languageIds[lang];
+  const lastExtension = lowerFilename.split(".").at(-1) ?? "";
+  if (lastExtension && iconManifest.fileExtensions[lastExtension]) {
+    return iconManifest.fileExtensions[lastExtension];
+  }
+
+  const languageId = EXT_TO_LANG[lastExtension];
+  if (languageId && iconManifest.languageIds[languageId]) {
+    return iconManifest.languageIds[languageId];
+  }
+
   return iconManifest.file;
 };
 
@@ -141,14 +165,22 @@ export const resolveFolderIcon = (
   folderName: string,
   open: boolean,
 ): string => {
-  if (!iconManifest) return "";
+  if (!iconManifest) {
+    return "";
+  }
 
-  const lower = folderName.toLowerCase();
-  if (open)
+  const lowerFolderName = folderName.toLowerCase();
+
+  if (open) {
     return (
-      iconManifest.folderNamesExpanded[lower] ?? iconManifest.folderExpanded
+      iconManifest.folderNamesExpanded[lowerFolderName] ??
+      iconManifest.folderExpanded
     );
-  return iconManifest.folderNames[lower] ?? iconManifest.folder;
+  }
+
+  return (
+    iconManifest.folderNames[lowerFolderName] ?? iconManifest.folder
+  );
 };
 
 export const getIconSvg = (filename: string): string =>
@@ -174,24 +206,33 @@ export const compactFolder = (
 ): { children: TreeDataItem[]; name: string } => {
   let current = item;
   let merged = item.name;
+
   for (;;) {
-    const only = current.children?.[0];
-    if (!only?.children || current.children?.length !== 1) break;
-    current = only;
+    const firstChild = current.children?.[0];
+
+    if (!firstChild?.children || current.children?.length !== 1) {
+      break;
+    }
+
+    current = firstChild;
     merged += `/${current.name}`;
   }
+
   return { children: current.children ?? [], name: merged };
 };
 
 export const extractTabs = (children: ReactNode): TabProps[] => {
   const tabs: TabProps[] = [];
+
   Children.forEach(children, (child) => {
     if (
       isValidElement(child) &&
       (child.type as { _type?: symbol })._type === TAB_TYPE
-    )
+    ) {
       tabs.push(child.props as TabProps);
+    }
   });
+
   return tabs;
 };
 
@@ -208,15 +249,19 @@ export const useAltKeys = (
   useEffect(() => {
     if (!enabled) return;
 
-    const handler = (e: KeyboardEvent) => {
-      if (!e.altKey || e.metaKey || e.ctrlKey) return;
+    const handler = (event: KeyboardEvent) => {
+      if (!event.altKey || event.metaKey || event.ctrlKey) {
+        return;
+      }
 
-      const fn = ref.current[e.code];
+      const fn = ref.current[event.code];
+
       if (fn) {
-        e.preventDefault();
+        event.preventDefault();
         fn();
       }
     };
+
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   }, [enabled]);
@@ -227,8 +272,13 @@ export const deduplicateTitle = (
   path: string,
   existingPanels: { id: string; title: string | undefined }[],
 ): string => {
-  const hasDupe = existingPanels.some((p) => p.title === name && p.id !== path);
-  if (!hasDupe) return name;
+  const hasDuplicate = existingPanels.some(
+    (panel) => panel.title === name && panel.id !== path,
+  );
+
+  if (!hasDuplicate) {
+    return name;
+  }
 
   const parts = path.split("/");
   return parts.length >= 2 ? `${parts.at(-2)}/${name}` : name;
@@ -238,10 +288,17 @@ export const virtualFileId = (name: string) => `${VIRTUAL_PREFIX}${name}`;
 
 export const flattenTree = (items: TreeDataItem[]): TreeDataItem[] => {
   const result: TreeDataItem[] = [];
-  for (const item of items)
-    if (item.children)
-      for (const child of flattenTree(item.children)) result.push(child);
-    else result.push(item);
+
+  for (const item of items) {
+    if (item.children) {
+      for (const child of flattenTree(item.children)) {
+        result.push(child);
+      }
+    } else {
+      result.push(item);
+    }
+  }
+
   return result;
 };
 
@@ -251,20 +308,34 @@ export const findSiblings = (
   depth: number,
 ): TreeDataItem[] => {
   let nodes = tree;
+
   for (let i = 0; i < depth; i += 1) {
-    const match = nodes.find((n) => n.name === pathParts[i]);
-    if (!match?.children) return [];
+    const match = nodes.find((node) => node.name === pathParts[i]);
+
+    if (!match?.children) {
+      return [];
+    }
+
     nodes = match.children;
   }
+
   return nodes;
 };
 
 export const resolveLanguageIcon = (language: string): string => {
-  if (!iconManifest) return "";
-  if (iconManifest.languageIds[language])
+  if (!iconManifest) {
+    return "";
+  }
+
+  if (iconManifest.languageIds[language]) {
     return iconManifest.languageIds[language];
-  for (const [ext, lang] of Object.entries(EXT_TO_LANG))
-    if (lang === language && iconManifest.fileExtensions[ext])
-      return iconManifest.fileExtensions[ext];
+  }
+
+  for (const [extension, languageId] of Object.entries(EXT_TO_LANG)) {
+    if (languageId === language && iconManifest.fileExtensions[extension]) {
+      return iconManifest.fileExtensions[extension];
+    }
+  }
+
   return iconManifest.file;
 };

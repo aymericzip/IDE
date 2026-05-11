@@ -4,6 +4,20 @@ import type { TreeDataItem } from "idecn";
 
 export type { TreeDataItem } from "idecn";
 
+export let githubToken: string | null =
+  typeof window !== "undefined" ? localStorage.getItem("GH_TOKEN") : null;
+
+export const setGithubToken = (token: string | null) => {
+  githubToken = token;
+  if (typeof window !== "undefined") {
+    if (token) {
+      localStorage.setItem("GH_TOKEN", token);
+    } else {
+      localStorage.removeItem("GH_TOKEN");
+    }
+  }
+};
+
 export type JsdelivrFile = {
   files?: JsdelivrFile[];
   name: string;
@@ -35,10 +49,13 @@ const MIME: Record<string, string> = {
   webp: "image/webp",
 };
 
-const u8ToBase64 = (bytes: Uint8Array): string => {
+const uint8ArrayToBase64 = (bytes: Uint8Array): string => {
   let binary = "";
-  for (let i = 0; i < bytes.length; i += 1)
+
+  for (let i = 0; i < bytes.length; i += 1) {
     binary += String.fromCharCode(bytes[i]!);
+  }
+
   return btoa(binary);
 };
 
@@ -46,30 +63,61 @@ const branchCache = new Map<string, string>();
 
 const getDefaultBranch = async (repo: string): Promise<string> => {
   const cached = branchCache.get(repo);
-  if (cached) return cached;
-  const r = await fetch(`https://api.github.com/repos/${repo}`);
-  if (r.ok) {
-    const d = (await r.json()) as { default_branch?: string };
-    const branch = d.default_branch ?? "main";
+  if (cached) {
+    return cached;
+  }
+
+  const headers: Record<string, string> = {};
+  if (githubToken) {
+    headers.Authorization = `Bearer ${githubToken}`;
+  }
+
+  const response = await fetch(`https://api.github.com/repos/${repo}`, {
+    headers,
+  });
+  if (response.ok) {
+    const data = (await response.json()) as { default_branch?: string };
+    const branch = data.default_branch ?? "main";
     branchCache.set(repo, branch);
     return branch;
   }
+
+  if (response.status === 404 || response.status === 401) {
+    if (!githubToken && typeof window !== "undefined") {
+      const token = window.prompt(
+        "This repository is private or not found. Please enter a GitHub Personal Access Token (PAT):",
+      );
+      if (token) {
+        setGithubToken(token);
+        window.location.reload();
+      }
+    }
+    throw new Error("PRIVATE_REPO_OR_NOT_FOUND");
+  }
+
   return "main";
 };
 
 const jsdelivrToTree = (files: JsdelivrFile[], prefix = ""): TreeDataItem[] => {
   const items: TreeDataItem[] = [];
   const sorted = [...files].toSorted((a, b) => {
-    if (a.type !== b.type) return a.type === "directory" ? -1 : 1;
+    if (a.type !== b.type) {
+      return a.type === "directory" ? -1 : 1;
+    }
     return a.name.localeCompare(b.name);
   });
-  for (const f of sorted) {
-    const path = prefix ? `${prefix}/${f.name}` : f.name;
-    const item: TreeDataItem = { id: path, name: f.name, path };
-    if (f.type === "directory" && f.files)
-      item.children = jsdelivrToTree(f.files, path);
+
+  for (const file of sorted) {
+    const path = prefix ? `${prefix}/${file.name}` : file.name;
+    const item: TreeDataItem = { id: path, name: file.name, path };
+
+    if (file.type === "directory" && file.files) {
+      item.children = jsdelivrToTree(file.files, path);
+    }
+
     items.push(item);
   }
+
   return items;
 };
 
@@ -77,40 +125,84 @@ const treeFromGitHubFlat = (
   flat: { path: string; type: string }[],
 ): TreeDataItem[] => {
   const items: TreeDataItem[] = [];
-  const dirs = new Map<string, TreeDataItem>();
-  for (const t of flat.toSorted((a, b) => {
-    if (a.type !== b.type) return a.type === "tree" ? -1 : 1;
-    return a.path.localeCompare(b.path);
-  })) {
-    const parts = t.path.split("/");
-    const name = parts.at(-1) ?? t.path;
-    const node: TreeDataItem = { id: t.path, name, path: t.path };
-    if (t.type === "tree") {
-      node.children = [];
-      dirs.set(t.path, node);
+  const directories = new Map<string, TreeDataItem>();
+
+  const sortedFlat = flat.toSorted((a, b) => {
+    if (a.type !== b.type) {
+      return a.type === "tree" ? -1 : 1;
     }
-    if (parts.length === 1) items.push(node);
-    else dirs.get(parts.slice(0, -1).join("/"))?.children?.push(node);
+    return a.path.localeCompare(b.path);
+  });
+
+  for (const item of sortedFlat) {
+    const parts = item.path.split("/");
+    const name = parts.at(-1) ?? item.path;
+    const node: TreeDataItem = { id: item.path, name, path: item.path };
+
+    if (item.type === "tree") {
+      node.children = [];
+      directories.set(item.path, node);
+    }
+
+    if (parts.length === 1) {
+      items.push(node);
+    } else {
+      const parentPath = parts.slice(0, -1).join("/");
+      directories.get(parentPath)?.children?.push(node);
+    }
   }
+
   return items;
 };
 
 export const fetchTree = async (repo: string): Promise<TreeDataItem[]> => {
   const branch = await getDefaultBranch(repo);
-  const r = await fetch(
+  const headers: Record<string, string> = {};
+
+  if (githubToken) {
+    headers.Authorization = `Bearer ${githubToken}`;
+    const githubResponse = await fetch(
+      `https://api.github.com/repos/${repo}/git/trees/${branch}?recursive=1`,
+      { headers },
+    );
+
+    if (githubResponse.ok) {
+      const data = (await githubResponse.json()) as {
+        tree?: { path: string; type: string }[];
+      };
+
+      if (data.tree?.length) {
+        return treeFromGitHubFlat(data.tree);
+      }
+    }
+  }
+
+  const jsdelivrResponse = await fetch(
     `https://data.jsdelivr.com/v1/packages/gh/${repo}@${branch}`,
   );
-  if (r.ok) {
-    const d = (await r.json()) as { files?: JsdelivrFile[] };
-    if (d.files?.length) return jsdelivrToTree(d.files);
+
+  if (jsdelivrResponse.ok) {
+    const data = (await jsdelivrResponse.json()) as { files?: JsdelivrFile[] };
+
+    if (data.files?.length) {
+      return jsdelivrToTree(data.files);
+    }
   }
-  const gh = await fetch(
+
+  const fallbackGithubResponse = await fetch(
     `https://api.github.com/repos/${repo}/git/trees/${branch}?recursive=1`,
   );
-  if (gh.ok) {
-    const d = (await gh.json()) as { tree?: { path: string; type: string }[] };
-    if (d.tree?.length) return treeFromGitHubFlat(d.tree);
+
+  if (fallbackGithubResponse.ok) {
+    const data = (await fallbackGithubResponse.json()) as {
+      tree?: { path: string; type: string }[];
+    };
+
+    if (data.tree?.length) {
+      return treeFromGitHubFlat(data.tree);
+    }
   }
+
   return [];
 };
 
@@ -118,31 +210,73 @@ export const fetchFile = async (
   repo: string,
   path: string,
 ): Promise<null | string> => {
-  const ext = path.split(".").at(-1)?.toLowerCase() ?? "";
-  // JSDelivr automatically resolves the default branch!
-  const url = `https://cdn.jsdelivr.net/gh/${repo}/${path}`;
-  if (IMAGE_EXTS.has(ext)) {
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    const buf = new Uint8Array(await res.arrayBuffer());
-    return `data:${MIME[ext] ?? "application/octet-stream"};base64,${u8ToBase64(buf)}`;
+  const extension = path.split(".").at(-1)?.toLowerCase() ?? "";
+
+  if (githubToken) {
+    const branch = await getDefaultBranch(repo).catch(() => "main");
+    const rawUrl = `https://raw.githubusercontent.com/${repo}/${branch}/${path}`;
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${githubToken}`,
+    };
+
+    const response = await fetch(rawUrl, { headers });
+
+    if (response.ok) {
+      if (IMAGE_EXTS.has(extension)) {
+        const buffer = new Uint8Array(await response.arrayBuffer());
+        const base64 = uint8ArrayToBase64(buffer);
+        const mimeType = MIME[extension] ?? "application/octet-stream";
+        return `data:${mimeType};base64,${base64}`;
+      }
+
+      return response.text();
+    }
   }
-  const res = await fetch(url);
-  return res.ok ? res.text() : null;
+
+  // JSDelivr automatically resolves the default branch!
+  const jsdelivrUrl = `https://cdn.jsdelivr.net/gh/${repo}/${path}`;
+
+  if (IMAGE_EXTS.has(extension)) {
+    const response = await fetch(jsdelivrUrl);
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const buffer = new Uint8Array(await response.arrayBuffer());
+    const base64 = uint8ArrayToBase64(buffer);
+    const mimeType = MIME[extension] ?? "application/octet-stream";
+    return `data:${mimeType};base64,${base64}`;
+  }
+
+  const response = await fetch(jsdelivrUrl);
+  return response.ok ? response.text() : null;
 };
 
 export const downloadFile = async (
   repo: string,
   path: string,
 ): Promise<null | { base64: string; name: string }> => {
-  const branch = await getDefaultBranch(repo);
-  const res = await fetch(
+  const branch = await getDefaultBranch(repo).catch(() => "main");
+  const headers: Record<string, string> = {};
+
+  if (githubToken) {
+    headers.Authorization = `Bearer ${githubToken}`;
+  }
+
+  const response = await fetch(
     `https://raw.githubusercontent.com/${repo}/${branch}/${path}`,
+    { headers },
   );
-  if (!res.ok) return null;
-  const buf = new Uint8Array(await res.arrayBuffer());
+
+  if (!response.ok) {
+    return null;
+  }
+
+  const buffer = new Uint8Array(await response.arrayBuffer());
+
   return {
-    base64: u8ToBase64(buf),
+    base64: uint8ArrayToBase64(buffer),
     name: path.split("/").at(-1) ?? "file",
   };
 };
@@ -151,32 +285,67 @@ export const downloadFolder = async (
   repo: string,
   path: string,
 ): Promise<null | { base64: string; name: string }> => {
-  const branch = await getDefaultBranch(repo);
-  const r = await fetch(
-    `https://api.github.com/repos/${repo}/git/trees/${branch}?recursive=1`,
-  );
-  if (!r.ok) return null;
-  const d = (await r.json()) as { tree?: { path: string; type: string }[] };
-  if (!d.tree) return null;
-  const pre = path.endsWith("/") ? path : `${path}/`;
-  const blobs = d.tree.filter(
-    (t) =>
-      t.type === "blob" && t.path.startsWith(pre) && t.path.length > pre.length,
-  );
-  if (blobs.length === 0) return null;
-  const entries: { input: Uint8Array; name: string }[] = [];
-  for (const t of blobs) {
-    const raw = await fetch(
-      `https://raw.githubusercontent.com/${repo}/${branch}/${t.path}`,
-    );
-    if (!raw.ok) continue;
-    const buf = new Uint8Array(await raw.arrayBuffer());
-    entries.push({ input: buf, name: t.path.slice(pre.length) });
+  const branch = await getDefaultBranch(repo).catch(() => "main");
+  const headers: Record<string, string> = {};
+
+  if (githubToken) {
+    headers.Authorization = `Bearer ${githubToken}`;
   }
-  if (entries.length === 0) return null;
-  const z = await downloadZip(entries);
+
+  const response = await fetch(
+    `https://api.github.com/repos/${repo}/git/trees/${branch}?recursive=1`,
+    { headers },
+  );
+
+  if (!response.ok) {
+    return null;
+  }
+
+  const data = (await response.json()) as {
+    tree?: { path: string; type: string }[];
+  };
+
+  if (!data.tree) {
+    return null;
+  }
+
+  const folderPrefix = path.endsWith("/") ? path : `${path}/`;
+  const blobs = data.tree.filter(
+    (item) =>
+      item.type === "blob" &&
+      item.path.startsWith(folderPrefix) &&
+      item.path.length > folderPrefix.length,
+  );
+
+  if (blobs.length === 0) {
+    return null;
+  }
+
+  const entries: { input: Uint8Array; name: string }[] = [];
+
+  for (const blob of blobs) {
+    const rawResponse = await fetch(
+      `https://raw.githubusercontent.com/${repo}/${branch}/${blob.path}`,
+      { headers },
+    );
+
+    if (!rawResponse.ok) {
+      continue;
+    }
+
+    const buffer = new Uint8Array(await rawResponse.arrayBuffer());
+    entries.push({ input: buffer, name: blob.path.slice(folderPrefix.length) });
+  }
+
+  if (entries.length === 0) {
+    return null;
+  }
+
+  const zip = downloadZip(entries);
+  const zipBuffer = new Uint8Array(await zip.arrayBuffer());
+
   return {
-    base64: u8ToBase64(new Uint8Array(await z.arrayBuffer())),
+    base64: uint8ArrayToBase64(zipBuffer),
     name: path.split("/").filter(Boolean).at(-1) ?? "folder",
   };
 };

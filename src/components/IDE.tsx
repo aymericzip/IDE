@@ -35,7 +35,6 @@ import {
   EDITOR_OPTIONS,
   FILE_SIZE_WARN,
   IMAGE_EXTS,
-  RESET_CSS,
   TAB_TYPE,
   VIRTUAL_PREFIX,
 } from "./ide/constants";
@@ -161,10 +160,11 @@ export const Workspace = ({
   const sidebarVisible = controlledSidebar ?? internalSidebar;
 
   const toggleSidebar = useCallback(() => {
-    const next = !sidebarVisible;
-    setInternalSidebar(next);
-    onSidebarChange?.(next);
-    log(next ? "Sidebar opened" : "Sidebar closed");
+    const nextVisibility = !sidebarVisible;
+
+    setInternalSidebar(nextVisibility);
+    onSidebarChange?.(nextVisibility);
+    log(nextVisibility ? "Sidebar opened" : "Sidebar closed");
   }, [log, onSidebarChange, sidebarVisible]);
 
   const stateRef = useRef({
@@ -207,10 +207,15 @@ export const Workspace = ({
 
   useEffect(() => {
     const { api } = stateRef.current;
-    if (!api) return;
-    for (const panel of api.panels)
-      if (stateRef.current.fileIds.has(panel.id))
+    if (!api) {
+      return;
+    }
+
+    for (const panel of api.panels) {
+      if (stateRef.current.fileIds.has(panel.id)) {
         panel.api.updateParameters({ editorOptions: mergedEditorOptions });
+      }
+    }
   }, [mergedEditorOptions]);
 
   useEffect(() => {
@@ -225,7 +230,11 @@ export const Workspace = ({
     });
     return () => {
       observer.disconnect();
-      for (const d of stateRef.current.disposables) d.dispose();
+
+      for (const disposable of stateRef.current.disposables) {
+        disposable.dispose();
+      }
+
       stateRef.current = {
         ...stateRef.current,
         disposables: [],
@@ -304,11 +313,15 @@ export const Workspace = ({
       log(`${preview ? "Preview" : "Open"}: ${item.path}`);
 
       if (preview && previewIdRef.current) {
-        const prev = api.panels.find((p) => p.id === previewIdRef.current);
-        if (prev) {
-          stateRef.current.fileIds.delete(prev.id);
+        const previousPreview = api.panels.find(
+          (panel) => panel.id === previewIdRef.current,
+        );
+
+        if (previousPreview) {
+          stateRef.current.fileIds.delete(previousPreview.id);
+
           try {
-            api.removePanel(prev);
+            api.removePanel(previousPreview);
           } catch {
             /* Already removed */
           }
@@ -338,9 +351,9 @@ export const Workspace = ({
       setPreviewId(preview ? item.path : null);
       previewIdRef.current = preview ? item.path : null;
 
-      const ext = extOf(item.path);
-      const isImage = IMAGE_EXTS.has(ext);
-      const isBinary = BINARY_EXTS.has(ext);
+      const extension = extOf(item.path);
+      const isImage = IMAGE_EXTS.has(extension);
+      const isBinary = BINARY_EXTS.has(extension);
       const title = deduplicateTitle(item.name, item.path, api.panels);
 
       if (isBinary) {
@@ -365,25 +378,35 @@ export const Workspace = ({
 
       if (isImage) {
         const result = onOpen(item);
-        const addImagePanel = (src: string) => {
+
+        const addImagePanel = (source: string) => {
           api.addPanel({
             component: "image",
             id: item.path,
-            params: { iconName: item.name, src },
+            params: { iconName: item.name, src: source },
             position,
             tabComponent: "default",
             title,
           });
           log(`Image: ${item.path}`);
         };
-        if (result === null) return;
-        if (typeof result === "string") addImagePanel(result);
-        else
+
+        if (result === null) {
+          return;
+        }
+
+        if (typeof result === "string") {
+          addImagePanel(result);
+        } else {
           result
-            .then((r) => {
-              if (r) addImagePanel(r);
+            .then((imageUrl) => {
+              if (imageUrl) {
+                addImagePanel(imageUrl);
+              }
             })
             .catch(() => undefined);
+        }
+
         return;
       }
 
@@ -410,32 +433,41 @@ export const Workspace = ({
       }
 
       if (typeof result === "string") {
-        if (result.length > FILE_SIZE_WARN)
+        if (result.length > FILE_SIZE_WARN) {
           log(
             `Large file: ${item.path} (${Math.round(result.length / 1024)} KB)`,
           );
+        }
+
         added.api.updateParameters({ content: result, loading: undefined });
         log(`Loaded: ${item.path} (${result.length} chars)`);
       } else {
         const panelPath = item.path;
+
         result
           .then((fileContent) => {
             try {
-              const p = api.panels.find((x) => x.id === panelPath);
-              if (!p) return;
+              const panel = api.panels.find((p) => p.id === panelPath);
+
+              if (!panel) {
+                return;
+              }
+
               if (fileContent === null) {
-                p.api.updateParameters({
+                panel.api.updateParameters({
                   content:
                     "// Failed to load file from repository. It might be empty, or you might be rate limited.",
                   loading: undefined,
                 });
                 log(`Load failed: ${panelPath}`);
               } else {
-                if (fileContent.length > FILE_SIZE_WARN)
+                if (fileContent.length > FILE_SIZE_WARN) {
                   log(
                     `Large file: ${panelPath} (${Math.round(fileContent.length / 1024)} KB)`,
                   );
-                p.api.updateParameters({
+                }
+
+                panel.api.updateParameters({
                   content: fileContent,
                   loading: undefined,
                 });
@@ -447,12 +479,15 @@ export const Workspace = ({
           })
           .catch(() => {
             try {
-              const p = api.panels.find((x) => x.id === panelPath);
-              if (p)
-                p.api.updateParameters({
+              const panel = api.panels.find((p) => p.id === panelPath);
+
+              if (panel) {
+                panel.api.updateParameters({
                   content: "// Error loading file.",
                   loading: undefined,
                 });
+              }
+
               log(`Load error: ${panelPath}`);
             } catch {
               /* Already removed */
@@ -477,13 +512,18 @@ export const Workspace = ({
 
   const addTab = useCallback((tab: TabProps) => {
     const { api } = stateRef.current;
-    if (!api) return;
-    const tabId = getTabId(tab);
-    const existing = api.panels.find((p) => p.id === tabId);
-    if (existing) {
-      existing.api.updateParameters({ content: tab.children });
+    if (!api) {
       return;
     }
+
+    const tabId = getTabId(tab);
+    const existingPanel = api.panels.find((panel) => panel.id === tabId);
+
+    if (existingPanel) {
+      existingPanel.api.updateParameters({ content: tab.children });
+      return;
+    }
+
     api.addPanel({
       component: "custom",
       id: tabId,
@@ -551,17 +591,25 @@ export const Workspace = ({
       {
         callback: () => {
           const { api } = stateRef.current;
-          if (!api) return;
-          let closed = 0;
+          if (!api) {
+            return;
+          }
+
+          let closedCount = 0;
+
           for (let i = api.panels.length - 1; i >= 0; i--) {
-            if (!pinnedTabsRef.current.includes(api.panels[i].id))
+            if (!pinnedTabsRef.current.includes(api.panels[i].id)) {
               try {
                 api.panels[i].api.close();
-                closed++;
-              } catch {}
+                closedCount++;
+              } catch {
+                /* Ignore close error */
+              }
+            }
           }
+
           log(
-            `Closed ${closed} tabs (${pinnedTabsRef.current.length} pinned kept)`,
+            `Closed ${closedCount} tabs (${pinnedTabsRef.current.length} pinned kept)`,
           );
         },
         hotkey: "Mod+Shift+W",
@@ -587,32 +635,44 @@ export const Workspace = ({
   useAltKeys(
     {
       ArrowLeft: () => {
-        const h = historyRef.current;
-        if (h.index <= 0) return;
-        h.index--;
-        h.navigating = true;
+        const history = historyRef.current;
+        if (history.index <= 0) {
+          return;
+        }
+
+        history.index--;
+        history.navigating = true;
+
         const panel = stateRef.current.api?.panels.find(
-          (p) => p.id === h.entries[h.index],
+          (p) => p.id === history.entries[history.index],
         );
+
         if (panel) {
           panel.focus();
           log(`Back: ${panel.title ?? panel.id}`);
         }
-        h.navigating = false;
+
+        history.navigating = false;
       },
       ArrowRight: () => {
-        const h = historyRef.current;
-        if (h.index >= h.entries.length - 1) return;
-        h.index++;
-        h.navigating = true;
+        const history = historyRef.current;
+        if (history.index >= history.entries.length - 1) {
+          return;
+        }
+
+        history.index++;
+        history.navigating = true;
+
         const panel = stateRef.current.api?.panels.find(
-          (p) => p.id === h.entries[h.index],
+          (p) => p.id === history.entries[history.index],
         );
+
         if (panel) {
           panel.focus();
           log(`Forward: ${panel.title ?? panel.id}`);
         }
-        h.navigating = false;
+
+        history.navigating = false;
       },
       KeyE: () => {
         const { api } = stateRef.current;
@@ -674,15 +734,17 @@ export const Workspace = ({
     const currentIds = new Set(tabs.map(getTabId));
     for (const id of stateRef.current.prevTabIds) {
       if (!currentIds.has(id)) {
-        const p = api.panels.find((panel) => panel.id === id);
-        if (p) api.removePanel(p);
+        const panel = api.panels.find((p) => p.id === id);
+        if (panel) {
+          api.removePanel(panel);
+        }
       }
     }
     for (const tab of tabs) {
-      const tid = getTabId(tab);
-      if (stateRef.current.prevTabIds.has(tid)) {
+      const tabId = getTabId(tab);
+      if (stateRef.current.prevTabIds.has(tabId)) {
         api.panels
-          .find((p) => p.id === tid)
+          .find((p) => p.id === tabId)
           ?.api.updateParameters({ content: tab.children });
       } else {
         addTab(tab);
@@ -697,14 +759,23 @@ export const Workspace = ({
 
   useEffect(() => {
     const { api } = stateRef.current;
-    if (!(api && files)) return;
-    const tid = setTimeout(() => {
+    if (!(api && files)) {
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
       const activeIds = new Set(files.map((f) => virtualFileId(f.name)));
-      for (const panel of api.panels)
-        if (panel.id.startsWith(VIRTUAL_PREFIX) && !activeIds.has(panel.id))
+
+      for (const panel of api.panels) {
+        if (panel.id.startsWith(VIRTUAL_PREFIX) && !activeIds.has(panel.id)) {
           try {
             api.removePanel(panel);
-          } catch {}
+          } catch {
+            /* Ignore removal error */
+          }
+        }
+      }
+
       for (const file of files) {
         const id = virtualFileId(file.name);
         api.panels
@@ -712,7 +783,8 @@ export const Workspace = ({
           ?.api.updateParameters({ content: file.content });
       }
     }, 100);
-    return () => clearTimeout(tid);
+
+    return () => clearTimeout(timeoutId);
   }, [files]);
 
   const handleReady = (event: DockviewReadyEvent) => {
@@ -725,11 +797,12 @@ export const Workspace = ({
         stateRef.current.onCloseMap.set(getTabId(tab), tab.onClose);
 
     if (filesRef.current) {
-      for (const f of filesRef.current)
-        if (f.open) {
-          openVirtualFile(f);
-          log(`Virtual file: ${f.name}`);
+      for (const file of filesRef.current) {
+        if (file.open) {
+          openVirtualFile(file);
+          log(`Virtual file: ${file.name}`);
         }
+      }
     }
 
     requestAnimationFrame(() => {
@@ -756,41 +829,53 @@ export const Workspace = ({
     };
 
     stateRef.current.disposables.push(
-      event.api.onDidRemovePanel((e) => {
-        stateRef.current.fileIds.delete(e.id);
-        stateRef.current.onCloseMap.get(e.id)?.();
-        stateRef.current.onCloseMap.delete(e.id);
+      event.api.onDidRemovePanel((removedPanel) => {
+        stateRef.current.fileIds.delete(removedPanel.id);
+        stateRef.current.onCloseMap.get(removedPanel.id)?.();
+        stateRef.current.onCloseMap.delete(removedPanel.id);
+
         initMonaco()
-          .then((m) => {
-            const model = m.editor.getModel(m.Uri.parse(e.id));
-            if (model) model.dispose();
+          .then((monaco) => {
+            const model = monaco.editor.getModel(monaco.Uri.parse(removedPanel.id));
+            if (model) {
+              model.dispose();
+            }
           })
           .catch(() => undefined);
-        if (previewIdRef.current === e.id) {
+
+        if (previewIdRef.current === removedPanel.id) {
           setPreviewId(null);
           previewIdRef.current = null;
         }
-        if (!e.id.startsWith(VIRTUAL_PREFIX))
-          setClosedTabs((prev) => [...prev.slice(-19), e.id]);
-        log(`Closed: ${e.title ?? e.id}`);
+
+        if (!removedPanel.id.startsWith(VIRTUAL_PREFIX)) {
+          setClosedTabs((prev) => [...prev.slice(-19), removedPanel.id]);
+        }
+
+        log(`Closed: ${removedPanel.title ?? removedPanel.id}`);
         notifyFiles();
       }),
-      event.api.onDidAddPanel((e) => {
-        log(`Opened tab: ${e.title ?? e.id}`);
+      event.api.onDidAddPanel((addedPanel) => {
+        log(`Opened tab: ${addedPanel.title ?? addedPanel.id}`);
         notifyFiles();
       }),
-      event.api.onDidActivePanelChange((e) => {
-        if (e?.id) {
-          setActiveFileId(e.id);
-          onTabChangeRef.current?.(e.id);
+      event.api.onDidActivePanelChange((activePanel) => {
+        if (activePanel?.id) {
+          setActiveFileId(activePanel.id);
+          onTabChangeRef.current?.(activePanel.id);
+
           if (!historyRef.current.navigating) {
-            const h = historyRef.current;
-            if (h.entries[h.index] !== e.id) {
-              h.entries = [...h.entries.slice(0, h.index + 1), e.id].slice(-50);
-              h.index = h.entries.length - 1;
+            const history = historyRef.current;
+            if (history.entries[history.index] !== activePanel.id) {
+              history.entries = [
+                ...history.entries.slice(0, history.index + 1),
+                activePanel.id,
+              ].slice(-50);
+              history.index = history.entries.length - 1;
             }
           }
-          log(`Focused: ${e.title ?? e.id}`);
+
+          log(`Focused: ${activePanel.title ?? activePanel.id}`);
         }
       }),
     );
@@ -798,18 +883,28 @@ export const Workspace = ({
   };
 
   const mergedTree = useMemo(() => {
-    if (!(tree || (files && files.length > 0))) return tree;
-    const toItem = (f: VirtualFile): TreeDataItem => ({
+    if (!(tree || (files && files.length > 0))) {
+      return tree;
+    }
+
+    const virtualFileToTreeItem = (file: VirtualFile): TreeDataItem => ({
       icon:
-        f.icon ?? (f.language ? resolveLanguageIcon(f.language) : undefined),
-      id: virtualFileId(f.name),
-      name: f.name,
-      path: virtualFileId(f.name),
+        file.icon ??
+        (file.language ? resolveLanguageIcon(file.language) : undefined),
+      id: virtualFileId(file.name),
+      name: file.name,
+      path: virtualFileId(file.name),
     });
-    const top = files?.filter((f) => f.pin === "top").map(toItem) ?? [];
-    const mid = files?.filter((f) => !f.pin).map(toItem) ?? [];
-    const bottom = files?.filter((f) => f.pin === "bottom").map(toItem) ?? [];
-    return [...top, ...mid, ...(tree ?? []), ...bottom];
+
+    const topPinnedFiles =
+      files?.filter((file) => file.pin === "top").map(virtualFileToTreeItem) ?? [];
+    const unpinnedFiles =
+      files?.filter((file) => !file.pin).map(virtualFileToTreeItem) ?? [];
+    const bottomPinnedFiles =
+      files?.filter((file) => file.pin === "bottom").map(virtualFileToTreeItem) ??
+      [];
+
+    return [...topPinnedFiles, ...unpinnedFiles, ...(tree ?? []), ...bottomPinnedFiles];
   }, [files, tree]);
 
   const sidebarChildren = useMemo(() => {
@@ -832,8 +927,8 @@ export const Workspace = ({
           className="p-0.5 text-muted-foreground transition-colors hover:text-foreground"
           onClick={() => {
             log(treeCollapsed ? "Tree expanded all" : "Tree collapsed all");
-            setTreeCollapsed((c) => !c);
-            setTreeKey((k) => k + 1);
+            setTreeCollapsed((prevCollapsed) => !prevCollapsed);
+            setTreeKey((prevKey) => prevKey + 1);
           }}
           title={treeCollapsed ? "Expand All" : "Collapse All"}
           type="button"
@@ -861,15 +956,26 @@ export const Workspace = ({
             }
           }}
           onSelectChange={(item) => {
-            if (!item) return;
+            if (!item) {
+              return;
+            }
+
             if (item.children) {
               log(`Folder: ${item.name}`);
               return;
             }
+
             if (item.id.startsWith(VIRTUAL_PREFIX)) {
-              const vf = files?.find((f) => virtualFileId(f.name) === item.id);
-              if (vf) openVirtualFile(vf);
-            } else openFile(item);
+              const virtualFile = files?.find(
+                (file) => virtualFileId(file.name) === item.id,
+              );
+
+              if (virtualFile) {
+                openVirtualFile(virtualFile);
+              }
+            } else {
+              openFile(item);
+            }
           }}
           selectedId={activeFileId}
         />
@@ -898,7 +1004,6 @@ export const Workspace = ({
 
   return (
     <Group orientation="horizontal" className={props.className}>
-      <style>{RESET_CSS}</style>
       {sidebarPosition === "left" ? sidePanel : null}
       <Panel minSize={20}>
         <div className="flex h-full flex-col">
@@ -919,9 +1024,16 @@ export const Workspace = ({
         log={log}
         onOpenFile={(item) => {
           if (item.id.startsWith(VIRTUAL_PREFIX)) {
-            const vf = files?.find((f) => virtualFileId(f.name) === item.id);
-            if (vf) openVirtualFile(vf);
-          } else openFile(item);
+            const virtualFile = files?.find(
+              (file) => virtualFileId(file.name) === item.id,
+            );
+
+            if (virtualFile) {
+              openVirtualFile(virtualFile);
+            }
+          } else {
+            openFile(item);
+          }
         }}
         open={quickOpenVisible}
         tree={mergedTree ?? EMPTY_TREE}

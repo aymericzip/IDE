@@ -10,7 +10,7 @@ import type { TreeDataItem } from './types';
 import { flattenTree } from './utils';
 
 export const QuickOpenDialog = ({
-  log: logFn,
+  log,
   onOpenFile,
   open,
   tree,
@@ -23,9 +23,12 @@ export const QuickOpenDialog = ({
   const setOpen = useSetAtom(quickOpenAtom);
   const flatFiles = useMemo(() => flattenTree(tree), [tree]);
 
-  const onChange = (v: boolean) => {
-    setOpen(v);
-    if (!v) logFn('Quick open closed');
+  const onChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+
+    if (!isOpen) {
+      log("Quick open closed");
+    }
   };
 
   return (
@@ -43,26 +46,27 @@ export const QuickOpenDialog = ({
             <Cmdk.Empty className="py-6 text-center text-xs">
               No files found
             </Cmdk.Empty>
-            {flatFiles.map((f) => {
-              const parent = f.path.includes('/')
-                ? f.path.slice(0, f.path.lastIndexOf('/'))
-                : '';
+            {flatFiles.map((file) => {
+              const parentPath = file.path.includes("/")
+                ? file.path.slice(0, file.path.lastIndexOf("/"))
+                : "";
+
               return (
                 <Cmdk.Item
                   className="relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-xs outline-hidden data-[disabled=true]:pointer-events-none data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0"
-                  key={f.id}
+                  key={file.id}
                   onSelect={() => {
-                    logFn(`Quick open: ${f.name}`);
-                    onOpenFile(f);
+                    log(`Quick open: ${file.name}`);
+                    onOpenFile(file);
                     setOpen(false);
                   }}
-                  value={`${f.name} ${f.path}`}
+                  value={`${file.name} ${file.path}`}
                 >
-                  <FileIcon className={ICON_CLASS} name={f.name} />
-                  <span className="shrink-0 truncate">{f.name}</span>
-                  {parent ? (
+                  <FileIcon className={ICON_CLASS} name={file.name} />
+                  <span className="shrink-0 truncate">{file.name}</span>
+                  {parentPath ? (
                     <span className="min-w-0 truncate text-muted-foreground text-xs">
-                      {parent}
+                      {parentPath}
                     </span>
                   ) : null}
                 </Cmdk.Item>

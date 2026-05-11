@@ -11,13 +11,18 @@ import { repoFromInput } from "./url-utils";
 import { Button } from "./components/button";
 
 const triggerDownload = (base64: string, filename: string) => {
-  const bytes = Uint8Array.from(atob(base64), (c) => c.codePointAt(0) ?? 0);
+  const bytes = Uint8Array.from(
+    atob(base64),
+    (char) => char.codePointAt(0) ?? 0,
+  );
   const blob = new Blob([bytes]);
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = filename;
+  link.click();
+
   URL.revokeObjectURL(url);
 };
 
@@ -60,23 +65,36 @@ export const Explorer = ({
       return;
     }
     void (async () => {
-      const t = await fetchTree(repo);
-      setTree(t);
-      if (t.length === 0) setError("Failed to load repo tree");
+      const fetchedTree = await fetchTree(repo);
+      setTree(fetchedTree);
+
+      if (fetchedTree.length === 0) {
+        setError("Failed to load repo tree");
+      }
     })();
   }, [initialRepo, initialTree, repo]);
 
   const submit = () => {
     const parsed = repoFromInput(input);
-    if (!parsed || parsed === repo) return;
+    if (!parsed || parsed === repo) {
+      return;
+    }
+
     setInput(parsed);
     setRepo(parsed);
+
     const params = new URLSearchParams(window.location.search);
     params.delete("repo");
     params.delete("url");
-    const q = params.toString();
+
+    const queryString = params.toString();
     const path = `/${parsed}`;
-    window.history.replaceState(null, "", q ? `${path}?${q}` : path);
+
+    window.history.replaceState(
+      null,
+      "",
+      queryString ? `${path}?${queryString}` : path,
+    );
   };
 
   return (

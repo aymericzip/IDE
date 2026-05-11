@@ -27,37 +27,40 @@ import { DockviewApiContext } from '../IDEContext';
 import { FileIcon } from '../Tree/TreeIcons';
 
 export const TabHeader = ({ api, params }: IDockviewPanelHeaderProps) => {
-  const p = params as any;
-  const dv = use(DockviewApiContext);
+  const parameters = params as any;
+  const dockviewApi = use(DockviewApiContext);
   const previewId = useAtomValue(previewPanelAtom);
   const [pinnedTabs, setPinnedTabs] = useAtom(pinnedTabsAtom);
 
   const isPreview = previewId === api.id;
   const isPinned = pinnedTabs.includes(api.id);
-  const showIcon = p?.icon !== false;
-  const closable = p?.closable !== false && !isPinned;
+  const showIcon = parameters?.icon !== false;
+  const isClosable = parameters?.closable !== false && !isPinned;
 
-  const [active, setActive] = useState(api.isActive);
+  const [isActive, setIsActive] = useState(api.isActive);
+
   useEffect(() => {
-    const d = api.onDidActiveChange((e) => setActive(e.isActive));
-    return () => d.dispose();
+    const disposable = api.onDidActiveChange((event) =>
+      setIsActive(event.isActive),
+    );
+    return () => disposable.dispose();
   }, [api]);
 
   return (
     <ContextMenu>
       <ContextMenuTrigger
         className={cn(
-          'group/tab flex h-full items-center gap-[3px] py-[3px] pl-1 text-xs',
-          p?.headerClassName,
-          active
-            ? p?.activeClassName
-            : ['text-muted-foreground', p?.inactiveClassName]
+          "group/tab flex h-full items-center gap-[3px] py-[3px] pl-1 text-xs",
+          parameters?.headerClassName,
+          isActive
+            ? parameters?.activeClassName
+            : ["text-muted-foreground", parameters?.inactiveClassName],
         )}
-        data-fill={p?.headerClassName ? '' : undefined}
-        data-preview={isPreview ? '' : undefined}
-        onMouseDown={(e) => {
-          if (e.button === 1 && closable) {
-            e.preventDefault();
+        data-fill={parameters?.headerClassName ? "" : undefined}
+        data-preview={isPreview ? "" : undefined}
+        onMouseDown={(event) => {
+          if (event.button === 1 && isClosable) {
+            event.preventDefault();
             api.close();
           }
         }}
@@ -65,63 +68,78 @@ export const TabHeader = ({ api, params }: IDockviewPanelHeaderProps) => {
         {showIcon ? (
           <FileIcon
             className={ICON_CLASS_TAB_HOVER}
-            name={p?.iconName ?? api.title ?? ''}
+            name={parameters?.iconName ?? api.title ?? ""}
           />
         ) : null}
         {api.title}
         {isPinned ? (
           <Pin
             className="-ml-1 size-4 rotate-45 p-0.5 opacity-50 transition-all hover:cursor-pointer hover:p-0 hover:opacity-100"
-            onClick={(e) => {
-              e.stopPropagation();
+            onClick={(event) => {
+              event.stopPropagation();
               setPinnedTabs((prev) => prev.filter((id) => id !== api.id));
             }}
           />
-        ) : closable ? (
+        ) : isClosable ? (
           <X
             className="-ml-1 size-4 p-0.5 opacity-0 transition-all hover:cursor-pointer hover:p-0 hover:text-red-500 hover:opacity-100 group-hover/tab:opacity-50"
-            onClick={(e) => {
-              e.stopPropagation();
+            onClick={(event) => {
+              event.stopPropagation();
               api.close();
             }}
           />
         ) : null}
       </ContextMenuTrigger>
-      {dv ? (
+      {dockviewApi ? (
         <ContextMenuContent>
           <ContextMenuItem onClick={() => api.close()}>
             <X /> Close <ContextMenuShortcut>⌥W</ContextMenuShortcut>
           </ContextMenuItem>
           <ContextMenuItem
             onClick={() => {
-              for (const pnl of dv.panels)
-                if (pnl.id !== api.id && !pinnedTabs.includes(pnl.id))
+              for (const panel of dockviewApi.panels) {
+                if (panel.id !== api.id && !pinnedTabs.includes(panel.id)) {
                   try {
-                    pnl.api.close();
-                  } catch {}
+                    panel.api.close();
+                  } catch {
+                    /* Ignore close error */
+                  }
+                }
+              }
             }}
           >
             <Trash /> Close Others
           </ContextMenuItem>
           <ContextMenuItem
             onClick={() => {
-              const idx = dv.panels.findIndex((pnl) => pnl.id === api.id);
-              for (let i = dv.panels.length - 1; i > idx; i -= 1)
-                if (!pinnedTabs.includes(dv.panels[i].id))
+              const index = dockviewApi.panels.findIndex(
+                (panel) => panel.id === api.id,
+              );
+
+              for (let i = dockviewApi.panels.length - 1; i > index; i -= 1) {
+                if (!pinnedTabs.includes(dockviewApi.panels[i].id)) {
                   try {
-                    dv.panels[i].api.close();
-                  } catch {}
+                    dockviewApi.panels[i].api.close();
+                  } catch {
+                    /* Ignore close error */
+                  }
+                }
+              }
             }}
           >
             <ArrowRightToLine /> Close to the Right
           </ContextMenuItem>
           <ContextMenuItem
             onClick={() => {
-              for (let i = dv.panels.length - 1; i >= 0; i -= 1)
-                if (!pinnedTabs.includes(dv.panels[i].id))
+              for (let i = dockviewApi.panels.length - 1; i >= 0; i -= 1) {
+                if (!pinnedTabs.includes(dockviewApi.panels[i].id)) {
                   try {
-                    dv.panels[i].api.close();
-                  } catch {}
+                    dockviewApi.panels[i].api.close();
+                  } catch {
+                    /* Ignore close error */
+                  }
+                }
+              }
             }}
           >
             <Trash2 /> Close All
@@ -151,16 +169,20 @@ export const TabHeader = ({ api, params }: IDockviewPanelHeaderProps) => {
           <ContextMenuSeparator />
           <ContextMenuItem
             onClick={() => {
-              const found = dv.panels.find((pnl) => pnl.id === api.id);
-              if (found)
-                dv.addPanel({
-                  component: found.view.contentComponent,
-                  id: `${found.id}-split-${Date.now()}`,
-                  params: found.params,
-                  position: { direction: 'right', referencePanel: found },
-                  tabComponent: 'default',
-                  title: found.title ?? '',
+              const foundPanel = dockviewApi.panels.find(
+                (panel) => panel.id === api.id,
+              );
+
+              if (foundPanel) {
+                dockviewApi.addPanel({
+                  component: foundPanel.view.contentComponent,
+                  id: `${foundPanel.id}-split-${Date.now()}`,
+                  params: foundPanel.params,
+                  position: { direction: "right", referencePanel: foundPanel },
+                  tabComponent: "default",
+                  title: foundPanel.title ?? "",
                 });
+              }
             }}
           >
             <SplitSquareHorizontal /> Split Right

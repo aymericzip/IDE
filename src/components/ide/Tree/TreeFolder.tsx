@@ -1,19 +1,19 @@
-import { Accordion } from '@base-ui/react/accordion';
-import { ClipboardCopy, Download } from 'lucide-react';
-import { type ReactNode, useState } from 'react';
-import { toast } from 'sonner';
+import { Accordion } from "@base-ui/react/accordion";
+import { ClipboardCopy, Download } from "lucide-react";
+import { type ReactNode, useState } from "react";
+import { toast } from "sonner";
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuSeparator,
   ContextMenuTrigger,
-} from '../../context-menu';
-import { cn } from '../../lib/utils';
-import { ITEM_CLASS } from '../constants';
-import { DepthContext } from '../IDEContext';
-import { FolderIcon } from './TreeIcons';
-import { useTreeItem } from './TreeItem';
+} from "../../context-menu";
+import { cn } from "../../lib/utils";
+import { ITEM_CLASS } from "../constants";
+import { DepthContext } from "../IDEContext";
+import { FolderIcon } from "./TreeIcons";
+import { useTreeItem } from "./TreeItem";
 
 export const TreeFolder = ({
   children,
@@ -43,23 +43,25 @@ export const TreeFolder = ({
     isMultiSelected,
     isSelected,
     itemId,
-    pl,
+    paddingLeft,
     select,
   } = useTreeItem({ id, name, path });
 
   const folderPath = path ?? name;
-  const excluded = expandExclude?.some((ex) => folderPath.startsWith(ex));
-  const shouldOpen = !excluded && (defaultOpen || depth < expandDepth);
-  const [open, setOpen] = useState(shouldOpen ? [itemId] : []);
-  const isOpen = open.includes(itemId);
+  const isExcluded = expandExclude?.some((excludePattern) =>
+    folderPath.startsWith(excludePattern),
+  );
+  const shouldOpen = !isExcluded && (defaultOpen || depth < expandDepth);
+  const [openValues, setOpenValues] = useState(shouldOpen ? [itemId] : []);
+  const isOpen = openValues.includes(itemId);
 
   return (
     <Accordion.Root
-      onValueChange={(v) => {
-        setOpen(v);
-        treeLog?.(v.length > 0 ? `Expand: ${name}` : `Collapse: ${name}`);
+      onValueChange={(values) => {
+        setOpenValues(values);
+        treeLog?.(values.length > 0 ? `Expand: ${name}` : `Collapse: ${name}`);
       }}
-      value={open}
+      value={openValues}
     >
       <Accordion.Item value={itemId}>
         <ContextMenu>
@@ -67,14 +69,14 @@ export const TreeFolder = ({
             <Accordion.Trigger
               className={cn(
                 ITEM_CLASS,
-                (isSelected || isMultiSelected) && 'bg-accent',
-                disabled && 'pointer-events-none opacity-50',
-                className
+                (isSelected || isMultiSelected) && "bg-accent",
+                disabled && "pointer-events-none opacity-50",
+                className,
               )}
               data-item-id={itemId}
-              onClick={(e) => select(e)}
+              onClick={(event) => select(event)}
               role="treeitem"
-              style={{ paddingLeft: pl }}
+              style={{ paddingLeft }}
             >
               <FolderIcon className={iconClass} name={name} open={isOpen} />
               {name}
@@ -93,7 +95,7 @@ export const TreeFolder = ({
               onClick={() => {
                 navigator.clipboard
                   .writeText(folderPath)
-                  .then(() => toast('Copied to clipboard'))
+                  .then(() => toast("Copied to clipboard"))
                   .catch(() => undefined);
               }}
             >

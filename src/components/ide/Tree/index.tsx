@@ -26,7 +26,8 @@ const renderItems = ({
   onItemDoubleClick?: (item: TreeDataItem) => void;
 }): ReactNode[] => {
   const nodes: ReactNode[] = [];
-  for (const item of items)
+
+  for (const item of items) {
     if (item.children) {
       const { children, name } = compactFolder(item);
       nodes.push(
@@ -38,9 +39,9 @@ const renderItems = ({
           path={item.path}
         >
           {renderItems({ items: children, onItemClick, onItemDoubleClick })}
-        </TreeFolder>
+        </TreeFolder>,
       );
-    } else
+    } else {
       nodes.push(
         <TreeFile
           disabled={item.disabled}
@@ -54,8 +55,11 @@ const renderItems = ({
           }}
           onDoubleClick={() => onItemDoubleClick?.(item)}
           path={item.path}
-        />
+        />,
       );
+    }
+  }
+
   return nodes;
 };
 
@@ -65,11 +69,11 @@ export const Tree = ({
   expandExclude,
   fileActions,
   indent = 16,
-  log: treePropLog,
+  log,
   onSelect,
   selectedId: controlledSelectedId,
   ...props
-}: ComponentProps<'nav'> & {
+}: ComponentProps<"nav"> & {
   expandDepth?: number;
   expandExclude?: string[];
   fileActions?: FileActions;
@@ -79,19 +83,19 @@ export const Tree = ({
   selectedId?: null | string;
 }) => {
   const [internalSelectedId, setInternalSelectedId] = useState<null | string>(
-    null
+    null,
   );
   const [selectedIds, setSelectedIds] = useState<Set<string>>(EMPTY_SET);
   const navRef = useRef<HTMLElement>(null);
   const selectedId = controlledSelectedId ?? internalSelectedId;
 
-  const ctx = useMemo(
+  const contextValue = useMemo(
     () => ({
       expandDepth,
       expandExclude,
       fileActions,
       indent,
-      log: treePropLog,
+      log,
       navRef,
       onSelect,
       selectedId,
@@ -104,15 +108,15 @@ export const Tree = ({
       expandExclude,
       fileActions,
       indent,
-      treePropLog,
+      log,
       onSelect,
       selectedId,
       selectedIds,
-    ]
+    ],
   );
 
   return (
-    <TreeContext value={ctx}>
+    <TreeContext value={contextValue}>
       <nav
         aria-label="File tree"
         ref={navRef}
@@ -121,22 +125,34 @@ export const Tree = ({
           'select-none overflow-auto text-xs [scrollbar-color:color-mix(in_oklch,var(--color-foreground,var(--foreground))_15%,transparent)_transparent] [scrollbar-width:thin]',
           props.className
         )}
-        onKeyDownCapture={(e) => {
-          if (![' ', 'ArrowDown', 'ArrowUp', 'Enter'].includes(e.key)) return;
-          const target = e.target as HTMLElement;
-          if (!target.closest('[role=treeitem]')) return;
-          e.preventDefault();
-          e.stopPropagation();
+        onKeyDownCapture={(event) => {
+          if (![" ", "ArrowDown", "ArrowUp", "Enter"].includes(event.key)) {
+            return;
+          }
+
+          const target = event.target as HTMLElement;
+
+          if (!target.closest("[role=treeitem]")) {
+            return;
+          }
+
+          event.preventDefault();
+          event.stopPropagation();
+
           const items =
-            e.currentTarget.querySelectorAll<HTMLElement>('[role=treeitem]');
-          const treeItem = target.closest('[role=treeitem]');
-          const idx = treeItem
+            event.currentTarget.querySelectorAll<HTMLElement>("[role=treeitem]");
+          const treeItem = target.closest("[role=treeitem]");
+          const index = treeItem
             ? [...items].indexOf(treeItem as HTMLElement)
             : -1;
-          if (e.key === 'ArrowDown')
-            items[Math.min(idx + 1, items.length - 1)]?.focus();
-          else if (e.key === 'ArrowUp') items[Math.max(idx - 1, 0)]?.focus();
-          else target.click();
+
+          if (event.key === "ArrowDown") {
+            items[Math.min(index + 1, items.length - 1)]?.focus();
+          } else if (event.key === "ArrowUp") {
+            items[Math.max(index - 1, 0)]?.focus();
+          } else {
+            target.click();
+          }
         }}
       >
         {children}

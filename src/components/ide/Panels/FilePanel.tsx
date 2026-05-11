@@ -33,44 +33,64 @@ export const FilePanel = ({
   const [editorOpts, setEditorOpts] = useState(params.editorOptions);
   const [ready, setReady] = useState(!shikiSetup);
   const { resolvedTheme } = useTheme();
-  const dark = resolvedTheme !== "light";
+  const isDarkMode = resolvedTheme !== "light";
 
   useEffect(() => {
-    if (shikiSetup)
+    if (shikiSetup) {
       shikiSetup.then(() => setReady(true)).catch(() => setReady(true));
+    }
   }, []);
 
   useEffect(() => {
-    const d = api.onDidParametersChange((e) => {
-      const p = e as any;
-      if (p.content !== undefined) {
-        setContent(p.content);
+    const disposable = api.onDidParametersChange((event) => {
+      const parameters = event;
+
+      if (parameters.content !== undefined) {
+        setContent(parameters.content);
         setLoadingState(undefined);
-        if (isVirtual)
+
+        if (isVirtual) {
           requestAnimationFrame(() => {
-            const lineCount = (p.content ?? "").split("\n").length;
+            const lineCount = (parameters.content ?? "").split("\n").length;
             editorRef.current?.revealLine(lineCount);
           });
+        }
       }
-      if (p.language !== undefined) setLanguage(p.language);
-      if (p.loading !== undefined) setLoadingState(p.loading);
-      if (p.editorOptions !== undefined) setEditorOpts(p.editorOptions);
+
+      if (parameters.language !== undefined) {
+        setLanguage(parameters.language);
+      }
+
+      if (parameters.loading !== undefined) {
+        setLoadingState(parameters.loading);
+      }
+
+      if (parameters.editorOptions !== undefined) {
+        setEditorOpts(parameters.editorOptions);
+      }
     });
-    return () => d.dispose();
+
+    return () => disposable.dispose();
   }, [api, isVirtual]);
 
   const setCursor = useSetAtom(cursorAtom);
   const setFileInfo = useSetAtom(activeFileInfoAtom);
 
   useEffect(() => {
-    if (api.isActive) setFileInfo({ language, path: api.id });
-    const d = api.onDidActiveChange((e) => {
-      if (e.isActive) setFileInfo({ language, path: api.id });
+    if (api.isActive) {
+      setFileInfo({ language, path: api.id });
+    }
+
+    const disposable = api.onDidActiveChange((event) => {
+      if (event.isActive) {
+        setFileInfo({ language, path: api.id });
+      }
     });
-    return () => d.dispose();
+
+    return () => disposable.dispose();
   }, [api, language, setFileInfo]);
 
-  if (loadingState || !ready)
+  if (loadingState || !ready) {
     return (
       <div className="flex h-full flex-col gap-2 p-4">
         <Skeleton className="h-4 w-3/4" />
@@ -78,13 +98,15 @@ export const FilePanel = ({
         <Skeleton className="h-4 w-2/3" />
       </div>
     );
+  }
 
-  if (!content)
+  if (!content) {
     return (
       <div className={cn(CENTER, "text-muted-foreground text-xs")}>
         Empty file
       </div>
     );
+  }
 
   const pathParts = api.id.split("/");
 
@@ -92,18 +114,23 @@ export const FilePanel = ({
     <div className="flex h-full flex-col">
       <Breadcrumb className="border-border border-b px-3 py-1">
         <BreadcrumbList className="flex-nowrap gap-1 text-xs sm:gap-1">
-          {pathParts.flatMap((part, i) => {
+          {pathParts.flatMap((part, index) => {
             const items: ReactNode[] = [];
-            if (i > 0) items.push(<BreadcrumbSeparator key={`sep-${part}`} />);
+
+            if (index > 0) {
+              items.push(<BreadcrumbSeparator key={`sep-${part}`} />);
+            }
+
             items.push(
               <BreadcrumbSegment
-                depth={i}
-                isLast={i === pathParts.length - 1}
+                depth={index}
+                isLast={index === pathParts.length - 1}
                 key={part}
                 name={part}
                 pathParts={pathParts}
               />,
             );
+
             return items;
           })}
         </BreadcrumbList>
@@ -113,12 +140,18 @@ export const FilePanel = ({
         language={language}
         onMount={(editor) => {
           editorRef.current = editor;
-          const update = () => {
-            const pos = editor.getPosition();
-            if (pos) setCursor({ col: pos.column, line: pos.lineNumber });
+
+          const updateCursor = () => {
+            const position = editor.getPosition();
+
+            if (position) {
+              setCursor({ col: position.column, line: position.lineNumber });
+            }
           };
-          update();
-          editor.onDidChangeCursorPosition(update);
+
+          updateCursor();
+
+          editor.onDidChangeCursorPosition(updateCursor);
           api.onDidDimensionsChange(() => editor.layout());
         }}
         options={{
@@ -130,7 +163,7 @@ export const FilePanel = ({
         theme={
           typeof params.theme === "string"
             ? params.theme
-            : dark
+            : isDarkMode
               ? (params.theme?.dark ?? "dark-plus")
               : (params.theme?.light ?? "light-plus")
         }
