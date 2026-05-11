@@ -7,28 +7,30 @@ import { cn } from "./lib/utils";
 /**
  * Button size variants for different use cases
  */
-export enum ButtonSize {
-  SM = "sm",
-  MD = "md",
-  LG = "lg",
-  XL = "xl",
-  ICON_SM = "icon-sm",
-  ICON_MD = "icon-md",
-  ICON_LG = "icon-lg",
-  ICON_XL = "icon-xl",
-}
+export const ButtonSize = {
+  SM: "sm",
+  MD: "md",
+  LG: "lg",
+  XL: "xl",
+  ICON_SM: "icon-sm",
+  ICON_MD: "icon-md",
+  ICON_LG: "icon-lg",
+  ICON_XL: "icon-xl",
+} as const;
+
+export type ButtonSize = (typeof ButtonSize)[keyof typeof ButtonSize];
 
 const buttonIconVariants = cva("flex-none shrink-0", {
   variants: {
     size: {
-      [`${ButtonSize.SM}`]: "size-3",
-      [`${ButtonSize.MD}`]: "size-4",
-      [`${ButtonSize.LG}`]: "size-5",
-      [`${ButtonSize.XL}`]: "size-6",
-      [`${ButtonSize.ICON_SM}`]: "size-3",
-      [`${ButtonSize.ICON_MD}`]: "size-4",
-      [`${ButtonSize.ICON_LG}`]: "size-4",
-      [`${ButtonSize.ICON_XL}`]: "size-5",
+      [ButtonSize.SM]: "size-3",
+      [ButtonSize.MD]: "size-4",
+      [ButtonSize.LG]: "size-5",
+      [ButtonSize.XL]: "size-6",
+      [ButtonSize.ICON_SM]: "size-3",
+      [ButtonSize.ICON_MD]: "size-4",
+      [ButtonSize.ICON_LG]: "size-4",
+      [ButtonSize.ICON_XL]: "size-5",
     },
   },
   defaultVariants: {
@@ -39,44 +41,52 @@ const buttonIconVariants = cva("flex-none shrink-0", {
 /**
  * Button visual style variants
  */
-export enum ButtonVariant {
-  DEFAULT = "default",
-  NONE = "none",
-  OUTLINE = "outline",
-  LINK = "link",
-  INVISIBLE_LINK = "invisible-link",
-  HOVERABLE = "hoverable",
-  FADE = "fade",
-  INPUT = "input",
-}
+export const ButtonVariant = {
+  DEFAULT: "default",
+  NONE: "none",
+  OUTLINE: "outline",
+  LINK: "link",
+  INVISIBLE_LINK: "invisible-link",
+  HOVERABLE: "hoverable",
+  FADE: "fade",
+  INPUT: "input",
+  GHOST: "ghost",
+} as const;
+
+export type ButtonVariant = (typeof ButtonVariant)[keyof typeof ButtonVariant];
 
 /**
  * Button color themes that work with the design system
  */
-export enum ButtonColor {
-  PRIMARY = "primary",
-  SECONDARY = "secondary",
-  DESTRUCTIVE = "destructive",
-  NEUTRAL = "neutral",
-  LIGHT = "light",
-  DARK = "dark",
-  TEXT = "text",
-  CARD = "card",
-  TEXT_INVERSE = "text-inverse",
-  CURRENT = "current",
-  ERROR = "error",
-  SUCCESS = "success",
-  CUSTOM = "custom",
-}
+export const ButtonColor = {
+  PRIMARY: "primary",
+  SECONDARY: "secondary",
+  DESTRUCTIVE: "destructive",
+  NEUTRAL: "neutral",
+  LIGHT: "light",
+  DARK: "dark",
+  TEXT: "text",
+  CARD: "card",
+  TEXT_INVERSE: "text-inverse",
+  CURRENT: "current",
+  ERROR: "error",
+  SUCCESS: "success",
+  CUSTOM: "custom",
+} as const;
+
+export type ButtonColor = (typeof ButtonColor)[keyof typeof ButtonColor];
 
 /**
  * Text alignment options for button content
  */
-export enum ButtonTextAlign {
-  LEFT = "left",
-  CENTER = "center",
-  RIGHT = "right",
-}
+export const ButtonTextAlign = {
+  LEFT: "left",
+  CENTER: "center",
+  RIGHT: "right",
+} as const;
+
+export type ButtonTextAlign =
+  (typeof ButtonTextAlign)[keyof typeof ButtonTextAlign];
 
 /**
  * Enhanced button variants with improved accessibility and focus states
@@ -86,94 +96,98 @@ export const buttonVariants = cva(
   {
     variants: {
       size: {
-        [`${ButtonSize.SM}`]: "min-h-7 px-3 text-xs max-md:py-1",
-        [`${ButtonSize.MD}`]: "min-h-8 px-6 text-sm max-md:py-2",
-        [`${ButtonSize.LG}`]: "min-h-10 px-8 text-lg max-md:py-3",
-        [`${ButtonSize.XL}`]: "min-h-11 px-10 text-xl max-md:py-4",
-        [`${ButtonSize.ICON_SM}`]: "p-1.5",
-        [`${ButtonSize.ICON_MD}`]: "p-1.5",
-        [`${ButtonSize.ICON_LG}`]: "p-2",
-        [`${ButtonSize.ICON_XL}`]: "p-3",
+        [ButtonSize.SM]: "min-h-7 px-3 text-xs max-md:py-1",
+        [ButtonSize.MD]: "min-h-8 px-6 text-sm max-md:py-2",
+        [ButtonSize.LG]: "min-h-10 px-8 text-lg max-md:py-3",
+        [ButtonSize.XL]: "min-h-11 px-10 text-xl max-md:py-4",
+        [ButtonSize.ICON_SM]: "p-1.5",
+        [ButtonSize.ICON_MD]: "p-1.5",
+        [ButtonSize.ICON_LG]: "p-2",
+        [ButtonSize.ICON_XL]: "p-3",
       },
       color: {
-        [`${ButtonColor.PRIMARY}`]:
+        [ButtonColor.PRIMARY]:
           "hover-primary-500/20 text-primary ring-primary-500/20 *:text-text-light",
-        [`${ButtonColor.SECONDARY}`]:
+        [ButtonColor.SECONDARY]:
           "hover-secondary-500/20 text-secondary ring-secondary-500/20 *:text-text-light",
-        [`${ButtonColor.DESTRUCTIVE}`]:
+        [ButtonColor.DESTRUCTIVE]:
           "hover-destructive-500/20 text-destructive ring-destructive-500/20 *:text-text-light",
-        [`${ButtonColor.NEUTRAL}`]:
+        [ButtonColor.NEUTRAL]:
           "text-neutral ring-neutral-500/5 *:text-text-light",
-        [`${ButtonColor.CARD}`]:
+        [ButtonColor.CARD]:
           "hover-card-500/20 text-card ring-card-500/20 *:text-text-light",
-        [`${ButtonColor.LIGHT}`]:
+        [ButtonColor.LIGHT]:
           "hover-white-500/20 text-white ring-white/20 *:text-text-light",
-        [`${ButtonColor.DARK}`]:
+        [ButtonColor.DARK]:
           "text-neutral-800 ring-text-light/50 *:text-text-light",
-        [`${ButtonColor.TEXT}`]: "text-text ring-text/20 *:text-text-opposite",
-        [`${ButtonColor.CURRENT}`]:
+        [ButtonColor.TEXT]: "text-text ring-text/20 *:text-text-opposite",
+        [ButtonColor.CURRENT]:
           "hover-current-500/10 text-current ring-current/10 *:text-text-light",
-        [`${ButtonColor.TEXT_INVERSE}`]:
+        [ButtonColor.TEXT_INVERSE]:
           "text-text-opposite ring-text-opposite/20 *:text-text",
-        [`${ButtonColor.ERROR}`]:
+        [ButtonColor.ERROR]:
           "hover-error-500/20 text-error ring-error/20 *:text-text-light",
-        [`${ButtonColor.SUCCESS}`]:
+        [ButtonColor.SUCCESS]:
           "hover-success-500/20 text-success ring-success/20 *:text-text-light",
-        [`${ButtonColor.CUSTOM}`]: "",
+        [ButtonColor.CUSTOM]: "",
       },
       roundedSize: {
-        [`${ButtonRoundedSize.NONE}`]: "rounded-none",
-        [`${ButtonRoundedSize.SM}`]:
+        [ButtonRoundedSize.NONE]: "rounded-none",
+        [ButtonRoundedSize.SM]:
           "rounded-lg [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-xl",
-        [`${ButtonRoundedSize.MD}`]:
+        [ButtonRoundedSize.MD]:
           "rounded-xl [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-2xl",
-        [`${ButtonRoundedSize.LG}`]:
+        [ButtonRoundedSize.LG]:
           "rounded-2xl [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-3xl",
-        [`${ButtonRoundedSize.XL}`]:
+        [ButtonRoundedSize.XL]:
           "rounded-3xl [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-4xl",
-        [`${ButtonRoundedSize["2xl"]}`]:
+        [ButtonRoundedSize["2xl"]]:
           "rounded-4xl [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-[2.5rem]",
-        [`${ButtonRoundedSize["3xl"]}`]:
+        [ButtonRoundedSize["3xl"]]:
           "rounded-[2.5rem] [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-[3rem]",
-        [`${ButtonRoundedSize["4xl"]}`]:
+        [ButtonRoundedSize["4xl"]]:
           "rounded-[3rem] [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-[4rem]",
-        [`${ButtonRoundedSize["5xl"]}`]:
+        [ButtonRoundedSize["5xl"]]:
           "rounded-[4rem] [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-[5rem]",
-        [`${ButtonRoundedSize.FULL}`]: "rounded-full",
+        [ButtonRoundedSize.FULL]: "rounded-full",
       },
       variant: {
-        [`${ButtonVariant.DEFAULT}`]: [
+        [ButtonVariant.DEFAULT]: [
           "bg-current",
           "hover:bg-current/90",
           "hover:ring-5",
           "aria-selected:ring-5",
         ],
 
-        [`${ButtonVariant.OUTLINE}`]: [
+        [ButtonVariant.OUTLINE]: [
           "rounded-2xl border-[1.3px] border-current bg-current/0 *:text-current!",
           "hover:bg-current/20 focus-visible:bg-current/20",
           "hover:ring-5 focus-visible:ring-5",
           "aria-selected:ring-5",
         ],
 
-        [`${ButtonVariant.NONE}`]:
+        [ButtonVariant.NONE]:
           "border-none bg-current/0 text-inherit hover:bg-current/0",
 
-        [`${ButtonVariant.LINK}`]:
+        [ButtonVariant.LINK]:
           "h-auto justify-start border-inherit bg-transparent px-1 underline-offset-4 *:text-current! hover:bg-transparent hover:underline",
 
-        [`${ButtonVariant.INVISIBLE_LINK}`]:
+        [ButtonVariant.INVISIBLE_LINK]:
           "h-auto justify-start border-inherit bg-transparent px-1 underline-offset-4 *:text-current! hover:bg-transparent",
 
-        [`${ButtonVariant.HOVERABLE}`]:
+        [ButtonVariant.HOVERABLE]:
           "rounded-lg border-none bg-current/0 transition *:text-current! hover:bg-current/20 aria-[current]:bg-current/5",
 
-        [`${ButtonVariant.FADE}`]: [
+        [ButtonVariant.FADE]: [
           "rounded-lg border-none bg-current/10 ring-current/5 transition *:text-current! hover:bg-current/20 aria-[current]:bg-current/5",
           "hover:ring-5 focus-visible:ring-5",
           "aria-selected:ring-5",
         ],
-        [`${ButtonVariant.INPUT}`]: [
+
+        [ButtonVariant.GHOST]:
+          "border-none bg-transparent hover:bg-current/10 focus-visible:bg-current/10",
+
+        [ButtonVariant.INPUT]: [
           // base styles
           "text-text",
           "w-full select-text resize-none rounded-2xl text-base shadow-none outline-none supports-[corner-shape:squircle]:rounded-4xl",
@@ -203,9 +217,9 @@ export const buttonVariants = cva(
       },
 
       textAlign: {
-        [`${ButtonTextAlign.LEFT}`]: "justify-start text-left",
-        [`${ButtonTextAlign.CENTER}`]: "justify-center text-center",
-        [`${ButtonTextAlign.RIGHT}`]: "justify-end text-right",
+        [ButtonTextAlign.LEFT]: "justify-start text-left",
+        [ButtonTextAlign.CENTER]: "justify-center text-center",
+        [ButtonTextAlign.RIGHT]: "justify-end text-right",
       },
 
       isFullWidth: {
@@ -214,11 +228,11 @@ export const buttonVariants = cva(
       },
     },
     defaultVariants: {
-      variant: `${ButtonVariant.DEFAULT}`,
-      size: `${ButtonSize.MD}`,
-      color: `${ButtonColor.CUSTOM}`,
-      roundedSize: `${ButtonRoundedSize.MD}`,
-      textAlign: `${ButtonTextAlign.CENTER}`,
+      variant: ButtonVariant.DEFAULT,
+      size: ButtonSize.MD,
+      color: ButtonColor.CUSTOM,
+      roundedSize: ButtonRoundedSize.MD,
+      textAlign: ButtonTextAlign.CENTER,
       isFullWidth: false,
     },
   },
@@ -365,8 +379,7 @@ export const Button: FC<ButtonProps> = ({
   ...props
 }) => {
   const isLink =
-    variant === `${ButtonVariant.LINK}` ||
-    variant === `${ButtonVariant.INVISIBLE_LINK}`;
+    variant === ButtonVariant.LINK || variant === ButtonVariant.INVISIBLE_LINK;
   const isIconOnly = !children && (Icon || IconRight);
 
   const accessibilityProps = {

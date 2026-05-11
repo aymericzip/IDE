@@ -14,21 +14,27 @@ export const defaultChoices: SwitchSelectorChoices<boolean> = [
   { content: "On", value: true },
 ];
 
-export enum SwitchSelectorColor {
-  PRIMARY = "primary",
-  SECONDARY = "secondary",
-  DESTRUCTIVE = "destructive",
-  NEUTRAL = "neutral",
-  LIGHT = "light",
-  DARK = "dark",
-  TEXT = "text",
-}
+export const SwitchSelectorColor = {
+  PRIMARY: "primary",
+  SECONDARY: "secondary",
+  DESTRUCTIVE: "destructive",
+  NEUTRAL: "neutral",
+  LIGHT: "light",
+  DARK: "dark",
+  TEXT: "text",
+} as const;
 
-export enum SwitchSelectorSize {
-  SM = "sm",
-  MD = "md",
-  LG = "lg",
-}
+export type SwitchSelectorColor =
+  (typeof SwitchSelectorColor)[keyof typeof SwitchSelectorColor];
+
+export const SwitchSelectorSize = {
+  SM: "sm",
+  MD: "md",
+  LG: "lg",
+} as const;
+
+export type SwitchSelectorSize =
+  (typeof SwitchSelectorSize)[keyof typeof SwitchSelectorSize];
 
 export type SwitchSelectorBaseProps<T = boolean> = {
   choices?: SwitchSelectorChoices<T>;
@@ -51,14 +57,14 @@ export const switchSelectorVariant = cva(
   {
     variants: {
       color: {
-        [`${SwitchSelectorColor.PRIMARY}`]: "border-primary text-primary",
-        [`${SwitchSelectorColor.SECONDARY}`]: "border-secondary text-secondary",
-        [`${SwitchSelectorColor.DESTRUCTIVE}`]:
+        [SwitchSelectorColor.PRIMARY]: "border-primary text-primary",
+        [SwitchSelectorColor.SECONDARY]: "border-secondary text-secondary",
+        [SwitchSelectorColor.DESTRUCTIVE]:
           "border-destructive bg-destructive text-destructive",
-        [`${SwitchSelectorColor.NEUTRAL}`]: "border-neutral text-neutral",
-        [`${SwitchSelectorColor.LIGHT}`]: "border-white text-white",
-        [`${SwitchSelectorColor.DARK}`]: "border-neutral-800 text-neutral-800",
-        [`${SwitchSelectorColor.TEXT}`]: "border-text text-text",
+        [SwitchSelectorColor.NEUTRAL]: "border-neutral text-neutral",
+        [SwitchSelectorColor.LIGHT]: "border-white text-white",
+        [SwitchSelectorColor.DARK]: "border-neutral-800 text-neutral-800",
+        [SwitchSelectorColor.TEXT]: "border-text text-text",
       },
       disabled: {
         true: "cursor-not-allowed opacity-50",
@@ -66,7 +72,7 @@ export const switchSelectorVariant = cva(
       },
     },
     defaultVariants: {
-      color: `${SwitchSelectorColor.PRIMARY}`,
+      color: SwitchSelectorColor.PRIMARY,
       disabled: false,
     },
   },
@@ -77,13 +83,13 @@ export const choiceVariant = cva(
   {
     variants: {
       size: {
-        [`${SwitchSelectorSize.SM}`]: "px-2 py-1 text-xs",
-        [`${SwitchSelectorSize.MD}`]: "p-2 text-sm",
-        [`${SwitchSelectorSize.LG}`]: "p-4 text-base",
+        [SwitchSelectorSize.SM]: "px-2 py-1 text-xs",
+        [SwitchSelectorSize.MD]: "p-2 text-sm",
+        [SwitchSelectorSize.LG]: "p-4 text-base",
       },
     },
     defaultVariants: {
-      size: `${SwitchSelectorSize.MD}`,
+      size: SwitchSelectorSize.MD,
     },
   },
 );
@@ -93,19 +99,19 @@ export const indicatorVariant = cva(
   {
     variants: {
       color: {
-        [`${SwitchSelectorColor.PRIMARY}`]:
+        [SwitchSelectorColor.PRIMARY]:
           "bg-primary data-[indicator=true]:text-text",
-        [`${SwitchSelectorColor.SECONDARY}`]:
+        [SwitchSelectorColor.SECONDARY]:
           "bg-secondary data-[indicator=true]:text-text",
-        [`${SwitchSelectorColor.DESTRUCTIVE}`]:
+        [SwitchSelectorColor.DESTRUCTIVE]:
           "bg-destructive data-[indicator=true]:text-text",
-        [`${SwitchSelectorColor.NEUTRAL}`]:
+        [SwitchSelectorColor.NEUTRAL]:
           "bg-neutral data-[indicator=true]:text-white",
-        [`${SwitchSelectorColor.LIGHT}`]:
+        [SwitchSelectorColor.LIGHT]:
           "bg-white data-[indicator=true]:text-black",
-        [`${SwitchSelectorColor.DARK}`]:
+        [SwitchSelectorColor.DARK]:
           "bg-neutral-800 data-[indicator=true]:text-white",
-        [`${SwitchSelectorColor.TEXT}`]:
+        [SwitchSelectorColor.TEXT]:
           "bg-text data-[indicator=true]:text-text-opposite",
       },
     },
@@ -123,7 +129,6 @@ export const SwitchSelector = <T,>(props: SwitchSelectorProps<T>) => {
     size = SwitchSelectorSize.MD,
     className,
     itemClassName,
-    ...baseProps
   } = props;
 
   const {

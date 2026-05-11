@@ -97,74 +97,94 @@ export const containerVariants = cva("flex flex-col text-text backdrop-blur", {
 });
 
 /** Available rounded corner sizes for the container */
-export enum ContainerRoundedSize {
-  NONE = "none",
-  SM = "sm",
-  MD = "md",
-  LG = "lg",
-  XL = "xl",
-  "2xl" = "2xl",
-  "3xl" = "3xl",
-  "4xl" = "4xl",
-  "5xl" = "5xl",
-  FULL = "full",
-}
+export const ContainerRoundedSize = {
+  NONE: "none",
+  SM: "sm",
+  MD: "md",
+  LG: "lg",
+  XL: "xl",
+  "2xl": "2xl",
+  "3xl": "3xl",
+  "4xl": "4xl",
+  "5xl": "5xl",
+  FULL: "full",
+} as const;
+
+export type ContainerRoundedSize =
+  (typeof ContainerRoundedSize)[keyof typeof ContainerRoundedSize];
 
 /** Background transparency levels for the container */
-export enum ContainerTransparency {
-  NONE = "none",
-  SM = "sm",
-  MD = "md",
-  LG = "lg",
-  XL = "xl",
-  FULL = "full",
-}
+export const ContainerTransparency = {
+  NONE: "none",
+  SM: "sm",
+  MD: "md",
+  LG: "lg",
+  XL: "xl",
+  FULL: "full",
+} as const;
+
+export type ContainerTransparency =
+  (typeof ContainerTransparency)[keyof typeof ContainerTransparency];
 
 /** Padding sizes for container content */
-export enum ContainerPadding {
-  NONE = "none",
-  SM = "sm",
-  MD = "md",
-  LG = "lg",
-  XL = "xl",
-}
+export const ContainerPadding = {
+  NONE: "none",
+  SM: "sm",
+  MD: "md",
+  LG: "lg",
+  XL: "xl",
+} as const;
+
+export type ContainerPadding =
+  (typeof ContainerPadding)[keyof typeof ContainerPadding];
 
 /** Separator options for dividing container children */
-export enum ContainerSeparator {
-  WITHOUT = "without",
-  X = "x",
-  Y = "y",
-  BOTH = "both",
-}
+export const ContainerSeparator = {
+  WITHOUT: "without",
+  X: "x",
+  Y: "y",
+  BOTH: "both",
+} as const;
+
+export type ContainerSeparator =
+  (typeof ContainerSeparator)[keyof typeof ContainerSeparator];
 
 /** Border color options for the container */
-export enum ContainerBorderColor {
-  PRIMARY = "primary",
-  SECONDARY = "secondary",
-  NEUTRAL = "neutral",
-  CARD = "card",
-  TEXT = "text",
-  ERROR = "error",
-  WARNING = "warning",
-  SUCCESS = "success",
-}
+export const ContainerBorderColor = {
+  PRIMARY: "primary",
+  SECONDARY: "secondary",
+  NEUTRAL: "neutral",
+  CARD: "card",
+  TEXT: "text",
+  ERROR: "error",
+  WARNING: "warning",
+  SUCCESS: "success",
+} as const;
+
+export type ContainerBorderColor =
+  (typeof ContainerBorderColor)[keyof typeof ContainerBorderColor];
 
 /** Background interaction states for the container */
-export enum ContainerBackground {
-  NONE = "none",
-  HOVERABLE = "hoverable",
-  WITH = "with",
-}
+export const ContainerBackground = {
+  NONE: "none",
+  HOVERABLE: "hoverable",
+  WITH: "with",
+} as const;
+
+export type ContainerBackground =
+  (typeof ContainerBackground)[keyof typeof ContainerBackground];
 
 /** Gap sizes between container children */
-export enum ContainerGap {
-  NONE = "none",
-  SM = "sm",
-  MD = "md",
-  LG = "lg",
-  XL = "xl",
-  "2xl" = "2xl",
-}
+export const ContainerGap = {
+  NONE: "none",
+  SM: "sm",
+  MD: "md",
+  LG: "lg",
+  XL: "xl",
+  "2xl": "2xl",
+} as const;
+
+export type ContainerGap = (typeof ContainerGap)[keyof typeof ContainerGap];
 
 /** Container component props extending HTML div attributes */
 export type ContainerProps = PropsWithChildren<

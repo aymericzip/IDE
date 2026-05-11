@@ -12,110 +12,124 @@ import { cn } from "./lib/utils";
 /**
  * Visual style variants for Link component
  */
-export enum LinkVariant {
-  DEFAULT = "default",
-  INVISIBLE_LINK = "invisible-link",
-  BUTTON = "button",
-  BUTTON_OUTLINED = "button-outlined",
-  HOVERABLE = "hoverable",
-}
+/**
+ * Visual style variants for Link component
+ */
+export const LinkVariant = {
+  DEFAULT: "default",
+  INVISIBLE_LINK: "invisible-link",
+  BUTTON: "button",
+  BUTTON_OUTLINED: "button-outlined",
+  HOVERABLE: "hoverable",
+} as const;
+
+export type LinkVariant = (typeof LinkVariant)[keyof typeof LinkVariant];
 
 /**
  * Color theme variants for Link component
  */
-export enum LinkColor {
-  PRIMARY = "primary",
-  SECONDARY = "secondary",
-  DESTRUCTIVE = "destructive",
-  NEUTRAL = "neutral",
-  LIGHT = "light",
-  DARK = "dark",
-  TEXT = "text",
-  TEXT_INVERSE = "text-inverse",
-  ERROR = "error",
-  SUCCESS = "success",
-  CUSTOM = "custom",
-}
+export const LinkColor = {
+  PRIMARY: "primary",
+  SECONDARY: "secondary",
+  DESTRUCTIVE: "destructive",
+  NEUTRAL: "neutral",
+  LIGHT: "light",
+  DARK: "dark",
+  TEXT: "text",
+  TEXT_INVERSE: "text-inverse",
+  ERROR: "error",
+  SUCCESS: "success",
+  CUSTOM: "custom",
+} as const;
 
-export enum LinkRoundedSize {
-  NONE = "none",
-  SM = "sm",
-  MD = "md",
-  LG = "lg",
-  XL = "xl",
-  TWO_XL = "2xl",
-  THREE_XL = "3xl",
-  FULL = "full",
-}
+export type LinkColor = (typeof LinkColor)[keyof typeof LinkColor];
 
-export enum LinkSize {
-  SM = "sm",
-  MD = "md",
-  LG = "lg",
-  XL = "xl",
-  CUSTOM = "custom",
-}
+export const LinkRoundedSize = {
+  NONE: "none",
+  SM: "sm",
+  MD: "md",
+  LG: "lg",
+  XL: "xl",
+  TWO_XL: "2xl",
+  THREE_XL: "3xl",
+  FULL: "full",
+} as const;
 
-export enum LinkUnderlined {
-  DEFAULT = "default",
-  TRUE = "true",
-  FALSE = "false",
-}
+export type LinkRoundedSize =
+  (typeof LinkRoundedSize)[keyof typeof LinkRoundedSize];
+
+export const LinkSize = {
+  SM: "sm",
+  MD: "md",
+  LG: "lg",
+  XL: "xl",
+  CUSTOM: "custom",
+} as const;
+
+export type LinkSize = (typeof LinkSize)[keyof typeof LinkSize];
+
+export const LinkUnderlined = {
+  DEFAULT: "default",
+  TRUE: "true",
+  FALSE: "false",
+} as const;
+
+export type LinkUnderlined = (typeof LinkUnderlined)[keyof typeof LinkUnderlined];
 
 export const linkVariants = cva(
   "gap-3 transition-all duration-300 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        [`${LinkVariant.DEFAULT}`]:
+        [LinkVariant.DEFAULT]:
           "h-auto justify-start border-inherit bg-current/0 px-1 font-medium decoration-[1.5] underline-offset-5 hover:bg-current/0 hover:text-current/80 hover:underline hover:underline-offset-6",
-        [`${LinkVariant.INVISIBLE_LINK}`]:
+        [LinkVariant.INVISIBLE_LINK]:
           "h-auto justify-start border-inherit bg-current/0 px-1 underline-offset-5 hover:bg-current/0 aria-[current]:bg-current/5",
 
-        [`${LinkVariant.BUTTON}`]:
+        [LinkVariant.BUTTON]:
           "relative flex cursor-pointer flex-row items-center justify-center gap-2 rounded-full bg-current text-center font-medium text-text ring-0 *:text-text-opposite hover:bg-current/90 hover:ring-5 aria-selected:ring-5 aria-[current]:ring-5",
 
-        [`${LinkVariant.BUTTON_OUTLINED}`]:
+        [LinkVariant.BUTTON_OUTLINED]:
           "relative flex cursor-pointer flex-row items-center justify-center gap-2 rounded-full border-[1.3px] border-current text-center font-medium text-text ring-0 *:text-text hover:bg-current/20 hover:ring-5 aria-selected:ring-5 aria-[current]:ring-5",
 
-        [`${LinkVariant.HOVERABLE}`]:
+        [LinkVariant.HOVERABLE]:
           "block rounded-lg border-none bg-current/0 hover:bg-current/10 aria-[current]:bg-current/5",
       },
       roundedSize: {
-        [`${LinkRoundedSize.NONE}`]: "rounded-none",
-        [`${LinkRoundedSize.SM}`]:
+        [LinkRoundedSize.NONE]: "rounded-none",
+        [LinkRoundedSize.SM]:
           "rounded-lg [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-xl",
-        [`${LinkRoundedSize.MD}`]:
+        [LinkRoundedSize.MD]:
           "rounded-xl [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-2xl",
-        [`${LinkRoundedSize.LG}`]:
+        [LinkRoundedSize.LG]:
           "rounded-2xl [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-3xl",
-        [`${LinkRoundedSize.XL}`]:
+        [LinkRoundedSize.XL]:
           "rounded-3xl [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-4xl",
-        [`${LinkRoundedSize.TWO_XL}`]:
+        [LinkRoundedSize.TWO_XL]:
           "rounded-4xl [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-[2.5rem]",
-        [`${LinkRoundedSize.THREE_XL}`]:
+        [LinkRoundedSize.THREE_XL]:
           "rounded-[2.5rem] [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-[3rem]",
-        [`${LinkRoundedSize.FULL}`]: "rounded-full",
+        [LinkRoundedSize.FULL]: "rounded-full",
       },
       color: {
-        [`${LinkColor.PRIMARY}`]: "text-primary",
-        [`${LinkColor.SECONDARY}`]: "text-secondary",
-        [`${LinkColor.DESTRUCTIVE}`]: "text-destructive",
-        [`${LinkColor.NEUTRAL}`]: "text-neutral",
-        [`${LinkColor.LIGHT}`]: "text-white",
-        [`${LinkColor.DARK}`]: "text-neutral-800",
-        [`${LinkColor.TEXT}`]: "text-text",
-        [`${LinkColor.TEXT_INVERSE}`]: "text-text-opposite",
-        [`${LinkColor.ERROR}`]: "text-error",
-        [`${LinkColor.SUCCESS}`]: "text-success",
-        [`${LinkColor.CUSTOM}`]: "",
+        [LinkColor.PRIMARY]: "text-primary",
+        [LinkColor.SECONDARY]: "text-secondary",
+        [LinkColor.DESTRUCTIVE]: "text-destructive",
+        [LinkColor.NEUTRAL]: "text-neutral",
+        [LinkColor.LIGHT]: "text-white",
+        [LinkColor.DARK]: "text-neutral-800",
+        [LinkColor.TEXT]: "text-text",
+        [LinkColor.TEXT_INVERSE]: "text-text-opposite",
+        [LinkColor.ERROR]: "text-error",
+        [LinkColor.SUCCESS]: "text-success",
+        [LinkColor.CUSTOM]: "",
       },
       size: {
-        [`${LinkSize.SM}`]: "text-sm",
-        [`${LinkSize.MD}`]: "text-base",
-        [`${LinkSize.LG}`]: "text-lg",
-        [`${LinkSize.XL}`]: "text-xl",
-        [`${LinkSize.CUSTOM}`]: "",
+        [LinkSize.SM]: "text-sm",
+        [LinkSize.MD]: "text-base",
+        [LinkSize.LG]: "text-lg",
+        [LinkSize.XL]: "text-xl",
+        [LinkSize.CUSTOM]: "",
       },
       underlined: {
         [LinkUnderlined.DEFAULT]: "",

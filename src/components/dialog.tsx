@@ -1,7 +1,7 @@
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { XIcon } from "lucide-react";
 import type * as React from "react";
-import { Button } from "./button";
+import { Button, ButtonVariant } from "./button";
 import { cn } from "./lib/utils";
 
 export const Dialog = ({ ...props }: DialogPrimitive.Root.Props) => {
@@ -56,7 +56,8 @@ export const DialogContent = ({
             data-slot="dialog-close"
             render={
               <Button
-                variant="ghost"
+                variant={ButtonVariant.GHOST}
+                label="Close dialog"
                 className="absolute top-4 right-4"
                 size="icon-sm"
               />
@@ -101,7 +102,9 @@ export const DialogFooter = ({
     >
       {children}
       {showCloseButton && (
-        <DialogPrimitive.Close render={<Button variant="outline" />}>
+        <DialogPrimitive.Close
+          render={<Button variant={ButtonVariant.OUTLINE} label="Close" />}
+        >
           Close
         </DialogPrimitive.Close>
       )}

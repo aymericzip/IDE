@@ -4,10 +4,12 @@ import type { FC } from "react";
 import { useEffect, useState } from "react";
 import { SwitchSelector, type SwitchSelectorChoices } from "./switch-selector";
 
-enum Modes {
-  light = "light",
-  dark = "dark",
-}
+const Modes = {
+  light: "light",
+  dark: "dark",
+} as const;
+
+type Modes = (typeof Modes)[keyof typeof Modes];
 
 export const SwitchThemeSwitcher: FC = () => {
   const { resolvedTheme, setTheme } = useTheme();

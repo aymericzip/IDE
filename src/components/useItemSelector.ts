@@ -41,7 +41,7 @@ export const useItemSelector = (
     useState<StyleState | null>(null);
 
   const [hoveredItem, setHoveredItem] = useState<HTMLElement | null>(null);
-  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastPositionRef = useRef<StyleState | null>(null);
 
   const itemsLength = optionsRefs.current.length;

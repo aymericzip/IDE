@@ -1,7 +1,6 @@
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import type { TreeDataItem, WorkspaceProps, WorkspaceRef } from "idecn";
 import { AlertTriangle, PanelLeft, X } from "lucide-react";
-import { useTheme } from "next-themes";
 import { type ComponentType, useEffect, useRef, useState } from "react";
 import { SwitchThemeSwitcher } from "./components/switchTheme-switcher";
 import { toast } from "sonner";
@@ -35,8 +34,6 @@ export const Explorer = ({
   const [tree, setTree] = useState(initialTree);
   const [error, setError] = useState<null | string>(null);
   const [input, setInput] = useState(initialRepo);
-  const [mounted, setMounted] = useState(false);
-  const { resolvedTheme, setTheme } = useTheme();
   const ref = useRef<WorkspaceRef>(null);
   const [Workspace, setWorkspace] =
     useState<ComponentType<WorkspaceProps> | null>(null);
@@ -55,10 +52,6 @@ export const Explorer = ({
     setRepo(initialRepo);
     setInput(initialRepo);
   }, [initialRepo]);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     setError(null);
