@@ -214,12 +214,13 @@ export const fetchFile = async (
 
   if (githubToken) {
     const branch = await getDefaultBranch(repo).catch(() => "main");
-    const rawUrl = `https://raw.githubusercontent.com/${repo}/${branch}/${path}`;
+    const url = `https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}`;
     const headers: Record<string, string> = {
+      Accept: "application/vnd.github.v3.raw",
       Authorization: `Bearer ${githubToken}`,
     };
 
-    const response = await fetch(rawUrl, { headers });
+    const response = await fetch(url, { headers });
 
     if (response.ok) {
       if (IMAGE_EXTS.has(extension)) {
@@ -231,6 +232,7 @@ export const fetchFile = async (
 
       return response.text();
     }
+    console.error(`Failed to fetch file from GitHub API: ${response.status} ${response.statusText}`, url);
   }
 
   // JSDelivr automatically resolves the default branch!
@@ -260,14 +262,15 @@ export const downloadFile = async (
   const branch = await getDefaultBranch(repo).catch(() => "main");
   const headers: Record<string, string> = {};
 
+  let url = `https://raw.githubusercontent.com/${repo}/${branch}/${path}`;
+
   if (githubToken) {
     headers.Authorization = `Bearer ${githubToken}`;
+    headers.Accept = "application/vnd.github.v3.raw";
+    url = `https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}`;
   }
 
-  const response = await fetch(
-    `https://raw.githubusercontent.com/${repo}/${branch}/${path}`,
-    { headers },
-  );
+  const response = await fetch(url, { headers });
 
   if (!response.ok) {
     return null;
@@ -324,10 +327,15 @@ export const downloadFolder = async (
   const entries: { input: Uint8Array; name: string }[] = [];
 
   for (const blob of blobs) {
-    const rawResponse = await fetch(
-      `https://raw.githubusercontent.com/${repo}/${branch}/${blob.path}`,
-      { headers },
-    );
+    let rawUrl = `https://raw.githubusercontent.com/${repo}/${branch}/${blob.path}`;
+    const rawHeaders: Record<string, string> = { ...headers };
+
+    if (githubToken) {
+      rawHeaders.Accept = "application/vnd.github.v3.raw";
+      rawUrl = `https://api.github.com/repos/${repo}/contents/${blob.path}?ref=${branch}`;
+    }
+
+    const rawResponse = await fetch(rawUrl, { headers: rawHeaders });
 
     if (!rawResponse.ok) {
       continue;

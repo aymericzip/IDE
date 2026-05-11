@@ -89,6 +89,7 @@ const IdeApp = () => {
         }
 
         if (error.message === "PRIVATE_REPO_OR_NOT_FOUND") {
+          console.error(error);
           setLoadError(
             "This repository is private or not found. A GitHub token is needed. Waiting for token...",
           );
