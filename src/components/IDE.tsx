@@ -1,10 +1,10 @@
-import 'dockview-core/dist/styles/dockview.css';
-import { useHotkeys } from '@tanstack/react-hotkeys';
-import type { DockviewApi, DockviewReadyEvent } from 'dockview-react';
-import { DockviewReact } from 'dockview-react';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { ChevronRight, ChevronsDownUp } from 'lucide-react';
-import type { ComponentProps, ReactNode, Ref } from 'react';
+import "dockview-core/dist/styles/dockview.css";
+import { useHotkeys } from "@tanstack/react-hotkeys";
+import type { DockviewApi, DockviewReadyEvent } from "dockview-react";
+import { DockviewReact } from "dockview-react";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { ChevronRight, ChevronsDownUp } from "lucide-react";
+import type { ComponentProps, ReactNode, Ref } from "react";
 import {
   Children,
   createElement,
@@ -15,8 +15,8 @@ import {
   useMemo,
   useRef,
   useState,
-} from 'react';
-import { Group, Panel, Separator } from 'react-resizable-panels';
+} from "react";
+import { Group, Panel, Separator } from "react-resizable-panels";
 // Atoms & Context
 import {
   closedTabsAtom,
@@ -27,7 +27,7 @@ import {
   quickOpenAtom,
   treeAtom,
   wordWrapAtom,
-} from './ide/atoms';
+} from "./ide/atoms";
 // Constants & Utils
 import {
   BINARY_EXTS,
@@ -38,18 +38,18 @@ import {
   RESET_CSS,
   TAB_TYPE,
   VIRTUAL_PREFIX,
-} from './ide/constants';
-import { DockviewApiContext } from './ide/IDEContext';
-import { ContentPanel } from './ide/Panels/ContentPanel';
-import { FilePanel } from './ide/Panels/FilePanel';
-import { ImagePanel } from './ide/Panels/ImagePanel';
-import { WatermarkPanel } from './ide/Panels/WatermarkPanel';
-import { QuickOpenDialog } from './ide/QuickOpenDialog';
-import { StatusBar } from './ide/StatusBar';
-import { Tab } from './ide/Tabs/Tab';
-import { TabHeader } from './ide/Tabs/TabHeader';
+} from "./ide/constants";
+import { DockviewApiContext } from "./ide/IDEContext";
+import { ContentPanel } from "./ide/Panels/ContentPanel";
+import { FilePanel } from "./ide/Panels/FilePanel";
+import { ImagePanel } from "./ide/Panels/ImagePanel";
+import { WatermarkPanel } from "./ide/Panels/WatermarkPanel";
+import { QuickOpenDialog } from "./ide/QuickOpenDialog";
+import { StatusBar } from "./ide/StatusBar";
+import { Tab } from "./ide/Tabs/Tab";
+import { TabHeader } from "./ide/Tabs/TabHeader";
 // Components
-import { FileTree } from './ide/Tree';
+import { FileTree } from "./ide/Tree";
 // Types
 import type {
   FileActions,
@@ -58,7 +58,7 @@ import type {
   TreeDataItem,
   VirtualFile,
   WorkspaceRef,
-} from './ide/types';
+} from "./ide/types";
 import {
   deduplicateTitle,
   extOf,
@@ -69,9 +69,9 @@ import {
   resolveLanguageIcon,
   useAltKeys,
   virtualFileId,
-} from './ide/utils';
-import { cn } from './lib/utils';
-import { Toaster } from './sonner';
+} from "./ide/utils";
+import { cn } from "./lib/utils";
+import { Toaster } from "./sonner";
 
 const EMPTY_TREE: TreeDataItem[] = [];
 const COMPONENTS = { custom: ContentPanel, file: FilePanel, image: ImagePanel };
@@ -95,12 +95,12 @@ export const Workspace = ({
   renderLoading,
   shortcuts = true,
   sidebar: controlledSidebar,
-  sidebarPosition = 'left',
+  sidebarPosition = "left",
   sidebarSize = 150,
   theme,
   tree,
   ...props
-}: Omit<ComponentProps<'div'>, 'ref'> & {
+}: Omit<ComponentProps<"div">, "ref"> & {
   activityLog?: (line: string) => void;
   defaultSidebar?: boolean;
   editorOptions?: Record<string, unknown>;
@@ -117,7 +117,7 @@ export const Workspace = ({
   renderLoading?: (item: TreeDataItem) => ReactNode;
   shortcuts?: boolean;
   sidebar?: boolean;
-  sidebarPosition?: 'left' | 'right';
+  sidebarPosition?: "left" | "right";
   sidebarSize?: number;
   theme?: string | { dark: string; light: string };
   tree?: TreeDataItem[];
@@ -155,7 +155,7 @@ export const Workspace = ({
     (msg: string) => {
       activityLog?.(msg);
     },
-    [activityLog]
+    [activityLog],
   );
 
   const [internalSidebar, setInternalSidebar] = useState(defaultSidebar);
@@ -165,7 +165,7 @@ export const Workspace = ({
     const next = !sidebarVisible;
     setInternalSidebar(next);
     onSidebarChange?.(next);
-    log(next ? 'Sidebar opened' : 'Sidebar closed');
+    log(next ? "Sidebar opened" : "Sidebar closed");
   }, [log, onSidebarChange, sidebarVisible]);
 
   const stateRef = useRef({
@@ -189,9 +189,9 @@ export const Workspace = ({
     () => ({
       ...editorOptions,
       fontSize: (EDITOR_OPTIONS.fontSize ?? 14) + fontSizeDelta,
-      wordWrap: (internalWordWrap ? 'on' : 'off') as any,
+      wordWrap: (internalWordWrap ? "on" : "off") as any,
     }),
-    [editorOptions, fontSizeDelta, internalWordWrap]
+    [editorOptions, fontSizeDelta, internalWordWrap],
   );
 
   useEffect(() => {
@@ -218,11 +218,11 @@ export const Workspace = ({
     setMounted(true);
     const observer = new MutationObserver(() => {
       log(
-        `Theme: ${document.documentElement.classList.contains('dark') ? 'dark' : 'light'}`
+        `Theme: ${document.documentElement.classList.contains("dark") ? "dark" : "light"}`,
       );
     });
     observer.observe(document.documentElement, {
-      attributeFilter: ['class'],
+      attributeFilter: ["class"],
       attributes: true,
     });
     return () => {
@@ -251,11 +251,11 @@ export const Workspace = ({
     }
 
     const existingFile = api.panels.find((p) =>
-      stateRef.current.fileIds.has(p.id)
+      stateRef.current.fileIds.has(p.id),
     );
     const position: PanelPosition | undefined = existingFile
       ? ({
-          direction: 'within',
+          direction: "within",
           referenceGroup: existingFile.group.id,
         } as unknown as PanelPosition)
       : undefined;
@@ -265,7 +265,7 @@ export const Workspace = ({
     const iconName = file.language ? `file.${file.language}` : file.name;
 
     api.addPanel({
-      component: 'file',
+      component: "file",
       id,
       params: {
         content: file.content,
@@ -274,8 +274,8 @@ export const Workspace = ({
         language: lang,
         theme: themeRef.current,
       },
-      position: position as any,
-      tabComponent: 'default',
+      position,
+      tabComponent: "default",
       title: file.name,
     });
   }, []);
@@ -285,11 +285,11 @@ export const Workspace = ({
       const { api } = stateRef.current;
       const onOpen = onOpenFileRef.current;
       if (!api) {
-        log('openFileInPanel: no api');
+        log("openFileInPanel: no api");
         return;
       }
       if (!onOpen) {
-        log('openFileInPanel: no onOpenFile callback');
+        log("openFileInPanel: no onOpenFile callback");
         return;
       }
 
@@ -303,7 +303,7 @@ export const Workspace = ({
         return;
       }
 
-      log(`${preview ? 'Preview' : 'Open'}: ${item.path}`);
+      log(`${preview ? "Preview" : "Open"}: ${item.path}`);
 
       if (preview && previewIdRef.current) {
         const prev = api.panels.find((p) => p.id === previewIdRef.current);
@@ -321,17 +321,17 @@ export const Workspace = ({
       const loadingNode = loading ? (
         loading(item)
       ) : (
-        <div className={cn(CENTER, 'text-muted-foreground text-xs')}>
+        <div className={cn(CENTER, "text-muted-foreground text-xs")}>
           Loading...
         </div>
       );
 
       const existingFile = api.panels.find((p) =>
-        stateRef.current.fileIds.has(p.id)
+        stateRef.current.fileIds.has(p.id),
       );
       const position: PanelPosition | undefined = existingFile
         ? ({
-            direction: 'within',
+            direction: "within",
             referenceGroup: existingFile.group.id,
           } as unknown as PanelPosition)
         : undefined;
@@ -347,18 +347,18 @@ export const Workspace = ({
 
       if (isBinary) {
         api.addPanel({
-          component: 'custom',
+          component: "custom",
           id: item.path,
           params: {
             content: createElement(
-              'div',
-              { className: cn(CENTER, 'h-full text-muted-foreground text-xs') },
-              'Binary file — cannot display'
+              "div",
+              { className: cn(CENTER, "h-full text-muted-foreground text-xs") },
+              "Binary file — cannot display",
             ),
             iconName: item.name,
           },
-          position: position as any,
-          tabComponent: 'default',
+          position,
+          tabComponent: "default",
           title,
         });
         log(`Binary: ${item.path}`);
@@ -369,17 +369,17 @@ export const Workspace = ({
         const result = onOpen(item);
         const addImagePanel = (src: string) => {
           api.addPanel({
-            component: 'image',
+            component: "image",
             id: item.path,
             params: { iconName: item.name, src },
-            position: position as any,
-            tabComponent: 'default',
+            position,
+            tabComponent: "default",
             title,
           });
           log(`Image: ${item.path}`);
         };
         if (result === null) return;
-        if (typeof result === 'string') addImagePanel(result);
+        if (typeof result === "string") addImagePanel(result);
         else
           result
             .then((r) => {
@@ -390,18 +390,18 @@ export const Workspace = ({
       }
 
       const added = api.addPanel({
-        component: 'file',
+        component: "file",
         id: item.path,
         params: {
-          content: '',
+          content: "",
           editorOptions: editorOptionsRef.current,
           iconName: item.name,
           language: langOf(item.path),
           loading: loadingNode,
           theme: themeRef.current,
         },
-        position: position as any,
-        tabComponent: 'default',
+        position,
+        tabComponent: "default",
         title,
       });
 
@@ -411,10 +411,10 @@ export const Workspace = ({
         return;
       }
 
-      if (typeof result === 'string') {
+      if (typeof result === "string") {
         if (result.length > FILE_SIZE_WARN)
           log(
-            `Large file: ${item.path} (${Math.round(result.length / 1024)} KB)`
+            `Large file: ${item.path} (${Math.round(result.length / 1024)} KB)`,
           );
         added.api.updateParameters({ content: result, loading: undefined });
         log(`Loaded: ${item.path} (${result.length} chars)`);
@@ -428,14 +428,14 @@ export const Workspace = ({
               if (fileContent === null) {
                 p.api.updateParameters({
                   content:
-                    '// Failed to load file from repository. It might be empty, or you might be rate limited.',
+                    "// Failed to load file from repository. It might be empty, or you might be rate limited.",
                   loading: undefined,
                 });
                 log(`Load failed: ${panelPath}`);
               } else {
                 if (fileContent.length > FILE_SIZE_WARN)
                   log(
-                    `Large file: ${panelPath} (${Math.round(fileContent.length / 1024)} KB)`
+                    `Large file: ${panelPath} (${Math.round(fileContent.length / 1024)} KB)`,
                   );
                 p.api.updateParameters({
                   content: fileContent,
@@ -452,7 +452,7 @@ export const Workspace = ({
               const p = api.panels.find((x) => x.id === panelPath);
               if (p)
                 p.api.updateParameters({
-                  content: '// Error loading file.',
+                  content: "// Error loading file.",
                   loading: undefined,
                 });
               log(`Load error: ${panelPath}`);
@@ -462,17 +462,17 @@ export const Workspace = ({
           });
       }
     },
-    [log, setPreviewId]
+    [log, setPreviewId],
   );
 
   const openFile = useCallback(
     (item: TreeDataItem) => openFileInPanel(item, true),
-    [openFileInPanel]
+    [openFileInPanel],
   );
 
   const pinFile = useCallback(
     (item: TreeDataItem) => openFileInPanel(item, false),
-    [openFileInPanel]
+    [openFileInPanel],
   );
 
   const tabs = useMemo(() => extractTabs(children), [children]);
@@ -487,7 +487,7 @@ export const Workspace = ({
       return;
     }
     api.addPanel({
-      component: 'custom',
+      component: "custom",
       id: tabId,
       params: {
         activeClassName: tab.activeClassName,
@@ -497,20 +497,20 @@ export const Workspace = ({
         icon: tab.icon,
         inactiveClassName: tab.inactiveClassName,
       },
-      tabComponent: 'default',
+      tabComponent: "default",
       title: tab.title,
     });
   }, []);
 
   useHotkeys(
     [
-      { callback: () => toggleSidebar(), hotkey: 'Mod+B' },
+      { callback: () => toggleSidebar(), hotkey: "Mod+B" },
       {
         callback: () => {
           setQuickOpen((v) => !v);
-          log('Quick open toggled');
+          log("Quick open toggled");
         },
-        hotkey: 'Mod+P',
+        hotkey: "Mod+P",
       },
       {
         callback: () => {
@@ -520,35 +520,35 @@ export const Workspace = ({
               component: panel.view.contentComponent,
               id: `${panel.id}-split-${Date.now()}`,
               params: panel.params,
-              position: { direction: 'right', referencePanel: panel },
-              tabComponent: 'default',
-              title: panel.title ?? '',
+              position: { direction: "right", referencePanel: panel },
+              tabComponent: "default",
+              title: panel.title ?? "",
             });
             log(`Split: ${panel.title ?? panel.id}`);
           }
         },
-        hotkey: 'Mod+\\',
+        hotkey: "Mod+\\",
       },
       {
         callback: () => {
           setFontSizeDelta((d) => d + 2);
-          log('Zoom in');
+          log("Zoom in");
         },
-        hotkey: 'Mod+=',
+        hotkey: "Mod+=",
       },
       {
         callback: () => {
           setFontSizeDelta((d) => d - 2);
-          log('Zoom out');
+          log("Zoom out");
         },
-        hotkey: 'Mod+-',
+        hotkey: "Mod+-",
       },
       {
         callback: () => {
           setFontSizeDelta(0);
-          log('Zoom reset');
+          log("Zoom reset");
         },
-        hotkey: 'Mod+0',
+        hotkey: "Mod+0",
       },
       {
         callback: () => {
@@ -563,10 +563,10 @@ export const Workspace = ({
               } catch {}
           }
           log(
-            `Closed ${closed} tabs (${pinnedTabsRef.current.length} pinned kept)`
+            `Closed ${closed} tabs (${pinnedTabsRef.current.length} pinned kept)`,
           );
         },
-        hotkey: 'Mod+Shift+W',
+        hotkey: "Mod+Shift+W",
       },
       {
         callback: () => {
@@ -575,15 +575,15 @@ export const Workspace = ({
           setClosedTabs((prev) => prev.slice(0, -1));
           pinFile({
             id: lastPath,
-            name: lastPath.split('/').pop() ?? lastPath,
+            name: lastPath.split("/").pop() ?? lastPath,
             path: lastPath,
           });
           log(`Reopened: ${lastPath}`);
         },
-        hotkey: 'Mod+Shift+T',
+        hotkey: "Mod+Shift+T",
       },
     ],
-    { enabled: shortcuts, preventDefault: true }
+    { enabled: shortcuts, preventDefault: true },
   );
 
   useAltKeys(
@@ -594,7 +594,7 @@ export const Workspace = ({
         h.index--;
         h.navigating = true;
         const panel = stateRef.current.api?.panels.find(
-          (p) => p.id === h.entries[h.index]
+          (p) => p.id === h.entries[h.index],
         );
         if (panel) {
           panel.focus();
@@ -608,7 +608,7 @@ export const Workspace = ({
         h.index++;
         h.navigating = true;
         const panel = stateRef.current.api?.panels.find(
-          (p) => p.id === h.entries[h.index]
+          (p) => p.id === h.entries[h.index],
         );
         if (panel) {
           panel.focus();
@@ -631,7 +631,7 @@ export const Workspace = ({
         setClosedTabs((prev) => prev.slice(0, -1));
         pinFile({
           id: lastPath,
-          name: lastPath.split('/').pop() ?? lastPath,
+          name: lastPath.split("/").pop() ?? lastPath,
           path: lastPath,
         });
         log(`Reopened: ${lastPath}`);
@@ -645,10 +645,10 @@ export const Workspace = ({
       },
       KeyZ: () => {
         setInternalWordWrap((w) => !w);
-        log('Word wrap toggled');
+        log("Word wrap toggled");
       },
     },
-    shortcuts
+    shortcuts,
   );
 
   useEffect(() => {
@@ -667,7 +667,7 @@ export const Workspace = ({
       openFile: pinFile,
       toggleSidebar,
     }),
-    [pinFile, toggleSidebar]
+    [pinFile, toggleSidebar],
   );
 
   useEffect(() => {
@@ -736,11 +736,11 @@ export const Workspace = ({
 
     requestAnimationFrame(() => {
       if (initialFiles) {
-        log(`Opening files: ${initialFiles.join(', ')}`);
+        log(`Opening files: ${initialFiles.join(", ")}`);
         for (const fpath of initialFiles) {
           pinFile({
             id: fpath,
-            name: fpath.split('/').pop() ?? fpath,
+            name: fpath.split("/").pop() ?? fpath,
             path: fpath,
           });
         }
@@ -750,7 +750,7 @@ export const Workspace = ({
         });
       }
     });
-    log('Workspace ready');
+    log("Workspace ready");
 
     const notifyFiles = () => {
       if (!stateRef.current.ready) return;
@@ -794,7 +794,7 @@ export const Workspace = ({
           }
           log(`Focused: ${e.title ?? e.id}`);
         }
-      })
+      }),
     );
     stateRef.current.ready = true;
   };
@@ -808,9 +808,9 @@ export const Workspace = ({
       name: f.name,
       path: virtualFileId(f.name),
     });
-    const top = files?.filter((f) => f.pin === 'top').map(toItem) ?? [];
+    const top = files?.filter((f) => f.pin === "top").map(toItem) ?? [];
     const mid = files?.filter((f) => !f.pin).map(toItem) ?? [];
-    const bottom = files?.filter((f) => f.pin === 'bottom').map(toItem) ?? [];
+    const bottom = files?.filter((f) => f.pin === "bottom").map(toItem) ?? [];
     return [...top, ...mid, ...(tree ?? []), ...bottom];
   }, [files, tree]);
 
@@ -835,11 +835,11 @@ export const Workspace = ({
         <button
           className="p-0.5 text-muted-foreground transition-colors hover:text-foreground"
           onClick={() => {
-            log(treeCollapsed ? 'Tree expanded all' : 'Tree collapsed all');
+            log(treeCollapsed ? "Tree expanded all" : "Tree collapsed all");
             setTreeCollapsed((c) => !c);
             setTreeKey((k) => k + 1);
           }}
-          title={treeCollapsed ? 'Expand All' : 'Collapse All'}
+          title={treeCollapsed ? "Expand All" : "Collapse All"}
           type="button"
         >
           {treeCollapsed ? (
@@ -885,25 +885,25 @@ export const Workspace = ({
 
   const sidePanel = sidebarVisible ? (
     <>
-      {sidebarPosition === 'right' ? <Separator className="" /> : null}
+      {sidebarPosition === "right" ? <Separator className="" /> : null}
       <Panel defaultSize={sidebarSize} minSize={10}>
         <div
           className={cn(
-            'h-full bg-muted/70',
-            sidebarPosition === 'left' ? 'border-r' : 'border-l'
+            "h-full bg-muted/70",
+            sidebarPosition === "left" ? "border-r" : "border-l",
           )}
         >
           {sidebarContent}
         </div>
       </Panel>
-      {sidebarPosition === 'left' ? <Separator className="" /> : null}
+      {sidebarPosition === "left" ? <Separator className="" /> : null}
     </>
   ) : null;
 
   return (
     <Group orientation="horizontal" className={props.className}>
       <style>{RESET_CSS}</style>
-      {sidebarPosition === 'left' ? sidePanel : null}
+      {sidebarPosition === "left" ? sidePanel : null}
       <Panel minSize={20}>
         <div className="flex h-full flex-col">
           <DockviewApiContext value={dockviewApi}>
@@ -918,7 +918,7 @@ export const Workspace = ({
           <StatusBar />
         </div>
       </Panel>
-      {sidebarPosition === 'right' ? sidePanel : null}
+      {sidebarPosition === "right" ? sidePanel : null}
       <QuickOpenDialog
         log={log}
         onOpenFile={(item) => {
@@ -938,7 +938,7 @@ export const Workspace = ({
 export type WorkspaceProps = ComponentProps<typeof Workspace>;
 
 export const IDE = (props: WorkspaceProps) => {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === "undefined") return null;
   return <Workspace {...props} />;
 };
 
@@ -946,9 +946,9 @@ IDE.Tab = Tab;
 IDE.Tree = FileTree;
 IDE.Folder = Panel;
 
-export { Tab } from './ide/Tabs/Tab';
-export { FileTree, Tree, TreeFile, TreeFolder } from './ide/Tree';
+export { Tab } from "./ide/Tabs/Tab";
+export { FileTree, Tree, TreeFile, TreeFolder } from "./ide/Tree";
 // Re-export everything for compatibility
-export { FileIcon, FolderIcon } from './ide/Tree/TreeIcons';
-export { getIconSvg } from './ide/utils';
+export { FileIcon, FolderIcon } from "./ide/Tree/TreeIcons";
+export { getIconSvg } from "./ide/utils";
 export type { FileActions, TreeDataItem, VirtualFile, WorkspaceRef };
