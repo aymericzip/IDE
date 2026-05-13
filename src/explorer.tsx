@@ -9,6 +9,7 @@ import { EXPAND_EXCLUDE } from "./constants";
 import { downloadFile, downloadFolder, fetchFile, fetchTree } from "./repo-api";
 import { repoFromInput } from "./url-utils";
 import { Button } from "./components/button";
+import { useSearchParamState } from "./hooks/useSearchParamState";
 import "./ide.css";
 
 const triggerDownload = (base64: string, filename: string) => {
@@ -43,6 +44,10 @@ export const Explorer = ({
   const ref = useRef<WorkspaceRef>(null);
   const [Workspace, setWorkspace] =
     useState<ComponentType<WorkspaceProps> | null>(null);
+
+  const { setParam } = useSearchParamState({
+    file: { type: "string" },
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -187,6 +192,9 @@ export const Explorer = ({
           onOpenFile={async (item) => {
             const content = await fetchFile(repo, item.path).catch(() => null);
             return content;
+          }}
+          onTabChange={(id) => {
+            setParam("file", id);
           }}
           ref={ref}
           tree={tree}

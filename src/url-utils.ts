@@ -129,3 +129,10 @@ export const filesFromSearch = (search: string): string[] => {
 
   return allFiles;
 };
+
+export const themeFromSearch = (search: string): string | null => {
+  const params = new URLSearchParams(
+    search.startsWith("?") ? search : `?${search}`,
+  );
+  return params.get("theme");
+};

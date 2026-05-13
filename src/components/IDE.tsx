@@ -18,7 +18,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { Group, Panel } from "react-resizable-panels";
+import { Group, Panel, Separator } from "react-resizable-panels";
 // Atoms & Context
 import {
   closedTabsAtom,
@@ -43,10 +43,24 @@ import {
 import { DockviewApiContext } from "./ide/IDEContext";
 import { lazy } from "react";
 
-const ContentPanel = lazy(() => import("./ide/Panels/ContentPanel").then(mod => ({ default: mod.ContentPanel })));
-const FilePanel = lazy(() => import("./ide/Panels/FilePanel").then(mod => ({ default: mod.FilePanel })));
-const ImagePanel = lazy(() => import("./ide/Panels/ImagePanel").then(mod => ({ default: mod.ImagePanel })));
-const WatermarkPanel = lazy(() => import("./ide/Panels/WatermarkPanel").then(mod => ({ default: mod.WatermarkPanel })));
+const ContentPanel = lazy(() =>
+  import("./ide/Panels/ContentPanel").then((mod) => ({
+    default: mod.ContentPanel,
+  })),
+);
+const FilePanel = lazy(() =>
+  import("./ide/Panels/FilePanel").then((mod) => ({ default: mod.FilePanel })),
+);
+const ImagePanel = lazy(() =>
+  import("./ide/Panels/ImagePanel").then((mod) => ({
+    default: mod.ImagePanel,
+  })),
+);
+const WatermarkPanel = lazy(() =>
+  import("./ide/Panels/WatermarkPanel").then((mod) => ({
+    default: mod.WatermarkPanel,
+  })),
+);
 
 import { QuickOpenDialog } from "./ide/QuickOpenDialog";
 import { StatusBar } from "./ide/StatusBar";
@@ -351,11 +365,7 @@ export const Workspace = ({
       }
 
       const loading = renderLoadingRef.current;
-      const loadingNode = loading ? (
-        loading(item)
-      ) : (
-        <Loader />
-      );
+      const loadingNode = loading ? loading(item) : <Loader />;
 
       const existingFile = api.panels.find((p) =>
         stateRef.current.fileIds.has(p.id),
@@ -1022,16 +1032,22 @@ export const Workspace = ({
       orientation="horizontal"
       className={cn("bg-card/40", props.className)}
     >
-      <Panel defaultSize={sidebarSize} minSize={10}>
-        <div
-          className={cn(
-            "h-full bg-muted border-neutral/20",
-            sidebarPosition === "left" ? "border-r" : "border-l",
-          )}
-        >
-          {sidebarContent}
-        </div>
-      </Panel>
+      {sidebarVisible && sidebarPosition === "left" && (
+        <>
+          <Panel defaultSize={sidebarSize} minSize={10}>
+            <div
+              className={cn(
+                "h-full bg-muted border-neutral/20",
+                sidebarPosition === "left" && "border-r",
+              )}
+            >
+              {sidebarContent}
+            </div>
+          </Panel>
+          <Separator className="w-1 hover:bg-primary/20 transition-colors cursor-col-resize" />
+        </>
+      )}
+
       <Panel minSize={20} className="flex h-full flex-col">
         <DockviewApiContext value={dockviewApi}>
           <DockviewReact
@@ -1044,6 +1060,7 @@ export const Workspace = ({
         </DockviewApiContext>
         <StatusBar />
       </Panel>
+
       <QuickOpenDialog
         log={log}
         onOpenFile={(item) => {

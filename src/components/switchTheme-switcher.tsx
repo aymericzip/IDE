@@ -1,5 +1,6 @@
 import { MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useSearchParamState } from "../hooks/useSearchParamState";
 import type { FC } from "react";
 import { useEffect, useState } from "react";
 import { SwitchSelector, type SwitchSelectorChoices } from "./switch-selector";
@@ -14,6 +15,16 @@ type Modes = (typeof Modes)[keyof typeof Modes];
 export const SwitchThemeSwitcher: FC = () => {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+
+  const { params, setParam } = useSearchParamState({
+    theme: { type: "string" },
+  });
+
+  useEffect(() => {
+    if (params.theme && (params.theme === "dark" || params.theme === "light")) {
+      setTheme(params.theme);
+    }
+  }, [params.theme, setTheme]);
 
   useEffect(() => {
     setMounted(true);
@@ -46,7 +57,10 @@ export const SwitchThemeSwitcher: FC = () => {
     <SwitchSelector
       choices={themeSwitcher}
       value={resolvedTheme as Modes}
-      onChange={setTheme}
+      onChange={(value) => {
+        setTheme(value);
+        setParam("theme", value);
+      }}
       color="text"
       size="sm"
     />
