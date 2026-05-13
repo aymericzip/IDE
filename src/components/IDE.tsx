@@ -71,6 +71,7 @@ import {
 } from "./ide/utils";
 import { cn } from "./lib/utils";
 import { Toaster } from "./sonner";
+import { Button } from "./button";
 
 const EMPTY_TREE: TreeDataItem[] = [];
 const COMPONENTS = { custom: ContentPanel, file: FilePanel, image: ImagePanel };
@@ -836,7 +837,9 @@ export const Workspace = ({
 
         initMonaco()
           .then((monaco) => {
-            const model = monaco.editor.getModel(monaco.Uri.parse(removedPanel.id));
+            const model = monaco.editor.getModel(
+              monaco.Uri.parse(removedPanel.id),
+            );
             if (model) {
               model.dispose();
             }
@@ -897,14 +900,21 @@ export const Workspace = ({
     });
 
     const topPinnedFiles =
-      files?.filter((file) => file.pin === "top").map(virtualFileToTreeItem) ?? [];
+      files?.filter((file) => file.pin === "top").map(virtualFileToTreeItem) ??
+      [];
     const unpinnedFiles =
       files?.filter((file) => !file.pin).map(virtualFileToTreeItem) ?? [];
     const bottomPinnedFiles =
-      files?.filter((file) => file.pin === "bottom").map(virtualFileToTreeItem) ??
-      [];
+      files
+        ?.filter((file) => file.pin === "bottom")
+        .map(virtualFileToTreeItem) ?? [];
 
-    return [...topPinnedFiles, ...unpinnedFiles, ...(tree ?? []), ...bottomPinnedFiles];
+    return [
+      ...topPinnedFiles,
+      ...unpinnedFiles,
+      ...(tree ?? []),
+      ...bottomPinnedFiles,
+    ];
   }, [files, tree]);
 
   const sidebarChildren = useMemo(() => {
@@ -923,8 +933,16 @@ export const Workspace = ({
         <span className="text-muted-foreground text-xs uppercase">
           explorer
         </span>
-        <button
-          className="p-0.5 text-muted-foreground transition-colors hover:text-foreground"
+        <Button
+          Icon={() =>
+            treeCollapsed ? (
+              <ChevronRight className="size-4 stroke-1" />
+            ) : (
+              <ChevronsDownUp className="size-4 stroke-1" />
+            )
+          }
+          variant="hoverable"
+          label="Close folders"
           onClick={() => {
             log(treeCollapsed ? "Tree expanded all" : "Tree collapsed all");
             setTreeCollapsed((prevCollapsed) => !prevCollapsed);
@@ -932,13 +950,8 @@ export const Workspace = ({
           }}
           title={treeCollapsed ? "Expand All" : "Collapse All"}
           type="button"
-        >
-          {treeCollapsed ? (
-            <ChevronRight className="size-4 stroke-1" />
-          ) : (
-            <ChevronsDownUp className="size-4 stroke-1" />
-          )}
-        </button>
+          size="icon-sm"
+        />
       </div>
       <div className="min-h-0 flex-1 overflow-auto">
         <FileTree
@@ -985,41 +998,33 @@ export const Workspace = ({
     sidebarChildren
   );
 
-  const sidePanel = sidebarVisible ? (
-    <>
-      {sidebarPosition === "right" ? <Separator className="" /> : null}
+  return (
+    <Group
+      orientation="horizontal"
+      className={cn("bg-card/40", props.className)}
+    >
       <Panel defaultSize={sidebarSize} minSize={10}>
         <div
           className={cn(
-            "h-full bg-muted/70",
+            "h-full bg-muted border-neutral/20",
             sidebarPosition === "left" ? "border-r" : "border-l",
           )}
         >
           {sidebarContent}
         </div>
       </Panel>
-      {sidebarPosition === "left" ? <Separator className="" /> : null}
-    </>
-  ) : null;
-
-  return (
-    <Group orientation="horizontal" className={props.className}>
-      {sidebarPosition === "left" ? sidePanel : null}
-      <Panel minSize={20}>
-        <div className="flex h-full flex-col">
-          <DockviewApiContext value={dockviewApi}>
-            <DockviewReact
-              className="dv-reset flex-1"
-              components={COMPONENTS}
-              onReady={handleReady}
-              tabComponents={TAB_COMPONENTS}
-              watermarkComponent={WatermarkPanel}
-            />
-          </DockviewApiContext>
-          <StatusBar />
-        </div>
+      <Panel minSize={20} className="flex h-full flex-col">
+        <DockviewApiContext value={dockviewApi}>
+          <DockviewReact
+            className="dv-reset flex-1"
+            components={COMPONENTS}
+            onReady={handleReady}
+            tabComponents={TAB_COMPONENTS}
+            watermarkComponent={WatermarkPanel}
+          />
+        </DockviewApiContext>
+        <StatusBar />
       </Panel>
-      {sidebarPosition === "right" ? sidePanel : null}
       <QuickOpenDialog
         log={log}
         onOpenFile={(item) => {

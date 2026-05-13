@@ -2,10 +2,10 @@ import type { EditorProps } from "@monaco-editor/react";
 
 export const ICON_CLASS =
   "size-4 shrink-0 [&_svg]:size-4 transition-all duration-300";
-export const ICON_CLASS_HOVER = `${ICON_CLASS} group-hover:scale-125`;
-export const ICON_CLASS_TAB_HOVER = `${ICON_CLASS} group-hover/tab:scale-125`;
+export const ICON_CLASS_HOVER = `${ICON_CLASS} group-hover:scale-115`;
+export const ICON_CLASS_TAB_HOVER = `${ICON_CLASS} group-hover/tab:scale-115`;
 export const ITEM_CLASS =
-  "group flex w-full items-center gap-[7px] py-[1px] pr-2 text-left text-xs leading-5 cursor-pointer whitespace-nowrap hover:bg-accent";
+  "group flex w-full items-center gap-[7px] py-[1px] pr-2 text-left text-xs leading-5 cursor-pointer whitespace-nowrap transition-colors duration-100 hover:bg-neutral/10";
 export const CENTER = "flex h-full items-center justify-center";
 
 export const EDITOR_OPTIONS: NonNullable<EditorProps["options"]> = {
@@ -128,7 +128,6 @@ export const BINARY_EXTS = new Set([
 
 export const FILE_SIZE_WARN = 500_000;
 export const VIRTUAL_PREFIX = "__virtual:";
-
 
 export const CORE_LANGS = [
   "javascript",

@@ -99,7 +99,7 @@ export const Explorer = ({
 
   return (
     <div className="flex h-screen flex-col">
-      <div className="flex items-center gap-2 py-1 bg-muted/70 border-b *:transition-all *:duration-300">
+      <div className="flex items-center gap-2 py-1 bg-muted *:transition-all *:duration-300">
         <Button
           Icon={PanelLeft}
           label="Toggle sidebar"
@@ -129,7 +129,7 @@ export const Explorer = ({
           variant="button-outlined"
           roundedSize="full"
           rel="noopener noreferrer nofollow"
-          className="flex px-0 aspect-square cursor-pointer items-center justify-center rounded-full border-[1.3px]"
+          className="flex p-1 min-h-0 aspect-square cursor-pointer items-center justify-center rounded-full border-[1.3px]"
         >
           <SiGithub size={18} />
         </Link>

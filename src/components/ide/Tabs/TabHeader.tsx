@@ -1,5 +1,5 @@
-import type { IDockviewPanelHeaderProps } from 'dockview-react';
-import { useAtom, useAtomValue } from 'jotai';
+import type { IDockviewPanelHeaderProps } from "dockview-react";
+import { useAtom, useAtomValue } from "jotai";
 import {
   ArrowRightToLine,
   ClipboardCopy,
@@ -9,9 +9,9 @@ import {
   Trash,
   Trash2,
   X,
-} from 'lucide-react';
-import { use, useEffect, useState } from 'react';
-import { toast } from 'sonner';
+} from "lucide-react";
+import { use, useEffect, useState } from "react";
+import { toast } from "sonner";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -19,12 +19,12 @@ import {
   ContextMenuSeparator,
   ContextMenuShortcut,
   ContextMenuTrigger,
-} from '../../context-menu';
-import { cn } from '../../lib/utils';
-import { pinnedTabsAtom, previewPanelAtom } from '../atoms';
-import { ICON_CLASS_TAB_HOVER } from '../constants';
-import { DockviewApiContext } from '../IDEContext';
-import { FileIcon } from '../Tree/TreeIcons';
+} from "../../context-menu";
+import { cn } from "../../lib/utils";
+import { pinnedTabsAtom, previewPanelAtom } from "../atoms";
+import { ICON_CLASS_TAB_HOVER } from "../constants";
+import { DockviewApiContext } from "../IDEContext";
+import { FileIcon } from "../Tree/TreeIcons";
 
 export const TabHeader = ({ api, params }: IDockviewPanelHeaderProps) => {
   const parameters = params as any;
@@ -50,11 +50,14 @@ export const TabHeader = ({ api, params }: IDockviewPanelHeaderProps) => {
     <ContextMenu>
       <ContextMenuTrigger
         className={cn(
-          "group/tab flex h-full items-center gap-[3px] py-[3px] pl-1 text-xs",
+          "select-none group/tab flex h-full items-center gap-[3px] py-[3px] pl-1 text-xs context-menu-trigger",
           parameters?.headerClassName,
           isActive
-            ? parameters?.activeClassName
-            : ["text-muted-foreground", parameters?.inactiveClassName],
+            ? ["text-zinc-950 dark:text-zinc-100", parameters?.activeClassName]
+            : [
+                "text-zinc-600 dark:text-zinc-400",
+                parameters?.inactiveClassName,
+              ],
         )}
         data-fill={parameters?.headerClassName ? "" : undefined}
         data-preview={isPreview ? "" : undefined}
@@ -149,7 +152,7 @@ export const TabHeader = ({ api, params }: IDockviewPanelHeaderProps) => {
             onClick={() => {
               navigator.clipboard
                 .writeText(api.id)
-                .then(() => toast('Copied to clipboard'))
+                .then(() => toast("Copied to clipboard"))
                 .catch(() => undefined);
             }}
           >
@@ -160,11 +163,11 @@ export const TabHeader = ({ api, params }: IDockviewPanelHeaderProps) => {
               setPinnedTabs((prev) =>
                 isPinned
                   ? prev.filter((id) => id !== api.id)
-                  : [...prev, api.id]
+                  : [...prev, api.id],
               )
             }
           >
-            {isPinned ? <PinOff /> : <Pin />} {isPinned ? 'Unpin' : 'Pin'}
+            {isPinned ? <PinOff /> : <Pin />} {isPinned ? "Unpin" : "Pin"}
           </ContextMenuItem>
           <ContextMenuSeparator />
           <ContextMenuItem
