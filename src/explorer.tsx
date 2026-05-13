@@ -9,6 +9,7 @@ import { EXPAND_EXCLUDE } from "./constants";
 import { downloadFile, downloadFolder, fetchFile, fetchTree } from "./repo-api";
 import { repoFromInput } from "./url-utils";
 import { Button } from "./components/button";
+import "./ide.css";
 
 const triggerDownload = (base64: string, filename: string) => {
   const bytes = Uint8Array.from(

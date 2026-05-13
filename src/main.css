@@ -1,0 +1,62 @@
+:root {
+  --background: #ffffff;
+  --foreground: #121212;
+  --muted: #f4f4f4;
+  --muted-foreground: #6d6d6d;
+  --amber-500: #f59e0b;
+}
+
+[data-theme="dark"] {
+  --background: #171717;
+  --foreground: #fff5ed;
+  --muted: #272727;
+  --muted-foreground: #b0b0b0;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+#root {
+  height: 100%;
+}
+
+.flex { display: flex; }
+.h-full { height: 100%; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.gap-3 { gap: 0.75rem; }
+.gap-2 { gap: 0.5rem; }
+.p-8 { padding: 2rem; }
+.p-4 { padding: 1rem; }
+.text-center { text-align: center; }
+.font-medium { font-weight: 500; }
+.text-sm { font-size: 0.875rem; }
+.text-xs { font-size: 0.75rem; }
+.text-muted-foreground { color: var(--muted-foreground); }
+.text-amber-500 { color: var(--amber-500); }
+.rounded { border-radius: 0.25rem; }
+.bg-muted { background-color: var(--muted); }
+.px-1 { padding-left: 0.25rem; padding-right: 0.25rem; }
+.size-8 { width: 2rem; height: 2rem; }
+.size-6 { width: 1.5rem; height: 1.5rem; }
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.border-2 { border-width: 2px; }
+.border-muted-foreground\/30 { border-color: rgba(109, 109, 109, 0.3); }
+.border-t-transparent { border-top-color: transparent; }
+.rounded-full { border-radius: 9999px; }

@@ -2,8 +2,8 @@ import { AlertTriangle } from "lucide-react";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { fetchTree, setGithubToken } from "./repo-api";
 import { filesFromSearch, repoFromLocation } from "./url-utils";
-import "./ide.css";
 import { Providers } from "./providers";
+import "./main.css";
 
 const Explorer = lazy(() =>
   import("./explorer").then((mod) => ({ default: mod.Explorer })),

@@ -1,4 +1,5 @@
 import "dockview-core/dist/styles/dockview.css";
+import "./IDE.css";
 import { useHotkeys } from "@tanstack/react-hotkeys";
 import type { DockviewApi, DockviewReadyEvent } from "dockview-react";
 import { DockviewReact } from "dockview-react";
