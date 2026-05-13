@@ -126,7 +126,7 @@ const IdeApp = () => {
   }
 
   return (
-    <Suspense fallback={<Loader />}>
+    <Suspense fallback={<Loader className="size-full" />}>
       <Explorer
         initialFiles={initialFiles}
         initialRepo={entry.repo}
