@@ -3,6 +3,7 @@ import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { fetchTree, setGithubToken } from "./repo-api";
 import { filesFromSearch, repoFromLocation } from "./url-utils";
 import { Providers } from "./providers";
+import { Loader } from "./components/loader";
 import "./main.css";
 
 const Explorer = lazy(() =>
@@ -121,22 +122,11 @@ const IdeApp = () => {
   }
 
   if (!entry) {
-    return (
-      <div className="flex h-full items-center justify-center p-4 text-muted-foreground text-sm">
-        Loading…
-      </div>
-    );
+    return <Loader />;
   }
 
   return (
-    <Suspense
-      fallback={
-        <div className="flex h-full flex-col items-center justify-center gap-2 p-4 text-muted-foreground text-sm">
-          <span className="size-6 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-transparent" />
-          Loading editor…
-        </div>
-      }
-    >
+    <Suspense fallback={<Loader />}>
       <Explorer
         initialFiles={initialFiles}
         initialRepo={entry.repo}

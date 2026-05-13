@@ -76,7 +76,17 @@ export const Explorer = ({
   }, [initialRepo, initialTree, repo]);
 
   const submit = () => {
-    const parsed = repoFromInput(input);
+    // Basic regex to ensure the input is either "owner/repo" or a valid GitHub URL
+    const githubPattern =
+      /^(?:https?:\/\/github\.com\/)?([a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+)\/?.*$/;
+    const match = input.match(githubPattern);
+
+    if (!match) {
+      setError("Invalid source. Only GitHub repositories are accepted.");
+      return;
+    }
+
+    const parsed = repoFromInput(match[1]); // Ensure your repoFromInput processes the clean "owner/repo" string
     if (!parsed || parsed === repo) {
       return;
     }

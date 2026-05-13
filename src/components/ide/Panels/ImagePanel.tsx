@@ -1,5 +1,6 @@
 import type { IDockviewPanelProps } from "dockview-react";
 import { useEffect, useState } from "react";
+import { Loader } from "../../loader";
 import { cn } from "../../lib/utils";
 import { CENTER } from "../constants";
 
@@ -22,11 +23,7 @@ export const ImagePanel = ({
   }, [api]);
 
   if (!src) {
-    return (
-      <div className={cn(CENTER, "text-muted-foreground text-xs")}>
-        Loading...
-      </div>
-    );
+    return <Loader />;
   }
 
   return (

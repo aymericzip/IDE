@@ -76,10 +76,11 @@ import {
 } from "./ide/utils";
 import { cn } from "./lib/utils";
 import { Toaster } from "./sonner";
+import { Loader } from "./loader";
 import { Button } from "./button";
 
 const SuspenseWrapper = (Component: any) => (props: any) => (
-  <Suspense fallback={<div className="p-4 text-xs">Loading...</div>}>
+  <Suspense fallback={<Loader />}>
     <Component {...props} />
   </Suspense>
 );
@@ -353,9 +354,7 @@ export const Workspace = ({
       const loadingNode = loading ? (
         loading(item)
       ) : (
-        <div className={cn(CENTER, "text-muted-foreground text-xs")}>
-          Loading...
-        </div>
+        <Loader />
       );
 
       const existingFile = api.panels.find((p) =>
