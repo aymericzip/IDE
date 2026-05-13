@@ -10,7 +10,6 @@ import {
 } from "react";
 import { createHighlighter } from "shiki";
 import {
-  ALL_LANGS,
   CORE_LANGS,
   EXT_TO_LANG,
   LANG,
@@ -79,15 +78,26 @@ export const defineThemes = (
   }
 };
 
+let highlighterPromise: Promise<Awaited<ReturnType<typeof createHighlighter>>> | null =
+  null;
+
+export const getHighlighter = () => {
+  if (highlighterPromise) return highlighterPromise;
+
+  highlighterPromise = createHighlighter({
+    langs: [...CORE_LANGS],
+    themes: ["dark-plus", "light-plus"],
+  });
+
+  return highlighterPromise;
+};
+
 export const shikiSetup =
   "location" in globalThis
     ? (async () => {
-        const highlighter = await createHighlighter({
-          langs: [...CORE_LANGS],
-          themes: ["dark-plus", "light-plus"],
-        });
-
+        const highlighter = await getHighlighter();
         const monaco = await initMonaco();
+
         const restoreTheme = () => {
           const dark =
             document.documentElement.getAttribute("data-theme") !== "light";
@@ -103,29 +113,27 @@ export const shikiSetup =
         );
         restoreTheme();
 
-        const remainingLanguages = ALL_LANGS.filter(
-          (lang) => !CORE_LANGS.includes(lang as (typeof CORE_LANGS)[number]),
-        );
-
-        if (remainingLanguages.length > 0) {
-          highlighter
-            .loadLanguage(...remainingLanguages)
-            .then(() => {
-              shikiToMonaco(highlighter, monaco);
-              defineThemes(
-                highlighter,
-                monaco as {
-                  editor: {
-                    defineTheme: (name: string, data: unknown) => void;
-                  };
-                },
-              );
-              restoreTheme();
-            })
-            .catch(() => undefined);
-        }
+        return highlighter;
       })()
     : null;
+
+export const ensureLanguage = async (lang: string) => {
+  if (!shikiSetup) return;
+  const highlighter = await shikiSetup;
+  const monaco = await initMonaco();
+
+  if (!highlighter.getLoadedLanguages().includes(lang)) {
+    try {
+      await highlighter.loadLanguage(lang as any);
+      shikiToMonaco(highlighter, monaco);
+      const dark =
+        document.documentElement.getAttribute("data-theme") !== "light";
+      (monaco as any).editor.setTheme(dark ? "dark-plus" : "light-plus");
+    } catch (e) {
+      console.error(`Failed to load Shiki language: ${lang}`, e);
+    }
+  }
+};
 
 export const getSvg = (name: string): string =>
   iconSvgs[name] ?? (iconManifest ? (iconSvgs[iconManifest.file] ?? "") : "");

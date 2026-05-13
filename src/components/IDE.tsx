@@ -10,6 +10,7 @@ import {
   Children,
   createElement,
   isValidElement,
+  Suspense,
   useCallback,
   useEffect,
   useImperativeHandle,
@@ -40,10 +41,13 @@ import {
   VIRTUAL_PREFIX,
 } from "./ide/constants";
 import { DockviewApiContext } from "./ide/IDEContext";
-import { ContentPanel } from "./ide/Panels/ContentPanel";
-import { FilePanel } from "./ide/Panels/FilePanel";
-import { ImagePanel } from "./ide/Panels/ImagePanel";
-import { WatermarkPanel } from "./ide/Panels/WatermarkPanel";
+import { lazy } from "react";
+
+const ContentPanel = lazy(() => import("./ide/Panels/ContentPanel").then(mod => ({ default: mod.ContentPanel })));
+const FilePanel = lazy(() => import("./ide/Panels/FilePanel").then(mod => ({ default: mod.FilePanel })));
+const ImagePanel = lazy(() => import("./ide/Panels/ImagePanel").then(mod => ({ default: mod.ImagePanel })));
+const WatermarkPanel = lazy(() => import("./ide/Panels/WatermarkPanel").then(mod => ({ default: mod.WatermarkPanel })));
+
 import { QuickOpenDialog } from "./ide/QuickOpenDialog";
 import { StatusBar } from "./ide/StatusBar";
 import { Tab } from "./ide/Tabs/Tab";
@@ -74,8 +78,23 @@ import { cn } from "./lib/utils";
 import { Toaster } from "./sonner";
 import { Button } from "./button";
 
+const SuspenseWrapper = (Component: any) => (props: any) => (
+  <Suspense fallback={<div className="p-4 text-xs">Loading...</div>}>
+    <Component {...props} />
+  </Suspense>
+);
+
+const LazyContentPanel = SuspenseWrapper(ContentPanel);
+const LazyFilePanel = SuspenseWrapper(FilePanel);
+const LazyImagePanel = SuspenseWrapper(ImagePanel);
+const LazyWatermarkPanel = SuspenseWrapper(WatermarkPanel);
+
 const EMPTY_TREE: TreeDataItem[] = [];
-const COMPONENTS = { custom: ContentPanel, file: FilePanel, image: ImagePanel };
+const COMPONENTS = {
+  custom: LazyContentPanel,
+  file: LazyFilePanel,
+  image: LazyImagePanel,
+};
 const TAB_COMPONENTS = { default: TabHeader };
 
 export const Workspace = ({
@@ -1021,7 +1040,7 @@ export const Workspace = ({
             components={COMPONENTS}
             onReady={handleReady}
             tabComponents={TAB_COMPONENTS}
-            watermarkComponent={WatermarkPanel}
+            watermarkComponent={LazyWatermarkPanel}
           />
         </DockviewApiContext>
         <StatusBar />

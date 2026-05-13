@@ -13,7 +13,7 @@ import { Skeleton } from "../../skeleton";
 import { activeFileInfoAtom, cursorAtom } from "../atoms";
 import { BreadcrumbSegment } from "../Breadcrumbs";
 import { CENTER, EDITOR_OPTIONS, VIRTUAL_PREFIX } from "../constants";
-import { monoFont, shikiSetup } from "../utils";
+import { monoFont, shikiSetup, ensureLanguage } from "../utils";
 
 export const FilePanel = ({
   api,
@@ -37,9 +37,12 @@ export const FilePanel = ({
 
   useEffect(() => {
     if (shikiSetup) {
-      shikiSetup.then(() => setReady(true)).catch(() => setReady(true));
+      shikiSetup
+        .then(() => ensureLanguage(language))
+        .then(() => setReady(true))
+        .catch(() => setReady(true));
     }
-  }, []);
+  }, [language]);
 
   useEffect(() => {
     const disposable = api.onDidParametersChange((event) => {
