@@ -16,7 +16,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { Group, Panel, Separator } from "react-resizable-panels";
+import { Group, Panel } from "react-resizable-panels";
 // Atoms & Context
 import {
   closedTabsAtom,

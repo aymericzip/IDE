@@ -4,6 +4,12 @@ A web IDE designed to render and browse github repository code directly in your 
 
 ![Screenshot](public/screenshot.png)
 
+## What it does not do
+
+- Search files
+- Edit files
+- Save files
+
 ## GitHub Authentication
 
 Work out of the box with public repositories.
