@@ -15,6 +15,28 @@ import { BreadcrumbSegment } from "../Breadcrumbs";
 import { CENTER, EDITOR_OPTIONS, VIRTUAL_PREFIX } from "../constants";
 import { monoFont, shikiSetup, ensureLanguage } from "../utils";
 
+/** Lines beyond this cannot be on screen, and the preview is discarded anyway. */
+const PREVIEW_LINES = 200;
+
+/**
+ * Monaco and its grammars take seconds to boot on a slow connection. Painting
+ * the raw text first means the file is readable long before the editor mounts,
+ * with metrics close enough that the swap is not jarring.
+ */
+const CodePreview = ({ code }: { code: string }) => (
+  <pre
+    className="flex-1 overflow-hidden py-1 pl-[62px] text-foreground"
+    style={{
+      fontFamily: monoFont() || "ui-monospace, monospace",
+      fontSize: 12,
+      letterSpacing: -0.8,
+      lineHeight: 1.5,
+    }}
+  >
+    {code.split("\n").slice(0, PREVIEW_LINES).join("\n")}
+  </pre>
+);
+
 export const FilePanel = ({
   api,
   params,
@@ -93,7 +115,7 @@ export const FilePanel = ({
     return () => disposable.dispose();
   }, [api, language, setFileInfo]);
 
-  if (loadingState || !ready) {
+  if (loadingState || (!ready && !content)) {
     return (
       <div className="flex h-full flex-col gap-2 p-4">
         <Skeleton className="h-4 w-3/4" />
@@ -138,40 +160,44 @@ export const FilePanel = ({
           })}
         </BreadcrumbList>
       </Breadcrumb>
-      <Editor
-        className="flex-1"
-        language={language}
-        onMount={(editor) => {
-          editorRef.current = editor;
+      {ready ? (
+        <Editor
+          className="flex-1"
+          language={language}
+          onMount={(editor) => {
+            editorRef.current = editor;
 
-          const updateCursor = () => {
-            const position = editor.getPosition();
+            const updateCursor = () => {
+              const position = editor.getPosition();
 
-            if (position) {
-              setCursor({ col: position.column, line: position.lineNumber });
-            }
-          };
+              if (position) {
+                setCursor({ col: position.column, line: position.lineNumber });
+              }
+            };
 
-          updateCursor();
+            updateCursor();
 
-          editor.onDidChangeCursorPosition(updateCursor);
-          api.onDidDimensionsChange(() => editor.layout());
-        }}
-        options={{
-          ...EDITOR_OPTIONS,
-          fontFamily: monoFont() || undefined,
-          ...editorOpts,
-        }}
-        path={api.id}
-        theme={
-          typeof params.theme === "string"
-            ? params.theme
-            : isDarkMode
-              ? (params.theme?.dark ?? "dark-plus")
-              : (params.theme?.light ?? "light-plus")
-        }
-        value={content}
-      />
+            editor.onDidChangeCursorPosition(updateCursor);
+            api.onDidDimensionsChange(() => editor.layout());
+          }}
+          options={{
+            ...EDITOR_OPTIONS,
+            fontFamily: monoFont() || undefined,
+            ...editorOpts,
+          }}
+          path={api.id}
+          theme={
+            typeof params.theme === "string"
+              ? params.theme
+              : isDarkMode
+                ? (params.theme?.dark ?? "dark-plus")
+                : (params.theme?.light ?? "light-plus")
+          }
+          value={content}
+        />
+      ) : (
+        <CodePreview code={content} />
+      )}
     </div>
   );
 };

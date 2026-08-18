@@ -139,9 +139,9 @@ const IdeApp = () => {
 export const App = () => {
   return (
     <Providers>
-      <div className="h-dvh min-h-0 w-full">
+      <main className="h-dvh min-h-0 w-full">
         <IdeApp />
-      </div>
+      </main>
     </Providers>
   );
 };

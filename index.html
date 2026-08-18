@@ -15,8 +15,21 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" />
     <link rel="preconnect" href="https://data.jsdelivr.com" crossorigin />
     <link rel="preconnect" href="https://api.github.com" crossorigin />
+    <!-- Otherwise the font is only discovered once the entry stylesheet has
+         been fetched and parsed, at the end of the critical chain. -->
+    <link
+      rel="preload"
+      href="/fonts/inter-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Intlayer online IDE</title>
+    <meta
+      name="description"
+      content="Intlayer's online IDE opens any GitHub repository in your browser: browse the file tree and read code with syntax highlighting, no clone or install."
+    />
   </head>
   <body>
     <div id="root"></div>

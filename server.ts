@@ -38,8 +38,9 @@ serve({
       } else if (path.endsWith('.css')) {
         response.headers.set('Content-Type', 'text/css; charset=utf-8');
       }
-      // Add strong caching for assets
-      if (path.startsWith('/assets/')) {
+      // Add strong caching for assets. Font file names are not hashed, so
+      // replacing a font means giving the file a new name.
+      if (path.startsWith('/assets/') || path.startsWith('/fonts/')) {
         response.headers.set(
           'Cache-Control',
           'public, max-age=31536000, immutable'

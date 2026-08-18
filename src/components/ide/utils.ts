@@ -9,7 +9,6 @@ import {
   useRef,
 } from "react";
 import { createHighlighter } from "shiki";
-import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
 import {
   CORE_LANGS,
   EXT_TO_LANG,
@@ -121,10 +120,9 @@ export const getHighlighter = () => {
   if (highlighterPromise) return highlighterPromise;
 
   highlighterPromise = createHighlighter({
-    // The JavaScript engine keeps the ~600 KiB Oniguruma WASM blob off the
-    // initial load; `forgiving` skips the few patterns it cannot compile
-    // instead of failing the whole grammar.
-    engine: createJavaScriptRegexEngine({ forgiving: true }),
+    // Oniguruma costs ~230 KiB of transfer but tokenizes 1.5-3x faster than
+    // the pure-JS engine, which matters more here: the first paint of a file
+    // is bound by main-thread time, not bandwidth.
     langs: [...CORE_LANGS],
     themes: ["dark-plus", "light-plus"],
   });
