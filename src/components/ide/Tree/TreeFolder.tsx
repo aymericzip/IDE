@@ -61,6 +61,9 @@ export const TreeFolder = ({
         setOpenValues(values);
         treeLog?.(values.length > 0 ? `Expand: ${name}` : `Collapse: ${name}`);
       }}
+      // The accordion is only a layout wrapper here: the tree/treeitem/group
+      // roles below it must stay directly related for assistive technology.
+      role="none"
       value={openValues}
     >
       <Accordion.Item value={itemId}>
@@ -103,7 +106,10 @@ export const TreeFolder = ({
             </ContextMenuItem>
           </ContextMenuContent>
         </ContextMenu>
-        <Accordion.Panel className="relative h-(--accordion-panel-height) overflow-hidden transition-[height] duration-150 ease-out data-ending-style:h-0 data-starting-style:h-0">
+        <Accordion.Panel
+          className="relative h-(--accordion-panel-height) overflow-hidden transition-[height] duration-150 ease-out data-ending-style:h-0 data-starting-style:h-0"
+          role="group"
+        >
           <span
             className="absolute top-0 bottom-0 w-px bg-accent"
             style={{ left: `${String(depth * indent + 16)}px` }}

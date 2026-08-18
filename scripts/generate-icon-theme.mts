@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { generateManifest, type Manifest } from 'material-icon-theme';
 import { createRequire } from 'node:module';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -10,72 +10,108 @@ const packJson = require.resolve('material-icon-theme/package.json');
 const packRoot = dirname(packJson);
 const iconsDir = join(packRoot, 'icons');
 
-const collectIconNames = (m: Manifest, into: Set<string>) => {
-  for (const v of [
+const root = fileURLToPath(new URL('..', import.meta.url));
+
+/** Icon names are used verbatim in `/icons/<name>.svg` request paths. */
+const SAFE_NAME = /^[a-zA-Z0-9._-]+$/;
+
+type IconManifest = {
+  file: string;
+  fileExtensions: Record<string, string>;
+  fileNames: Record<string, string>;
+  folder: string;
+  folderExpanded: string;
+  folderNames: Record<string, string>;
+  folderNamesExpanded: Record<string, string>;
+  languageIds: Record<string, string>;
+};
+
+const collectIconNames = (m: IconManifest): Set<string> => {
+  const names = new Set<string>();
+
+  for (const value of [
     m.file,
     m.folder,
     m.folderExpanded,
-    m.rootFolder,
-    m.rootFolderExpanded,
-    ...Object.values(m.folderNames ?? {}),
-    ...Object.values(m.folderNamesExpanded ?? {}),
-    ...Object.values(m.rootFolderNames ?? {}),
-    ...Object.values(m.rootFolderNamesExpanded ?? {}),
-    ...Object.values(m.fileExtensions ?? {}),
-    ...Object.values(m.fileNames ?? {}),
-    ...Object.values(m.languageIds ?? {}),
+    ...Object.values(m.fileExtensions),
+    ...Object.values(m.fileNames),
+    ...Object.values(m.folderNames),
+    ...Object.values(m.folderNamesExpanded),
+    ...Object.values(m.languageIds),
   ])
-    if (v) into.add(v);
+    if (value) names.add(value);
 
-  for (const def of Object.values(m.iconDefinitions ?? {}))
-    if (def?.iconPath) {
-      const base = def.iconPath.replace(/\.svg$/i, '');
-      into.add(base);
-    }
-  if (m.light) collectIconNames(m.light, into);
-  if (m.highContrast) collectIconNames(m.highContrast, into);
+  return names;
 };
 
 const main = () => {
-  const manifest = generateManifest();
-  const usedIcons = new Set<string>();
-  collectIconNames(manifest, usedIcons);
+  const manifest: Manifest = generateManifest();
 
-  const svgMap: Record<string, string> = {};
-  for (const name of usedIcons) {
+  const payload: IconManifest = {
+    file: manifest.file!,
+    fileExtensions: manifest.fileExtensions ?? {},
+    fileNames: manifest.fileNames ?? {},
+    folder: manifest.folder!,
+    folderExpanded: manifest.folderExpanded!,
+    folderNames: manifest.folderNames ?? {},
+    folderNamesExpanded: manifest.folderNamesExpanded ?? {},
+    languageIds: manifest.languageIds ?? {},
+  };
+
+  const outDir = join(root, 'public', 'icons');
+  rmSync(outDir, { force: true, recursive: true });
+  mkdirSync(outDir, { recursive: true });
+
+  const available = new Set<string>();
+  const missing = new Set<string>();
+
+  for (const name of collectIconNames(payload)) {
+    if (!SAFE_NAME.test(name)) {
+      throw new Error(`Icon name is not URL-safe: ${name}`);
+    }
+
     try {
-      svgMap[name] = readFileSync(join(iconsDir, `${name}.svg`), 'utf8');
+      const svg = readFileSync(join(iconsDir, `${name}.svg`), 'utf8');
+      writeFileSync(join(outDir, `${name}.svg`), svg);
+      available.add(name);
     } catch {
-      /* icon file not found */
+      missing.add(name);
     }
   }
 
-  const outDir = join(fileURLToPath(new URL('..', import.meta.url)), 'src', 'components', '_generated');
-  mkdirSync(outDir, { recursive: true });
-  const payload = {
-    manifest: {
-      file: manifest.file,
-      fileExtensions: manifest.fileExtensions,
-      fileNames: manifest.fileNames,
-      folder: manifest.folder,
-      folderExpanded: manifest.folderExpanded,
-      folderNames: manifest.folderNames,
-      folderNamesExpanded: manifest.folderNamesExpanded,
-      languageIds: manifest.languageIds,
-    },
-    svgs: svgMap,
-  };
-  const outPath = join(outDir, 'icons.ts');
+  // Some manifest entries point at icons the theme package does not ship.
+  // Dropping them lets the runtime fall back to the default file/folder icon
+  // instead of firing a request that can only 404.
+  for (const map of [
+    payload.fileExtensions,
+    payload.fileNames,
+    payload.folderNames,
+    payload.folderNamesExpanded,
+    payload.languageIds,
+  ])
+    for (const [key, name] of Object.entries(map))
+      if (!available.has(name)) delete map[key];
+
+  for (const name of [payload.file, payload.folder, payload.folderExpanded])
+    if (!available.has(name)) {
+      throw new Error(`Default icon "${name}" is missing from the theme`);
+    }
+
+  const manifestDir = join(root, 'src', 'components', '_generated');
+  mkdirSync(manifestDir, { recursive: true });
+  const manifestPath = join(manifestDir, 'icon-manifest.ts');
   writeFileSync(
-    outPath,
+    manifestPath,
     `/* Generated by scripts/generate-icon-theme.mts — do not edit */\n` +
-      `const icons = ${JSON.stringify(payload)} as const\n` +
-      `export { icons }\n`
+      `const iconManifest = ${JSON.stringify(payload)} as const\n` +
+      `export { iconManifest }\n`
   );
-  const folderCount = Object.keys(manifest.folderNames ?? {}).length;
+
   console.log(
-    `Wrote ${outPath}: ${String(Object.keys(svgMap).length)} SVGs, ` +
-      `${String(folderCount)} folder name mappings`
+    `Wrote ${String(available.size)} SVGs to public/icons and ${manifestPath}` +
+      (missing.size > 0
+        ? ` (dropped ${String(missing.size)} manifest entries with no icon file)`
+        : '')
   );
 };
 

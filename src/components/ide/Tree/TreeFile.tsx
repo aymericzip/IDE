@@ -10,8 +10,7 @@ import {
 } from '../../context-menu';
 import { cn } from '../../lib/utils';
 import { ITEM_CLASS } from '../constants';
-import { getSvg } from '../utils';
-import { FileIcon } from './TreeIcons';
+import { FileIcon, IconSvg } from './TreeIcons';
 import { useTreeItem } from './TreeItem';
 
 export const TreeFile = ({
@@ -65,10 +64,7 @@ export const TreeFile = ({
           {CustomIcon ? (
             <CustomIcon className={iconClass} />
           ) : typeof icon === 'string' ? (
-            <span
-              className={iconClass}
-              dangerouslySetInnerHTML={{ __html: getSvg(icon) }}
-            />
+            <IconSvg className={iconClass} iconName={icon} />
           ) : (
             <FileIcon className={iconClass} name={name} />
           )}

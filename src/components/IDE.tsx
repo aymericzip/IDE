@@ -1098,6 +1098,6 @@ IDE.Folder = Panel;
 export { Tab } from "./ide/Tabs/Tab";
 export { FileTree, Tree, TreeFile, TreeFolder } from "./ide/Tree";
 // Re-export everything for compatibility
-export { FileIcon, FolderIcon } from "./ide/Tree/TreeIcons";
-export { getIconSvg } from "./ide/utils";
+export { FileIcon, FolderIcon, IconSvg } from "./ide/Tree/TreeIcons";
+export { getIconSvg, loadIconSvg } from "./ide/utils";
 export type { FileActions, TreeDataItem, VirtualFile, WorkspaceRef };

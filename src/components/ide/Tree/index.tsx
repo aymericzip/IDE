@@ -155,7 +155,9 @@ export const Tree = ({
           }
         }}
       >
-        {children}
+        {/* The tree role has to sit directly above the treeitems, so it goes
+            here rather than on the navigation landmark. */}
+        <div role="tree">{children}</div>
       </nav>
     </TreeContext>
   );

@@ -9,6 +9,7 @@ import {
   useRef,
 } from "react";
 import { createHighlighter } from "shiki";
+import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
 import {
   CORE_LANGS,
   EXT_TO_LANG,
@@ -19,22 +20,57 @@ import {
 import type { IconManifest, TabProps, TreeDataItem } from "./types";
 
 let iconManifest: IconManifest | null = null;
-let iconSvgs: Record<string, string> = {};
 let cachedMonoFont: string | undefined;
 
 export const iconsReady =
   "location" in globalThis
-    ? import("../_generated/icons").then(
-        (mod: {
-          icons: { manifest: IconManifest; svgs: Record<string, string> };
-        }) => {
-          iconManifest = mod.icons.manifest;
-          iconSvgs = mod.icons.svgs;
+    ? import("../_generated/icon-manifest").then(
+        (mod: { iconManifest: IconManifest }) => {
+          iconManifest = mod.iconManifest;
         },
       )
     : Promise.resolve();
 
 export const getIconManifest = () => iconManifest;
+
+const iconSvgCache = new Map<string, string>();
+const pendingIconSvgs = new Map<string, Promise<string>>();
+
+/** Icon names come from the manifest and are interpolated into a request path. */
+const SAFE_ICON_NAME = /^[a-zA-Z0-9._-]+$/;
+
+/**
+ * Icons live in `public/icons` and are fetched one by one so a repository only
+ * pays for the handful of icons its tree actually shows.
+ */
+export const loadIconSvg = async (name: string): Promise<string> => {
+  if (!SAFE_ICON_NAME.test(name)) {
+    return "";
+  }
+
+  const cached = iconSvgCache.get(name);
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  const pending = pendingIconSvgs.get(name);
+  if (pending) {
+    return pending;
+  }
+
+  const request = fetch(`${import.meta.env.BASE_URL}icons/${name}.svg`)
+    .then((response) => (response.ok ? response.text() : ""))
+    .catch(() => "")
+    .then((svg) => {
+      iconSvgCache.set(name, svg);
+      pendingIconSvgs.delete(name);
+      return svg;
+    });
+
+  pendingIconSvgs.set(name, request);
+
+  return request;
+};
 
 export const initMonaco = async (): Promise<Monaco> => loader.init();
 
@@ -85,6 +121,10 @@ export const getHighlighter = () => {
   if (highlighterPromise) return highlighterPromise;
 
   highlighterPromise = createHighlighter({
+    // The JavaScript engine keeps the ~600 KiB Oniguruma WASM blob off the
+    // initial load; `forgiving` skips the few patterns it cannot compile
+    // instead of failing the whole grammar.
+    engine: createJavaScriptRegexEngine({ forgiving: true }),
     langs: [...CORE_LANGS],
     themes: ["dark-plus", "light-plus"],
   });
@@ -135,8 +175,8 @@ export const ensureLanguage = async (lang: string) => {
   }
 };
 
-export const getSvg = (name: string): string =>
-  iconSvgs[name] ?? (iconManifest ? (iconSvgs[iconManifest.file] ?? "") : "");
+/** Already-fetched markup for `name`, or an empty string while it loads. */
+export const getSvg = (name: string): string => iconSvgCache.get(name) ?? "";
 
 export const resolveFileIcon = (filename: string): string => {
   if (!iconManifest) {
@@ -191,6 +231,7 @@ export const resolveFolderIcon = (
   );
 };
 
+/** Empty until the icon for `filename` has been fetched — see `loadIconSvg`. */
 export const getIconSvg = (filename: string): string =>
   getSvg(resolveFileIcon(filename));
 

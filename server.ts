@@ -44,6 +44,10 @@ serve({
           'Cache-Control',
           'public, max-age=31536000, immutable'
         );
+      } else if (path.startsWith('/icons/')) {
+        // File-type icons keep stable names, so they can only change when the
+        // icon theme is upgraded: cache them, but not forever.
+        response.headers.set('Cache-Control', 'public, max-age=2592000');
       }
       return response;
     }

@@ -10,17 +10,11 @@
       })();
     </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://data.jsdelivr.com" />
+    <!-- Keep this list to the origins the first load actually hits: extra
+         preconnects compete for the same connection budget. -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+    <link rel="preconnect" href="https://data.jsdelivr.com" crossorigin />
     <link rel="preconnect" href="https://api.github.com" crossorigin />
-    <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin />
-    <link rel="preconnect" href="https://avatars.githubusercontent.com" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
-      rel="stylesheet"
-    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Intlayer online IDE</title>
   </head>

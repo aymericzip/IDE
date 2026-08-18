@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b tsconfig.build.json && vite build",
+    "dev": "bun run generate:icons && vite",
+    "build": "bun run generate:icons && tsc -b tsconfig.build.json && vite build",
     "lint": "eslint . && biome check .",
     "format": "biome check --write --unsafe .",
     "preview": "vite preview",
