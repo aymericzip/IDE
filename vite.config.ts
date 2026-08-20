@@ -9,8 +9,13 @@ const here = fileURLToPath(new URL(".", import.meta.url));
 
 const securityHeaders = {
   // Enforce GitHub-only sources, Monaco editor requirements (blob, unsafe-eval), and iframe constraints
+  // Kept in step with the production policy in server.ts, minus the inline
+  // script hashes, which are computed from the built index.html.
   "Content-Security-Policy": [
     "default-src 'self'",
+    "base-uri 'self'",
+    "object-src 'none'",
+    "form-action 'none'",
     "connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://data.jsdelivr.com https://cdn.jsdelivr.net",
     "frame-ancestors 'self' https://intlayer.org https://*.intlayer.org",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net",

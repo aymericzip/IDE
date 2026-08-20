@@ -22,6 +22,9 @@ export const EDITOR_OPTIONS: NonNullable<EditorProps["options"]> = {
     scale: 2,
     showSlider: "always",
   },
+  // Marks Monaco's hidden textarea readonly instead of only swallowing edits,
+  // so the browser blocks pasting rather than Monaco cancelling paste events.
+  domReadOnly: true,
   readOnly: true,
   scrollBeyondLastLine: false,
   scrollbar: {
