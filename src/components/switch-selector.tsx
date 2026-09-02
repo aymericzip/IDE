@@ -17,17 +17,18 @@ export const defaultChoices: SwitchSelectorChoices<boolean> = [
 export const SwitchSelectorColor = {
   PRIMARY: "primary",
   SECONDARY: "secondary",
-  DESTRUCTIVE: "destructive",
   NEUTRAL: "neutral",
-  LIGHT: "light",
-  DARK: "dark",
+  WHITE: "white",
+  BLACK: "black",
   TEXT: "text",
+  ERROR: "error",
 } as const;
 
 export type SwitchSelectorColor =
   (typeof SwitchSelectorColor)[keyof typeof SwitchSelectorColor];
 
 export const SwitchSelectorSize = {
+  XS: "xs",
   SM: "sm",
   MD: "md",
   LG: "lg",
@@ -59,12 +60,11 @@ export const switchSelectorVariant = cva(
       color: {
         [SwitchSelectorColor.PRIMARY]: "border-primary text-primary",
         [SwitchSelectorColor.SECONDARY]: "border-secondary text-secondary",
-        [SwitchSelectorColor.DESTRUCTIVE]:
-          "border-destructive bg-destructive text-destructive",
         [SwitchSelectorColor.NEUTRAL]: "border-neutral text-neutral",
-        [SwitchSelectorColor.LIGHT]: "border-white text-white",
-        [SwitchSelectorColor.DARK]: "border-neutral-800 text-neutral-800",
-        [SwitchSelectorColor.TEXT]: "border-text text-text",
+        [SwitchSelectorColor.WHITE]: "border-white text-white",
+        [SwitchSelectorColor.BLACK]: "border-black text-black",
+        [SwitchSelectorColor.TEXT]: "border-foreground text-foreground",
+        [SwitchSelectorColor.ERROR]: "border-error text-error",
       },
       disabled: {
         true: "cursor-not-allowed opacity-50",
@@ -72,17 +72,18 @@ export const switchSelectorVariant = cva(
       },
     },
     defaultVariants: {
-      color: SwitchSelectorColor.PRIMARY,
+      color: SwitchSelectorColor.TEXT,
       disabled: false,
     },
   },
 );
 
 export const choiceVariant = cva(
-  "z-1 flex-1 cursor-pointer font-medium text-sm transition-all duration-300 ease-in-out aria-selected:cursor-default data-[indicator=true]:text-text-opposite motion-reduce:transition-none",
+  "z-1 flex-1 cursor-pointer font-medium text-sm transition-all duration-300 ease-in-out aria-selected:cursor-default data-[indicator=true]:text-background motion-reduce:transition-none",
   {
     variants: {
       size: {
+        [SwitchSelectorSize.XS]: "px-2 py-0.5 text-xs",
         [SwitchSelectorSize.SM]: "px-2 py-1 text-xs",
         [SwitchSelectorSize.MD]: "p-2 text-sm",
         [SwitchSelectorSize.LG]: "p-4 text-base",
@@ -100,19 +101,19 @@ export const indicatorVariant = cva(
     variants: {
       color: {
         [SwitchSelectorColor.PRIMARY]:
-          "bg-primary data-[indicator=true]:text-text",
+          "bg-primary data-[indicator=true]:text-primary-foreground",
         [SwitchSelectorColor.SECONDARY]:
-          "bg-secondary data-[indicator=true]:text-text",
-        [SwitchSelectorColor.DESTRUCTIVE]:
-          "bg-destructive data-[indicator=true]:text-text",
+          "bg-secondary data-[indicator=true]:text-secondary-foreground",
         [SwitchSelectorColor.NEUTRAL]:
           "bg-neutral data-[indicator=true]:text-white",
-        [SwitchSelectorColor.LIGHT]:
+        [SwitchSelectorColor.WHITE]:
           "bg-white data-[indicator=true]:text-black",
-        [SwitchSelectorColor.DARK]:
-          "bg-neutral-800 data-[indicator=true]:text-white",
+        [SwitchSelectorColor.BLACK]:
+          "bg-black data-[indicator=true]:text-white",
         [SwitchSelectorColor.TEXT]:
-          "bg-text data-[indicator=true]:text-text-opposite",
+          "bg-foreground data-[indicator=true]:text-background",
+        [SwitchSelectorColor.ERROR]:
+          "bg-error data-[indicator=true]:text-white",
       },
     },
   },
@@ -125,7 +126,7 @@ export const indicatorVariant = cva(
 export const SwitchSelector = <T,>(props: SwitchSelectorProps<T>) => {
   const {
     choices = defaultChoices as SwitchSelectorChoices<T>,
-    color = SwitchSelectorColor.PRIMARY,
+    color = SwitchSelectorColor.TEXT,
     size = SwitchSelectorSize.MD,
     className,
     itemClassName,
@@ -162,7 +163,7 @@ export const SwitchSelector = <T,>(props: SwitchSelectorProps<T>) => {
       role="tablist"
       aria-disabled={disabled ? "true" : undefined}
     >
-      <div className="relative flex h-full w-full flex-row items-center justify-center">
+      <div className="relative flex size-full flex-row items-center justify-center">
         {choices.map((choice, index) => {
           const { content, value, ...buttonProps } = choice;
 
@@ -175,6 +176,7 @@ export const SwitchSelector = <T,>(props: SwitchSelectorProps<T>) => {
           return (
             <button
               {...buttonProps}
+              type="button"
               className={cn(
                 choiceVariant({
                   size,

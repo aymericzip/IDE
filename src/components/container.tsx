@@ -11,7 +11,7 @@ import { cn } from "./lib/utils";
  * Container component variants using class-variance-authority
  * Provides flexible styling options for background, padding, borders, and layout
  */
-export const containerVariants = cva("flex flex-col text-text backdrop-blur", {
+export const containerVariants = cva("flex flex-col text-foreground backdrop-blur", {
   variants: {
     roundedSize: {
       none: "rounded-none",
@@ -57,7 +57,7 @@ export const containerVariants = cva("flex flex-col text-text backdrop-blur", {
     borderColor: {
       primary: "border-primary",
       secondary: "border-secondary",
-      neutral: "border-neutral",
+      neutral: "",
       card: "border-card",
       text: "border-text",
       error: "border-error",
@@ -65,7 +65,7 @@ export const containerVariants = cva("flex flex-col text-text backdrop-blur", {
       success: "border-success",
     },
     background: {
-      none: "",
+      none: "backdrop-blur-none",
       hoverable:
         "bg-opacity-5! backdrop-blur-0 hover:bg-opacity-10! hover:backdrop-blur focus:bg-opacity-10! focus:backdrop-blur aria-selected:bg-opacity-15! aria-selected:backdrop-blur",
       with: "",

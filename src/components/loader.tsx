@@ -45,7 +45,7 @@ export type LoaderProps = HTMLAttributes<HTMLDivElement> & {
  * ```tsx
  * <Loader
  *   isLoading={true}
- *   className="min-h-[200px] bg-gray-50"
+ *   className="min-h-50 bg-gray-50"
  *   aria-label="Loading user data"
  * />
  * ```
@@ -115,7 +115,7 @@ export const Loader: FC<LoaderProps> = ({
             className,
           )}
           role="status"
-          aria-label="loader"
+          aria-label="Animated icon, meaning that the website is processing"
           {...props}
         >
           <Spinner className="size-10 max-h-full max-w-full" />
@@ -129,7 +129,7 @@ export const Loader: FC<LoaderProps> = ({
           className,
         )}
         role="status"
-        aria-label="loader"
+        aria-label="Animated icon, meaning that the website is processing"
         {...props}
       >
         <Spinner className="size-10 max-h-full max-w-full" />

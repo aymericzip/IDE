@@ -3,11 +3,13 @@ import { type LucideIcon } from "lucide-react";
 import type { ButtonHTMLAttributes, DetailedHTMLProps, FC } from "react";
 import { ContainerRoundedSize as ButtonRoundedSize } from "./container";
 import { cn } from "./lib/utils";
+import { Loader } from "./loader";
 
 /**
  * Button size variants for different use cases
  */
 export const ButtonSize = {
+  XS: "xs",
   SM: "sm",
   MD: "md",
   LG: "lg",
@@ -16,6 +18,7 @@ export const ButtonSize = {
   ICON_MD: "icon-md",
   ICON_LG: "icon-lg",
   ICON_XL: "icon-xl",
+  CUSTOM: "custom",
 } as const;
 
 export type ButtonSize = (typeof ButtonSize)[keyof typeof ButtonSize];
@@ -23,14 +26,16 @@ export type ButtonSize = (typeof ButtonSize)[keyof typeof ButtonSize];
 const buttonIconVariants = cva("flex-none shrink-0", {
   variants: {
     size: {
+      [ButtonSize.XS]: "size-2",
       [ButtonSize.SM]: "size-3",
       [ButtonSize.MD]: "size-4",
       [ButtonSize.LG]: "size-5",
       [ButtonSize.XL]: "size-6",
       [ButtonSize.ICON_SM]: "size-3",
       [ButtonSize.ICON_MD]: "size-4",
-      [ButtonSize.ICON_LG]: "size-4",
-      [ButtonSize.ICON_XL]: "size-5",
+      [ButtonSize.ICON_LG]: "size-5",
+      [ButtonSize.ICON_XL]: "size-6",
+      [ButtonSize.CUSTOM]: "",
     },
   },
   defaultVariants: {
@@ -66,6 +71,7 @@ export const ButtonColor = {
   LIGHT: "light",
   DARK: "dark",
   TEXT: "text",
+  FOREGROUND: "foreground",
   CARD: "card",
   TEXT_INVERSE: "text-inverse",
   CURRENT: "current",
@@ -96,14 +102,16 @@ export const buttonVariants = cva(
   {
     variants: {
       size: {
+        [ButtonSize.XS]: "min-h-7 px-3 text-xs max-md:py-1",
         [ButtonSize.SM]: "min-h-7 px-3 text-xs max-md:py-1",
         [ButtonSize.MD]: "min-h-8 px-6 text-sm max-md:py-2",
         [ButtonSize.LG]: "min-h-10 px-8 text-lg max-md:py-3",
         [ButtonSize.XL]: "min-h-11 px-10 text-xl max-md:py-4",
         [ButtonSize.ICON_SM]: "p-1.5",
         [ButtonSize.ICON_MD]: "p-1.5",
-        [ButtonSize.ICON_LG]: "p-2",
+        [ButtonSize.ICON_LG]: "p-1.5",
         [ButtonSize.ICON_XL]: "p-3",
+        [ButtonSize.CUSTOM]: "",
       },
       color: {
         [ButtonColor.PRIMARY]:
@@ -121,6 +129,8 @@ export const buttonVariants = cva(
         [ButtonColor.DARK]:
           "text-neutral-800 ring-text-light/50 *:text-text-light",
         [ButtonColor.TEXT]: "text-text ring-text/20 *:text-text-opposite",
+        [ButtonColor.FOREGROUND]:
+          "text-foreground ring-foreground/20 *:text-foreground-opposite",
         [ButtonColor.CURRENT]:
           "hover-current-500/10 text-current ring-current/10 *:text-text-light",
         [ButtonColor.TEXT_INVERSE]:
@@ -230,7 +240,7 @@ export const buttonVariants = cva(
     defaultVariants: {
       variant: ButtonVariant.DEFAULT,
       size: ButtonSize.MD,
-      color: ButtonColor.CUSTOM,
+      color: ButtonColor.TEXT,
       roundedSize: ButtonRoundedSize.MD,
       textAlign: ButtonTextAlign.CENTER,
       isFullWidth: false,
@@ -429,6 +439,26 @@ export const Button: FC<ButtonProps> = ({
           aria-hidden="true"
         />
       )}
+
+      <div
+        className={cn(
+          "flex items-center justify-center transition-[width] duration-300",
+          isLoading && size === ButtonSize.SM && "w-3",
+          isLoading && size === ButtonSize.MD && "w-4",
+          isLoading && size === ButtonSize.LG && "w-6",
+          isLoading && size === ButtonSize.XL && "w-8",
+        )}
+      >
+        <Loader
+          className={buttonIconVariants({
+            size,
+            className: cn(!isSquareButton && "mr-3", iconClassName),
+          })}
+          isLoading={isLoading}
+          aria-hidden="true"
+          data-testid="loader"
+        />
+      </div>
 
       {children && (
         <span className="flex-1 truncate whitespace-nowrap">{children}</span>

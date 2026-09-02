@@ -84,16 +84,16 @@ export const linkVariants = cva(
         [LinkVariant.DEFAULT]:
           "h-auto justify-start border-inherit bg-current/0 px-1 font-medium decoration-[1.5] underline-offset-5 hover:bg-current/0 hover:text-current/80 hover:underline hover:underline-offset-6",
         [LinkVariant.INVISIBLE_LINK]:
-          "h-auto justify-start border-inherit bg-current/0 px-1 underline-offset-5 hover:bg-current/0 aria-[current]:bg-current/5",
+          "h-auto justify-start border-inherit bg-current/0 px-1",
 
         [LinkVariant.BUTTON]:
-          "relative flex cursor-pointer flex-row items-center justify-center gap-2 rounded-full bg-current text-center font-medium text-text ring-0 *:text-text-opposite hover:bg-current/90 hover:ring-5 aria-selected:ring-5 aria-[current]:ring-5",
+          "relative inline-flex min-h-8 cursor-pointer flex-row items-center justify-center gap-2 rounded-full bg-current px-6 text-center font-medium text-sm text-text ring-0 *:text-text-opposite hover:bg-current/90 hover:ring-5 aria-selected:ring-5 aria-[current]:ring-5 max-md:py-2",
 
         [LinkVariant.BUTTON_OUTLINED]:
-          "relative flex cursor-pointer flex-row items-center justify-center gap-2 rounded-full border-[1.3px] border-current text-center font-medium text-text ring-0 *:text-text hover:bg-current/20 hover:ring-5 aria-selected:ring-5 aria-[current]:ring-5",
+          "relative inline-flex min-h-8 cursor-pointer flex-row items-center justify-center gap-2 rounded-full border-[1.3px] border-current px-6 text-center font-medium text-sm text-text ring-0 *:text-text hover:bg-current/20 hover:ring-5 aria-selected:ring-5 aria-[current]:ring-5 max-md:py-2",
 
         [LinkVariant.HOVERABLE]:
-          "block rounded-lg border-none bg-current/0 hover:bg-current/10 aria-[current]:bg-current/5",
+          "rounded-lg border-none bg-current/0 transition *:text-current! hover:bg-current/10 aria-[current]:bg-current/5",
       },
       roundedSize: {
         [LinkRoundedSize.NONE]: "rounded-none",
@@ -163,22 +163,22 @@ export const linkVariants = cva(
       {
         variant: [LinkVariant.BUTTON, LinkVariant.BUTTON_OUTLINED],
         size: LinkSize.SM,
-        class: "min-h-7 px-3 max-md:py-1",
+        class: "min-h-7 px-3 text-xs max-md:py-1",
       },
       {
         variant: [LinkVariant.BUTTON, LinkVariant.BUTTON_OUTLINED],
         size: LinkSize.MD,
-        class: "min-h-8 px-6 max-md:py-2",
+        class: "min-h-8 px-6 text-sm max-md:py-2",
       },
       {
         variant: [LinkVariant.BUTTON, LinkVariant.BUTTON_OUTLINED],
         size: LinkSize.LG,
-        class: "min-h-10 px-8 max-md:py-3",
+        class: "min-h-10 px-8 text-lg max-md:py-3",
       },
       {
         variant: [LinkVariant.BUTTON, LinkVariant.BUTTON_OUTLINED],
         size: LinkSize.XL,
-        class: "min-h-11 px-10 max-md:py-4",
+        class: "min-h-11 px-10 text-xl max-md:py-4",
       },
       // Ring color variants
       {
@@ -237,7 +237,7 @@ export const linkVariants = cva(
       variant: LinkVariant.DEFAULT,
       roundedSize: LinkRoundedSize.MD,
       underlined: LinkUnderlined.DEFAULT,
-      size: LinkSize.MD,
+      size: LinkSize.CUSTOM,
     },
   },
 );
@@ -292,10 +292,12 @@ export const Link: FC<LinkProps> = (props) => {
     className,
     isActive,
     underlined,
-    size,
+    size: sizeProp,
     isExternalLink: isExternalLinkProp,
     isPageSection: isPageSectionProp,
     href: hrefProp,
+    rel: relProp,
+    target: targetProp,
     ...otherProps
   } = props;
 
@@ -306,14 +308,21 @@ export const Link: FC<LinkProps> = (props) => {
   const isButton =
     variant === LinkVariant.BUTTON || variant === LinkVariant.BUTTON_OUTLINED;
 
-  const rel = isExternalLink ? "noopener noreferrer nofollow" : undefined;
+  const size = sizeProp ?? (isButton ? LinkSize.MD : LinkSize.CUSTOM);
 
-  const target = isExternalLink ? "_blank" : "_self";
+  /**
+   * External links always carry the full safety/SEO `rel`, so a caller cannot
+   * accidentally strip `nofollow`. Internal links keep whatever the caller asked for.
+   */
+  const rel = isExternalLink ? "noopener noreferrer nofollow" : relProp;
+
+  const target = isExternalLink ? "_blank" : (targetProp ?? "_self");
 
   const href = hrefProp;
 
   return (
     <a
+      {...otherProps}
       href={href}
       aria-label={label}
       rel={rel}
@@ -330,7 +339,6 @@ export const Link: FC<LinkProps> = (props) => {
           className,
         }),
       )}
-      {...otherProps}
     >
       {isButton && isChildrenString ? <span>{children}</span> : children}
 
