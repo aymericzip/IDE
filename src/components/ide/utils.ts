@@ -73,6 +73,60 @@ export const loadIconSvg = async (name: string): Promise<string> => {
 
 export const initMonaco = async (): Promise<Monaco> => loader.init();
 
+/** Resolving the token costs a style recalc, so each palette is read once. */
+const editorBackgrounds = new Map<string, string>();
+
+/**
+ * Monaco themes only take hex, so the app's `--editor-background` — a
+ * `color-mix()` over `oklch()` tokens — has to be resolved to a concrete
+ * colour. A probe carrying the target `data-theme` reads either palette no
+ * matter which one is currently mounted, and a 1x1 canvas converts whatever
+ * colour space the browser reports back the way the compositor would.
+ */
+const resolveEditorBackground = (
+  theme: "dark" | "light",
+): string | undefined => {
+  const cached = editorBackgrounds.get(theme);
+  if (cached) return cached;
+
+  const host = globalThis.document?.body;
+  if (!host) return undefined;
+
+  const probe = document.createElement("div");
+  probe.dataset.theme = theme;
+  probe.style.cssText =
+    "position:absolute;visibility:hidden;pointer-events:none;background-color:var(--editor-background)";
+  host.append(probe);
+  const computed = getComputedStyle(probe).backgroundColor;
+  probe.remove();
+
+  if (
+    !computed ||
+    computed === "transparent" ||
+    computed === "rgba(0, 0, 0, 0)"
+  ) {
+    return undefined;
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = 1;
+  canvas.height = 1;
+  const context = canvas.getContext("2d");
+  if (!context) return undefined;
+
+  context.fillStyle = computed;
+  context.fillRect(0, 0, 1, 1);
+
+  const [red, green, blue] = context.getImageData(0, 0, 1, 1).data;
+  const hex = `#${[red, green, blue]
+    .map((channel) => channel.toString(16).padStart(2, "0"))
+    .join("")}`;
+
+  editorBackgrounds.set(theme, hex);
+
+  return hex;
+};
+
 /**
  * Every Monaco surface that has to read as "the editor background": the code
  * area, the left gutter, the sticky-scroll header and its own gutter, and the
@@ -98,7 +152,10 @@ export const defineThemes = (
     };
 
     const isDark = resolved.type === "dark";
-    const background = isDark ? "#1e1e1e" : "#ffffff";
+    // Falls back to Monaco's own shades if the stylesheet has not landed yet.
+    const background =
+      resolveEditorBackground(isDark ? "dark" : "light") ??
+      (isDark ? "#1e1e1e" : "#ffffff");
 
     if (isDark) {
       converted.colors["editor.lineHighlightBackground"] = "#2c2c2c";
@@ -163,14 +220,26 @@ export const shikiSetup =
           (monaco as any).editor.setTheme(dark ? "dark-plus" : "light-plus");
         };
 
+        const applyThemes = () =>
+          defineThemes(
+            highlighter,
+            monaco as {
+              editor: { defineTheme: (name: string, data: unknown) => void };
+            },
+          );
+
         shikiToMonaco(highlighter, monaco);
-        defineThemes(
-          highlighter,
-          monaco as {
-            editor: { defineTheme: (name: string, data: unknown) => void };
-          },
-        );
+        applyThemes();
         restoreTheme();
+
+        // Nothing resolved means the stylesheet landed after Monaco did, so the
+        // themes are still on the fallback shades; one frame later it is there.
+        if (editorBackgrounds.size === 0) {
+          requestAnimationFrame(() => {
+            applyThemes();
+            restoreTheme();
+          });
+        }
 
         return highlighter;
       })()

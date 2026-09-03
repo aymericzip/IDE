@@ -1030,7 +1030,7 @@ export const Workspace = ({
   return (
     <Group
       orientation="horizontal"
-      className={cn("bg-card/40", props.className)}
+      className={cn("bg-editor-background", props.className)}
     >
       {sidebarVisible && sidebarPosition === "left" && (
         <>

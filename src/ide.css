@@ -35,6 +35,8 @@
   --color-card: var(--card);
   --color-card-hover: var(--card-hover);
 
+  --color-editor-background: var(--editor-background);
+
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
 
@@ -84,6 +86,12 @@
   --card: oklch(98% 0 271);
   --card-hover: oklch(0.97 0 0);
 
+  /* The workspace surface the editor sits on. Monaco paints its gutter and
+     minimap onto canvases it owns, so the colour has to be a token both the
+     workspace and the Monaco theme can read rather than a translucent layer.
+     Mixed in srgb because that is what compositing `card` at 40% would do. */
+  --editor-background: color-mix(in srgb, var(--card) 40%, var(--background));
+
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
 
@@ -127,6 +135,8 @@
 
   --card: oklch(0.205 0 0);
   --card-hover: oklch(0.3 0 0);
+
+  --editor-background: color-mix(in srgb, var(--card) 40%, var(--background));
 
   --muted: oklch(0.205 0 0);
   --muted-foreground: oklch(0.708 0 0);
