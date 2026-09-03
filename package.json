@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "bun run generate:icons && vite",
-    "build": "bun run generate:icons && tsc -b tsconfig.build.json && vite build",
+    "build": "bun run generate:icons && tsc -b tsconfig.build.json && vite build && bun run compress:static",
     "lint": "eslint . && biome check .",
     "format": "biome check --write --unsafe .",
     "preview": "vite preview",
-    "generate:icons": "bun ./scripts/generate-icon-theme.mts"
+    "generate:icons": "bun ./scripts/generate-icon-theme.mts",
+    "compress:static": "bun ./scripts/compress-static.mts"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",
