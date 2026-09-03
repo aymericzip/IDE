@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <script>
-      (function () {
+      (() => {
         var t = "dark";
-        try { t = localStorage.getItem("theme") || "dark"; } catch (e) {}
+        try { t = localStorage.getItem("theme") || "dark"; } catch {}
         document.documentElement.setAttribute("data-theme", t);
       })();
     </script>

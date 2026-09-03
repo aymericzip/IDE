@@ -10,6 +10,7 @@ import {
   Children,
   createElement,
   isValidElement,
+  lazy,
   Suspense,
   useCallback,
   useEffect,
@@ -19,6 +20,7 @@ import {
   useState,
 } from "react";
 import { Group, Panel, Separator } from "react-resizable-panels";
+import { Button } from "./button";
 // Atoms & Context
 import {
   closedTabsAtom,
@@ -41,27 +43,6 @@ import {
   VIRTUAL_PREFIX,
 } from "./ide/constants";
 import { DockviewApiContext } from "./ide/IDEContext";
-import { lazy } from "react";
-
-const ContentPanel = lazy(() =>
-  import("./ide/Panels/ContentPanel").then((mod) => ({
-    default: mod.ContentPanel,
-  })),
-);
-const FilePanel = lazy(() =>
-  import("./ide/Panels/FilePanel").then((mod) => ({ default: mod.FilePanel })),
-);
-const ImagePanel = lazy(() =>
-  import("./ide/Panels/ImagePanel").then((mod) => ({
-    default: mod.ImagePanel,
-  })),
-);
-const WatermarkPanel = lazy(() =>
-  import("./ide/Panels/WatermarkPanel").then((mod) => ({
-    default: mod.WatermarkPanel,
-  })),
-);
-
 import { QuickOpenDialog } from "./ide/QuickOpenDialog";
 import { StatusBar } from "./ide/StatusBar";
 import { Tab } from "./ide/Tabs/Tab";
@@ -89,9 +70,27 @@ import {
   virtualFileId,
 } from "./ide/utils";
 import { cn } from "./lib/utils";
-import { Toaster } from "./sonner";
 import { Loader } from "./loader";
-import { Button } from "./button";
+import { Toaster } from "./sonner";
+
+const ContentPanel = lazy(() =>
+  import("./ide/Panels/ContentPanel").then((mod) => ({
+    default: mod.ContentPanel,
+  })),
+);
+const FilePanel = lazy(() =>
+  import("./ide/Panels/FilePanel").then((mod) => ({ default: mod.FilePanel })),
+);
+const ImagePanel = lazy(() =>
+  import("./ide/Panels/ImagePanel").then((mod) => ({
+    default: mod.ImagePanel,
+  })),
+);
+const WatermarkPanel = lazy(() =>
+  import("./ide/Panels/WatermarkPanel").then((mod) => ({
+    default: mod.WatermarkPanel,
+  })),
+);
 
 const SuspenseWrapper = (Component: any) => (props: any) => (
   <Suspense fallback={<Loader />}>
@@ -1037,14 +1036,14 @@ export const Workspace = ({
           <Panel defaultSize={sidebarSize} minSize={10}>
             <div
               className={cn(
-                "h-full bg-muted border-neutral/20",
+                "h-full border-neutral/20 bg-muted",
                 sidebarPosition === "left" && "border-r",
               )}
             >
               {sidebarContent}
             </div>
           </Panel>
-          <Separator className="w-1 hover:bg-primary/20 transition-colors cursor-col-resize" />
+          <Separator className="w-1 cursor-col-resize transition-colors hover:bg-primary/20" />
         </>
       )}
 

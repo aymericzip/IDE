@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import { type LucideIcon } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import type { ButtonHTMLAttributes, DetailedHTMLProps, FC } from "react";
 import { ContainerRoundedSize as ButtonRoundedSize } from "./container";
 import { cn } from "./lib/utils";

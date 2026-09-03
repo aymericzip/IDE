@@ -50,7 +50,7 @@ export const TabHeader = ({ api, params }: IDockviewPanelHeaderProps) => {
     <ContextMenu>
       <ContextMenuTrigger
         className={cn(
-          "select-none group/tab flex h-full items-center gap-[3px] py-[3px] pl-1 text-xs context-menu-trigger",
+          "group/tab context-menu-trigger flex h-full select-none items-center gap-[3px] py-[3px] pl-1 text-xs",
           parameters?.headerClassName,
           isActive
             ? ["text-zinc-950 dark:text-zinc-100", parameters?.activeClassName]

@@ -2,14 +2,14 @@ import { SiGithub } from "@icons-pack/react-simple-icons";
 import type { TreeDataItem, WorkspaceProps, WorkspaceRef } from "idecn";
 import { AlertTriangle, PanelLeft, X } from "lucide-react";
 import { type ComponentType, useEffect, useRef, useState } from "react";
-import { SwitchThemeSwitcher } from "./components/switchTheme-switcher";
 import { toast } from "sonner";
+import { Button } from "./components/button";
 import { Link } from "./components/link";
+import { SwitchThemeSwitcher } from "./components/switchTheme-switcher";
 import { EXPAND_EXCLUDE } from "./constants";
+import { useSearchParamState } from "./hooks/useSearchParamState";
 import { downloadFile, downloadFolder, fetchFile, fetchTree } from "./repo-api";
 import { repoFromInput } from "./url-utils";
-import { Button } from "./components/button";
-import { useSearchParamState } from "./hooks/useSearchParamState";
 import "./ide.css";
 
 const triggerDownload = (base64: string, filename: string) => {
@@ -115,7 +115,7 @@ export const Explorer = ({
 
   return (
     <div className="flex h-screen flex-col">
-      <div className="flex items-center gap-2 py-1 bg-muted *:transition-all *:duration-300">
+      <div className="flex items-center gap-2 bg-muted py-1 *:transition-all *:duration-300">
         <Button
           Icon={PanelLeft}
           label="Toggle sidebar"
@@ -145,7 +145,7 @@ export const Explorer = ({
           variant="button-outlined"
           roundedSize="full"
           rel="noopener noreferrer nofollow"
-          className="flex p-1 min-h-0 aspect-square cursor-pointer items-center justify-center rounded-full border-[1.3px]"
+          className="flex aspect-square min-h-0 cursor-pointer items-center justify-center rounded-full border-[1.3px] p-1"
         >
           <SiGithub size={18} />
         </Link>
