@@ -73,6 +73,20 @@ export const loadIconSvg = async (name: string): Promise<string> => {
 
 export const initMonaco = async (): Promise<Monaco> => loader.init();
 
+/**
+ * Every Monaco surface that has to read as "the editor background": the code
+ * area, the left gutter, the sticky-scroll header and its own gutter, and the
+ * minimap and overview ruler on the right.
+ */
+const EDITOR_SURFACE_COLORS = [
+  "editor.background",
+  "editorGutter.background",
+  "editorStickyScroll.background",
+  "editorStickyScrollGutter.background",
+  "minimap.background",
+  "editorOverviewRuler.background",
+] as const;
+
 export const defineThemes = (
   highlighter: Awaited<ReturnType<typeof createHighlighter>>,
   monaco: { editor: { defineTheme: (name: string, data: unknown) => void } },
@@ -84,20 +98,27 @@ export const defineThemes = (
     };
 
     const isDark = resolved.type === "dark";
+    const background = isDark ? "#1e1e1e" : "#ffffff";
 
     if (isDark) {
-      converted.colors["editor.background"] = "#1e1e1e";
       converted.colors["editor.lineHighlightBackground"] = "#2c2c2c";
       converted.colors["editorLineNumber.foreground"] = "#858585";
-      converted.colors["minimap.background"] = "#1e1e1e";
       converted.colors["minimapSlider.background"] = "#ffffff15";
       converted.colors["minimapSlider.hoverBackground"] = "#ffffff25";
       converted.colors["minimapSlider.activeBackground"] = "#ffffff35";
-    } else {
-      converted.colors["editor.background"] = "#ffffff";
-      converted.colors["minimap.background"] = "#ffffff";
     }
 
+    // Monaco resolves unset colors from its own registry defaults, which leaves
+    // the gutter, the sticky-scroll header and the overview ruler on the right
+    // painting their own shade. Pinning every surface to `background` keeps the
+    // editor a single flat colour edge to edge.
+    for (const surface of EDITOR_SURFACE_COLORS) {
+      converted.colors[surface] = background;
+    }
+
+    converted.colors["editorOverviewRuler.border"] = "#00000000";
+    converted.colors["editorStickyScroll.border"] = "#00000000";
+    converted.colors["editorStickyScroll.shadow"] = "#00000000";
     converted.colors["scrollbar.shadow"] = "#00000000";
     converted.colors["scrollbarSlider.background"] = isDark
       ? "#ffffff15"
@@ -163,7 +184,16 @@ export const ensureLanguage = async (lang: string) => {
   if (!highlighter.getLoadedLanguages().includes(lang)) {
     try {
       await highlighter.loadLanguage(lang as any);
+      // `shikiToMonaco` re-defines the themes straight from the TextMate data,
+      // so the surface overrides have to be re-applied or the gutter and the
+      // minimap snap back to their registry defaults.
       shikiToMonaco(highlighter, monaco);
+      defineThemes(
+        highlighter,
+        monaco as {
+          editor: { defineTheme: (name: string, data: unknown) => void };
+        },
+      );
       const dark =
         document.documentElement.getAttribute("data-theme") !== "light";
       (monaco as any).editor.setTheme(dark ? "dark-plus" : "light-plus");

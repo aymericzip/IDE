@@ -4,6 +4,13 @@
   outline: none !important;
 }
 
+/* Monaco ships `.lines-decorations { background: #fff }` as a literal, with no
+   theme variable behind it, so that strip stays white inside a dark gutter. */
+.monaco-editor .lines-decorations,
+.monaco-editor .glyph-margin {
+  background-color: var(--vscode-editorGutter-background);
+}
+
 /* Dockview Reset */
 .dv-reset {
   --dv-activegroup-visiblepanel-tab-background-color: transparent;
