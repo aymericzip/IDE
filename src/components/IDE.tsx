@@ -1,4 +1,4 @@
-import "dockview-core/dist/styles/dockview.css";
+import "dockview-react/dist/styles/dockview.css";
 import "./IDE.css";
 import { useHotkeys } from "@tanstack/react-hotkeys";
 import type { DockviewApi, DockviewReadyEvent } from "dockview-react";
@@ -891,7 +891,7 @@ export const Workspace = ({
         log(`Opened tab: ${addedPanel.title ?? addedPanel.id}`);
         notifyFiles();
       }),
-      event.api.onDidActivePanelChange((activePanel) => {
+      event.api.onDidActivePanelChange(({ panel: activePanel }) => {
         if (activePanel?.id) {
           setActiveFileId(activePanel.id);
           onTabChangeRef.current?.(activePanel.id);
