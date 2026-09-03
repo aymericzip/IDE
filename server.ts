@@ -30,8 +30,9 @@ const CONTENT_SECURITY_POLICY = [
   "object-src 'none'",
   "form-action 'none'",
   "connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://data.jsdelivr.com https://cdn.jsdelivr.net",
-  // The IDE is embedded by intlayer.org, which X-Frame-Options cannot express.
-  "frame-ancestors 'self' https://intlayer.org https://*.intlayer.org",
+  // The IDE is embedded by intlayer.org and intlayer.cn, which X-Frame-Options
+  // cannot express.
+  "frame-ancestors 'self' https://intlayer.org https://*.intlayer.org https://intlayer.cn https://*.intlayer.cn",
   // Monaco's AMD loader needs eval; its workers are created from blob URLs.
   `script-src 'self' 'unsafe-eval' ${inlineScriptHashes()} https://cdn.jsdelivr.net`,
   "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
