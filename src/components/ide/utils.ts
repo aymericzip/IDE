@@ -1,5 +1,8 @@
 import type { Monaco } from "@monaco-editor/loader";
 import { loader } from "@monaco-editor/react";
+// Side-effect import: points the loader at the bundled Monaco. Must be
+// evaluated before `initMonaco` runs, which is why it sits with the imports.
+import "./monaco-env";
 import { shikiToMonaco, textmateThemeToMonacoTheme } from "@shikijs/monaco";
 import {
   Children,

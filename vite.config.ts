@@ -8,9 +8,11 @@ import { defineConfig } from "vite";
 const here = fileURLToPath(new URL(".", import.meta.url));
 
 const securityHeaders = {
-  // Enforce GitHub-only sources, Monaco editor requirements (blob, unsafe-eval), and iframe constraints
-  // Kept in step with the production policy in server.ts, minus the inline
-  // script hashes, which are computed from the built index.html.
+  // Enforce GitHub-only sources and iframe constraints. Kept in step with the
+  // production policy in server.ts, with two deliberate relaxations: the inline
+  // script hashes are computed from the built index.html and so cannot be known
+  // here, and Vite's dev client needs `'unsafe-inline'` and `'unsafe-eval'`
+  // that production does not.
   "Content-Security-Policy": [
     "default-src 'self'",
     "base-uri 'self'",
@@ -18,9 +20,9 @@ const securityHeaders = {
     "form-action 'none'",
     "connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://data.jsdelivr.com https://cdn.jsdelivr.net",
     "frame-ancestors 'self' https://intlayer.org https://*.intlayer.org https://intlayer.cn https://*.intlayer.cn",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net",
-    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
-    "font-src 'self' data: https://cdn.jsdelivr.net",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'",
+    "style-src 'self' 'unsafe-inline'",
+    "font-src 'self' data:",
     "img-src 'self' data: https://raw.githubusercontent.com https://avatars.githubusercontent.com",
     "worker-src 'self' blob:",
   ].join("; "),

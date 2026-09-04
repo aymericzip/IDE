@@ -29,14 +29,22 @@ const CONTENT_SECURITY_POLICY = [
   "base-uri 'self'",
   "object-src 'none'",
   "form-action 'none'",
+  // jsdelivr stays reachable as *data* — `repo-api.ts` reads repository trees
+  // and file contents from it — but no longer as a source of code.
   "connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://data.jsdelivr.com https://cdn.jsdelivr.net",
   // The IDE is embedded by intlayer.org and intlayer.cn, which X-Frame-Options
   // cannot express.
   "frame-ancestors 'self' https://intlayer.org https://*.intlayer.org https://intlayer.cn https://*.intlayer.cn",
-  // Monaco's AMD loader needs eval; its workers are created from blob URLs.
-  `script-src 'self' 'unsafe-eval' ${inlineScriptHashes()} https://cdn.jsdelivr.net`,
-  "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
-  "font-src 'self' data: https://cdn.jsdelivr.net",
+  // Monaco is bundled (see `monaco-env.ts`), so no CDN origin and no AMD
+  // loader: scripts come from this origin and the one hashed inline block.
+  //
+  // `wasm-unsafe-eval` is for Shiki's Oniguruma engine, which compiles a WASM
+  // module. It is the narrow grant — WebAssembly compilation only — where the
+  // AMD loader previously forced full `unsafe-eval`, which also permits
+  // `eval()` and `new Function()` on strings.
+  `script-src 'self' 'wasm-unsafe-eval' ${inlineScriptHashes()}`,
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self' data:",
   "img-src 'self' data: https://raw.githubusercontent.com https://avatars.githubusercontent.com",
   "worker-src 'self' blob:",
 ].join('; ');
@@ -246,6 +254,14 @@ const serveFile = (
 
 const INDEX_PATH = join(DIST_DIR, 'index.html');
 
+/**
+ * Liveness probe for the container's HEALTHCHECK. Answered before any file
+ * lookup so it reports on the server itself, and kept off the SPA fallback —
+ * which returns 200 for every unknown path and would mark a server with a
+ * missing `dist` as healthy.
+ */
+const HEALTH_PATH = '/healthz';
+
 serve({
   port: Number(process.env.PORT ?? 3000),
   fetch(req) {
@@ -259,6 +275,18 @@ serve({
     }
 
     const url = new URL(req.url);
+
+    if (url.pathname === HEALTH_PATH) {
+      return withSecurityHeaders(
+        new Response('ok', {
+          headers: {
+            'Cache-Control': 'no-store',
+            'Content-Type': 'text/plain; charset=utf-8',
+          },
+        })
+      );
+    }
+
     const path = url.pathname === '/' ? '/index.html' : url.pathname;
     const absolutePath = resolveWithinDist(path);
 
