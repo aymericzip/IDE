@@ -44,7 +44,7 @@ export const useItemSelector = (
   const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastPositionRef = useRef<StyleState | null>(null);
 
-  const itemsLength = optionsRefs.current.length;
+  const itemsLength = (optionsRefs.current ?? []).length;
 
   const calculatePosition = () => {
     let targetElement: HTMLElement | null = null;
@@ -57,7 +57,7 @@ export const useItemSelector = (
         hideTimeoutRef.current = null;
       }
     } else {
-      targetElement = optionsRefs.current.find(selector) ?? null;
+      targetElement = (optionsRefs.current ?? []).find(selector) ?? null;
     }
 
     if (!targetElement) {
@@ -147,7 +147,7 @@ export const useItemSelector = (
     // MutationObserver to watch for 'aria-selected' changes
     const mutationObservers: MutationObserver[] = [];
 
-    optionsRefs.current.forEach((option) => {
+    (optionsRefs.current ?? []).forEach((option) => {
       if (option) {
         const observer = new MutationObserver((mutations) => {
           for (const mutation of mutations) {
@@ -185,7 +185,7 @@ export const useItemSelector = (
     };
 
     // Observe the selected item
-    const selectedItem = optionsRefs.current.find(selector) ?? null;
+    const selectedItem = (optionsRefs.current ?? []).find(selector) ?? null;
 
     if (selectedItem) {
       observeSize(selectedItem);
@@ -220,7 +220,7 @@ export const useItemSelector = (
     };
 
     if (isHoverable) {
-      optionsRefs.current.forEach((option) => {
+      (optionsRefs.current ?? []).forEach((option) => {
         option?.addEventListener("mouseenter", handleMouseEnter, {
           passive: true,
         });
@@ -251,7 +251,7 @@ export const useItemSelector = (
       });
 
       // Remove hover event listeners
-      optionsRefs.current.forEach((option) => {
+      (optionsRefs.current ?? []).forEach((option) => {
         option?.removeEventListener("mouseenter", handleMouseEnter);
         option?.removeEventListener("mouseleave", handleMouseLeave);
       });

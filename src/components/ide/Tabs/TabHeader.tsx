@@ -10,7 +10,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import { use, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
   ContextMenu,
@@ -28,7 +28,7 @@ import { FileIcon } from "../Tree/TreeIcons";
 
 export const TabHeader = ({ api, params }: IDockviewPanelHeaderProps) => {
   const parameters = params as any;
-  const dockviewApi = use(DockviewApiContext);
+  const dockviewApi = useContext(DockviewApiContext);
   const previewId = useAtomValue(previewPanelAtom);
   const [pinnedTabs, setPinnedTabs] = useAtom(pinnedTabsAtom);
 

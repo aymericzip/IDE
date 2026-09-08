@@ -1,5 +1,6 @@
 import { Accordion as AccordionPrimitive } from '@base-ui/react/accordion';
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
+import type { WithRefOf } from './lib/base-ui-props';
 import { cn } from './lib/utils';
 
 export const Accordion = ({
@@ -30,7 +31,10 @@ export const AccordionTrigger = ({
   className,
   children,
   ...props
-}: AccordionPrimitive.Trigger.Props) => {
+}: WithRefOf<
+  typeof AccordionPrimitive.Trigger,
+  AccordionPrimitive.Trigger.Props
+>) => {
   return (
     <AccordionPrimitive.Header className="flex">
       <AccordionPrimitive.Trigger

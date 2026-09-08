@@ -25,6 +25,11 @@ export const TreeFile = ({
   icon?: ComponentType<{ className?: string }> | string;
   id?: string;
   name: string;
+  /**
+   * preact's JSX types only declare `onDblClick`, but `preact/compat` still
+   * maps `onDoubleClick` onto the `dblclick` listener at runtime.
+   */
+  onDoubleClick?: ComponentProps<'button'>['onDblClick'];
   path?: string;
 }) => {
   const {
@@ -59,7 +64,12 @@ export const TreeFile = ({
             }
             props.onClick?.(event);
           }}
-          style={{ paddingLeft, ...props.style }}
+          // preact widens `style` to `string | CSSProperties`, so it is only
+          // spreadable once narrowed to the object form.
+          style={{
+            paddingLeft,
+            ...(typeof props.style === 'object' ? props.style : null),
+          }}
         >
           {CustomIcon ? (
             <CustomIcon className={iconClass} />

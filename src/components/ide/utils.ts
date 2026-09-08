@@ -4,13 +4,10 @@ import { loader } from "@monaco-editor/react";
 // evaluated before `initMonaco` runs, which is why it sits with the imports.
 import "./monaco-env";
 import { shikiToMonaco, textmateThemeToMonacoTheme } from "@shikijs/monaco";
-import {
-  Children,
-  isValidElement,
-  type ReactNode,
-  useEffect,
-  useRef,
-} from "react";
+// `preact/compat` types `isValidElement` as returning `boolean`; preact core
+// types it as a type predicate, which is what narrows `ComponentChild` here.
+import { isValidElement } from "preact";
+import { Children, type ReactNode, useEffect, useRef } from "react";
 import { createHighlighter } from "shiki";
 import {
   CORE_LANGS,

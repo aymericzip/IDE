@@ -1,6 +1,7 @@
 import { ContextMenu as ContextMenuPrimitive } from "@base-ui/react/context-menu";
 import { CheckIcon, ChevronRightIcon } from "lucide-react";
 import type * as React from "react";
+import type { WithRefOf } from "./lib/base-ui-props";
 import { cn } from "./lib/utils";
 
 export const ContextMenu = ({ ...props }: ContextMenuPrimitive.Root.Props) => {
@@ -89,7 +90,10 @@ export const ContextMenuItem = ({
   inset,
   variant = "default",
   ...props
-}: ContextMenuPrimitive.Item.Props & {
+}: WithRefOf<
+  typeof ContextMenuPrimitive.Item,
+  ContextMenuPrimitive.Item.Props
+> & {
   inset?: boolean;
   variant?: "default" | "destructive";
 }) => {
@@ -118,7 +122,10 @@ export const ContextMenuSubTrigger = ({
   inset,
   children,
   ...props
-}: ContextMenuPrimitive.SubmenuTrigger.Props & {
+}: WithRefOf<
+  typeof ContextMenuPrimitive.SubmenuTrigger,
+  ContextMenuPrimitive.SubmenuTrigger.Props
+> & {
   inset?: boolean;
 }) => {
   return (
@@ -154,7 +161,10 @@ export const ContextMenuCheckboxItem = ({
   checked,
   inset,
   ...props
-}: ContextMenuPrimitive.CheckboxItem.Props & {
+}: WithRefOf<
+  typeof ContextMenuPrimitive.CheckboxItem,
+  ContextMenuPrimitive.CheckboxItem.Props
+> & {
   inset?: boolean;
 }) => {
   return (
@@ -192,7 +202,10 @@ export const ContextMenuRadioItem = ({
   children,
   inset,
   ...props
-}: ContextMenuPrimitive.RadioItem.Props & {
+}: WithRefOf<
+  typeof ContextMenuPrimitive.RadioItem,
+  ContextMenuPrimitive.RadioItem.Props
+> & {
   inset?: boolean;
 }) => {
   return (

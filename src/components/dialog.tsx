@@ -2,12 +2,15 @@ import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { XIcon } from "lucide-react";
 import type * as React from "react";
 import { Button, ButtonVariant } from "./button";
+import type { WithRefOf } from "./lib/base-ui-props";
 import { cn } from "./lib/utils";
 
 export const Dialog = ({ ...props }: DialogPrimitive.Root.Props) => {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />;
 };
-export const DialogTrigger = ({ ...props }: DialogPrimitive.Trigger.Props) => {
+export const DialogTrigger = ({
+  ...props
+}: WithRefOf<typeof DialogPrimitive.Trigger, DialogPrimitive.Trigger.Props>) => {
   return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />;
 };
 export const DialogPortal = ({ ...props }: DialogPrimitive.Portal.Props) => {

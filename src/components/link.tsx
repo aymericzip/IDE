@@ -1,11 +1,13 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { ExternalLink, MoveRight } from "lucide-react";
-import {
-  type AnchorHTMLAttributes,
-  type DetailedHTMLProps,
-  type FC,
-  isValidElement,
-  type ReactNode,
+// `preact/compat` types `isValidElement` as returning `boolean`; preact core
+// types it as a type predicate, which is what narrows `ComponentChild` here.
+import { isValidElement } from "preact";
+import type {
+  AnchorHTMLAttributes,
+  DetailedHTMLProps,
+  FC,
+  ReactNode,
 } from "react";
 import { cn } from "./lib/utils";
 
@@ -302,7 +304,11 @@ export const Link: FC<LinkProps> = (props) => {
   } = props;
 
   const isExternalLink = isExternalLinkProp ?? checkIsExternalLink(props);
-  const isPageSection = isPageSectionProp ?? hrefProp?.startsWith("#") ?? false;
+  // `href` is `Signalish<string | undefined>` under preact's JSX types, so it
+  // has to be narrowed to the plain-string case before being inspected.
+  const isPageSection =
+    isPageSectionProp ??
+    (typeof hrefProp === "string" && hrefProp.startsWith("#"));
 
   const isChildrenString = isTextChildren(children);
   const isButton =
@@ -328,7 +334,6 @@ export const Link: FC<LinkProps> = (props) => {
       rel={rel}
       target={target}
       aria-current={isActive ? "page" : undefined}
-      suppressHydrationWarning
       className={cn(
         linkVariants({
           variant,

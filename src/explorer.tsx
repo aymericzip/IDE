@@ -129,7 +129,7 @@ export const Explorer = ({
         <input
           autoComplete="off"
           className="ml-4 min-w-0 flex-1 bg-transparent text-xs outline-none"
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(e) => setInput(e.currentTarget.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") submit();
           }}

@@ -5,11 +5,13 @@ import type { DockviewApi, DockviewReadyEvent } from "dockview-react";
 import { DockviewReact } from "dockview-react";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { ChevronRight, ChevronsDownUp } from "lucide-react";
+// `preact/compat` types `isValidElement` as returning `boolean`; preact core
+// types it as a type predicate, which is what narrows `ComponentChild` here.
+import { isValidElement } from "preact";
 import type { ComponentProps, ReactNode, Ref } from "react";
 import {
   Children,
   createElement,
-  isValidElement,
   lazy,
   Suspense,
   useCallback,
@@ -747,7 +749,9 @@ export const Workspace = ({
   }, [pinFile, setOpenFileFn]);
 
   useImperativeHandle(
-    ref,
+    // preact's `useImperativeHandle` takes `Ref<T>`, which does not include
+    // `undefined` the way React's does.
+    ref ?? null,
     () => ({
       focusPanel: (id: string) =>
         stateRef.current.api?.panels.find((p) => p.id === id)?.focus(),

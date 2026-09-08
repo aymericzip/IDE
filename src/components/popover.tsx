@@ -1,5 +1,6 @@
 import { Popover as PopoverPrimitive } from "@base-ui/react/popover";
 import type * as React from "react";
+import type { WithRefOf } from "./lib/base-ui-props";
 import { cn } from "./lib/utils";
 
 export const Popover = ({ ...props }: PopoverPrimitive.Root.Props) => {
@@ -7,7 +8,10 @@ export const Popover = ({ ...props }: PopoverPrimitive.Root.Props) => {
 };
 export const PopoverTrigger = ({
   ...props
-}: PopoverPrimitive.Trigger.Props) => {
+}: WithRefOf<
+  typeof PopoverPrimitive.Trigger,
+  PopoverPrimitive.Trigger.Props
+>) => {
   return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />;
 };
 export const PopoverContent = ({

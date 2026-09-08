@@ -1,4 +1,4 @@
-import { use } from 'react';
+import { useContext } from 'react';
 import { ICON_CLASS_HOVER } from '../constants';
 import { DepthContext, EMPTY_SET, TreeContext } from '../IDEContext';
 
@@ -23,9 +23,9 @@ export const useTreeItem = ({
     selectedIds,
     setSelectedId,
     setSelectedIds,
-  } = use(TreeContext);
+  } = useContext(TreeContext);
 
-  const depth = use(DepthContext);
+  const depth = useContext(DepthContext);
   const itemId = id ?? path ?? name;
 
   const isSelected =
