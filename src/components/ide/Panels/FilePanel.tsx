@@ -1,19 +1,19 @@
-import { Editor } from "@monaco-editor/react";
-import type { IDockviewPanelProps } from "dockview-react";
-import { useSetAtom } from "jotai";
-import { useTheme } from "next-themes";
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import { Editor } from '@monaco-editor/react';
+import type { IDockviewPanelProps } from 'dockview-react';
+import { useSetAtom } from 'jotai';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { useTheme } from '../../../providers';
 import {
   Breadcrumb,
   BreadcrumbList,
   BreadcrumbSeparator,
-} from "../../breadcrumb";
-import { cn } from "../../lib/utils";
-import { Skeleton } from "../../skeleton";
-import { activeFileInfoAtom, cursorAtom } from "../atoms";
-import { BreadcrumbSegment } from "../Breadcrumbs";
-import { CENTER, EDITOR_OPTIONS, VIRTUAL_PREFIX } from "../constants";
-import { monoFont, shikiSetup, ensureLanguage } from "../utils";
+} from '../../breadcrumb';
+import { cn } from '../../lib/utils';
+import { Skeleton } from '../../skeleton';
+import { activeFileInfoAtom, cursorAtom } from '../atoms';
+import { BreadcrumbSegment } from '../Breadcrumbs';
+import { CENTER, EDITOR_OPTIONS, VIRTUAL_PREFIX } from '../constants';
+import { ensureLanguage, monoFont, shikiSetup } from '../utils';
 
 /** Lines beyond this cannot be on screen, and the preview is discarded anyway. */
 const PREVIEW_LINES = 200;
@@ -27,13 +27,13 @@ const CodePreview = ({ code }: { code: string }) => (
   <pre
     className="flex-1 overflow-hidden py-1 pl-[62px] text-foreground"
     style={{
-      fontFamily: monoFont() || "ui-monospace, monospace",
+      fontFamily: monoFont() || 'ui-monospace, monospace',
       fontSize: 12,
       letterSpacing: -0.8,
       lineHeight: 1.5,
     }}
   >
-    {code.split("\n").slice(0, PREVIEW_LINES).join("\n")}
+    {code.split('\n').slice(0, PREVIEW_LINES).join('\n')}
   </pre>
 );
 
@@ -55,7 +55,7 @@ export const FilePanel = ({
   const [editorOpts, setEditorOpts] = useState(params.editorOptions);
   const [ready, setReady] = useState(!shikiSetup);
   const { resolvedTheme } = useTheme();
-  const isDarkMode = resolvedTheme !== "light";
+  const isDarkMode = resolvedTheme !== 'light';
 
   useEffect(() => {
     if (shikiSetup) {
@@ -76,7 +76,7 @@ export const FilePanel = ({
 
         if (isVirtual) {
           requestAnimationFrame(() => {
-            const lineCount = (parameters.content ?? "").split("\n").length;
+            const lineCount = (parameters.content ?? '').split('\n').length;
             editorRef.current?.revealLine(lineCount);
           });
         }
@@ -127,13 +127,13 @@ export const FilePanel = ({
 
   if (!content) {
     return (
-      <div className={cn(CENTER, "text-muted-foreground text-xs")}>
+      <div className={cn(CENTER, 'text-muted-foreground text-xs')}>
         Empty file
       </div>
     );
   }
 
-  const pathParts = api.id.split("/");
+  const pathParts = api.id.split('/');
 
   return (
     <div className="flex h-full flex-col">
@@ -153,7 +153,7 @@ export const FilePanel = ({
                 key={part}
                 name={part}
                 pathParts={pathParts}
-              />,
+              />
             );
 
             return items;
@@ -187,11 +187,11 @@ export const FilePanel = ({
           }}
           path={api.id}
           theme={
-            typeof params.theme === "string"
+            typeof params.theme === 'string'
               ? params.theme
               : isDarkMode
-                ? (params.theme?.dark ?? "dark-plus")
-                : (params.theme?.light ?? "light-plus")
+                ? (params.theme?.dark ?? 'dark-plus')
+                : (params.theme?.light ?? 'light-plus')
           }
           value={content}
         />

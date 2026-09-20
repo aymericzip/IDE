@@ -1,13 +1,13 @@
-import { MoonIcon, SunIcon } from "lucide-react";
-import { useTheme } from "next-themes";
-import { useSearchParamState } from "../hooks/useSearchParamState";
-import type { FC } from "react";
-import { useEffect, useState } from "react";
-import { SwitchSelector, type SwitchSelectorChoices } from "./switch-selector";
+import { MoonIcon, SunIcon } from 'lucide-react';
+import type { FC } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParamState } from '../hooks/useSearchParamState';
+import { useTheme } from '../providers';
+import { SwitchSelector, type SwitchSelectorChoices } from './switch-selector';
 
 const Modes = {
-  light: "light",
-  dark: "dark",
+  light: 'light',
+  dark: 'dark',
 } as const;
 
 type Modes = (typeof Modes)[keyof typeof Modes];
@@ -17,11 +17,11 @@ export const SwitchThemeSwitcher: FC = () => {
   const [mounted, setMounted] = useState(false);
 
   const { params, setParam } = useSearchParamState({
-    theme: { type: "string" },
+    theme: { type: 'string' },
   });
 
   useEffect(() => {
-    if (params.theme && (params.theme === "dark" || params.theme === "light")) {
+    if (params.theme && (params.theme === 'dark' || params.theme === 'light')) {
       setTheme(params.theme);
     }
   }, [params.theme, setTheme]);
@@ -59,7 +59,7 @@ export const SwitchThemeSwitcher: FC = () => {
       value={resolvedTheme as Modes}
       onChange={(value) => {
         setTheme(value);
-        setParam("theme", value);
+        setParam('theme', value);
       }}
       color="text"
       size="sm"
