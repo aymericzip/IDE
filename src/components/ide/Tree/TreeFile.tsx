@@ -42,7 +42,7 @@ export const TreeFile = ({
     select,
   } = useTreeItem({ id, name, path });
 
-  const CustomIcon = typeof icon === "function" ? icon : undefined;
+  const CustomIcon = typeof icon === 'function' ? icon : undefined;
 
   return (
     <ContextMenu>
@@ -54,9 +54,9 @@ export const TreeFile = ({
           {...props}
           className={cn(
             ITEM_CLASS,
-            (isSelected || isMultiSelected) && "bg-accent",
-            disabled && "pointer-events-none opacity-50",
-            props.className,
+            (isSelected || isMultiSelected) && 'bg-accent',
+            disabled && 'pointer-events-none opacity-50',
+            props.className
           )}
           onClick={(event) => {
             if (!disabled) {

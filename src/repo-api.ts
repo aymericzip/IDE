@@ -1,19 +1,19 @@
-import { downloadZip } from "client-zip";
+import { downloadZip } from 'client-zip';
 
-import type { TreeDataItem } from "idecn";
+import type { TreeDataItem } from 'idecn';
 
-export type { TreeDataItem } from "idecn";
+export type { TreeDataItem } from 'idecn';
 
 export let githubToken: string | null =
-  typeof window !== "undefined" ? localStorage.getItem("GH_TOKEN") : null;
+  typeof window !== 'undefined' ? localStorage.getItem('GH_TOKEN') : null;
 
 export const setGithubToken = (token: string | null) => {
   githubToken = token;
-  if (typeof window !== "undefined") {
+  if (typeof window !== 'undefined') {
     if (token) {
-      localStorage.setItem("GH_TOKEN", token);
+      localStorage.setItem('GH_TOKEN', token);
     } else {
-      localStorage.removeItem("GH_TOKEN");
+      localStorage.removeItem('GH_TOKEN');
     }
   }
 };
@@ -21,36 +21,36 @@ export const setGithubToken = (token: string | null) => {
 export type JsdelivrFile = {
   files?: JsdelivrFile[];
   name: string;
-  type: "directory" | "file";
+  type: 'directory' | 'file';
 };
 
 const IMAGE_EXTS = new Set([
-  "apng",
-  "avif",
-  "bmp",
-  "gif",
-  "ico",
-  "jpeg",
-  "jpg",
-  "png",
-  "svg",
-  "webp",
+  'apng',
+  'avif',
+  'bmp',
+  'gif',
+  'ico',
+  'jpeg',
+  'jpg',
+  'png',
+  'svg',
+  'webp',
 ]);
 const MIME: Record<string, string> = {
-  apng: "image/apng",
-  avif: "image/avif",
-  bmp: "image/bmp",
-  gif: "image/gif",
-  ico: "image/x-icon",
-  jpeg: "image/jpeg",
-  jpg: "image/jpeg",
-  png: "image/png",
-  svg: "image/svg+xml",
-  webp: "image/webp",
+  apng: 'image/apng',
+  avif: 'image/avif',
+  bmp: 'image/bmp',
+  gif: 'image/gif',
+  ico: 'image/x-icon',
+  jpeg: 'image/jpeg',
+  jpg: 'image/jpeg',
+  png: 'image/png',
+  svg: 'image/svg+xml',
+  webp: 'image/webp',
 };
 
 const uint8ArrayToBase64 = (bytes: Uint8Array): string => {
-  let binary = "";
+  let binary = '';
 
   for (let i = 0; i < bytes.length; i += 1) {
     binary += String.fromCharCode(bytes[i]!);
@@ -77,32 +77,32 @@ const getDefaultBranch = async (repo: string): Promise<string> => {
   });
   if (response.ok) {
     const data = (await response.json()) as { default_branch?: string };
-    const branch = data.default_branch ?? "main";
+    const branch = data.default_branch ?? 'main';
     branchCache.set(repo, branch);
     return branch;
   }
 
   if (response.status === 404 || response.status === 401) {
-    if (!githubToken && typeof window !== "undefined") {
+    if (!githubToken && typeof window !== 'undefined') {
       const token = window.prompt(
-        "This repository is private or not found. Please enter a GitHub Personal Access Token (PAT):",
+        'This repository is private or not found. Please enter a GitHub Personal Access Token (PAT):'
       );
       if (token) {
         setGithubToken(token);
         window.location.reload();
       }
     }
-    throw new Error("PRIVATE_REPO_OR_NOT_FOUND");
+    throw new Error('PRIVATE_REPO_OR_NOT_FOUND');
   }
 
-  return "main";
+  return 'main';
 };
 
-const jsdelivrToTree = (files: JsdelivrFile[], prefix = ""): TreeDataItem[] => {
+const jsdelivrToTree = (files: JsdelivrFile[], prefix = ''): TreeDataItem[] => {
   const items: TreeDataItem[] = [];
   const sorted = [...files].toSorted((a, b) => {
     if (a.type !== b.type) {
-      return a.type === "directory" ? -1 : 1;
+      return a.type === 'directory' ? -1 : 1;
     }
     return a.name.localeCompare(b.name);
   });
@@ -111,7 +111,7 @@ const jsdelivrToTree = (files: JsdelivrFile[], prefix = ""): TreeDataItem[] => {
     const path = prefix ? `${prefix}/${file.name}` : file.name;
     const item: TreeDataItem = { id: path, name: file.name, path };
 
-    if (file.type === "directory" && file.files) {
+    if (file.type === 'directory' && file.files) {
       item.children = jsdelivrToTree(file.files, path);
     }
 
@@ -122,24 +122,24 @@ const jsdelivrToTree = (files: JsdelivrFile[], prefix = ""): TreeDataItem[] => {
 };
 
 const treeFromGitHubFlat = (
-  flat: { path: string; type: string }[],
+  flat: { path: string; type: string }[]
 ): TreeDataItem[] => {
   const items: TreeDataItem[] = [];
   const directories = new Map<string, TreeDataItem>();
 
   const sortedFlat = flat.toSorted((a, b) => {
     if (a.type !== b.type) {
-      return a.type === "tree" ? -1 : 1;
+      return a.type === 'tree' ? -1 : 1;
     }
     return a.path.localeCompare(b.path);
   });
 
   for (const item of sortedFlat) {
-    const parts = item.path.split("/");
+    const parts = item.path.split('/');
     const name = parts.at(-1) ?? item.path;
     const node: TreeDataItem = { id: item.path, name, path: item.path };
 
-    if (item.type === "tree") {
+    if (item.type === 'tree') {
       node.children = [];
       directories.set(item.path, node);
     }
@@ -147,7 +147,7 @@ const treeFromGitHubFlat = (
     if (parts.length === 1) {
       items.push(node);
     } else {
-      const parentPath = parts.slice(0, -1).join("/");
+      const parentPath = parts.slice(0, -1).join('/');
       directories.get(parentPath)?.children?.push(node);
     }
   }
@@ -163,7 +163,7 @@ export const fetchTree = async (repo: string): Promise<TreeDataItem[]> => {
     headers.Authorization = `Bearer ${githubToken}`;
     const githubResponse = await fetch(
       `https://api.github.com/repos/${repo}/git/trees/${branch}?recursive=1`,
-      { headers },
+      { headers }
     );
 
     if (githubResponse.ok) {
@@ -178,7 +178,7 @@ export const fetchTree = async (repo: string): Promise<TreeDataItem[]> => {
   }
 
   const jsdelivrResponse = await fetch(
-    `https://data.jsdelivr.com/v1/packages/gh/${repo}@${branch}`,
+    `https://data.jsdelivr.com/v1/packages/gh/${repo}@${branch}`
   );
 
   if (jsdelivrResponse.ok) {
@@ -190,7 +190,7 @@ export const fetchTree = async (repo: string): Promise<TreeDataItem[]> => {
   }
 
   const fallbackGithubResponse = await fetch(
-    `https://api.github.com/repos/${repo}/git/trees/${branch}?recursive=1`,
+    `https://api.github.com/repos/${repo}/git/trees/${branch}?recursive=1`
   );
 
   if (fallbackGithubResponse.ok) {
@@ -208,15 +208,15 @@ export const fetchTree = async (repo: string): Promise<TreeDataItem[]> => {
 
 export const fetchFile = async (
   repo: string,
-  path: string,
+  path: string
 ): Promise<null | string> => {
-  const extension = path.split(".").at(-1)?.toLowerCase() ?? "";
+  const extension = path.split('.').at(-1)?.toLowerCase() ?? '';
 
   if (githubToken) {
-    const branch = await getDefaultBranch(repo).catch(() => "main");
+    const branch = await getDefaultBranch(repo).catch(() => 'main');
     const url = `https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}`;
     const headers: Record<string, string> = {
-      Accept: "application/vnd.github.v3.raw",
+      Accept: 'application/vnd.github.v3.raw',
       Authorization: `Bearer ${githubToken}`,
     };
 
@@ -226,13 +226,16 @@ export const fetchFile = async (
       if (IMAGE_EXTS.has(extension)) {
         const buffer = new Uint8Array(await response.arrayBuffer());
         const base64 = uint8ArrayToBase64(buffer);
-        const mimeType = MIME[extension] ?? "application/octet-stream";
+        const mimeType = MIME[extension] ?? 'application/octet-stream';
         return `data:${mimeType};base64,${base64}`;
       }
 
       return response.text();
     }
-    console.error(`Failed to fetch file from GitHub API: ${response.status} ${response.statusText}`, url);
+    console.error(
+      `Failed to fetch file from GitHub API: ${response.status} ${response.statusText}`,
+      url
+    );
   }
 
   // JSDelivr automatically resolves the default branch!
@@ -247,7 +250,7 @@ export const fetchFile = async (
 
     const buffer = new Uint8Array(await response.arrayBuffer());
     const base64 = uint8ArrayToBase64(buffer);
-    const mimeType = MIME[extension] ?? "application/octet-stream";
+    const mimeType = MIME[extension] ?? 'application/octet-stream';
     return `data:${mimeType};base64,${base64}`;
   }
 
@@ -257,16 +260,16 @@ export const fetchFile = async (
 
 export const downloadFile = async (
   repo: string,
-  path: string,
+  path: string
 ): Promise<null | { base64: string; name: string }> => {
-  const branch = await getDefaultBranch(repo).catch(() => "main");
+  const branch = await getDefaultBranch(repo).catch(() => 'main');
   const headers: Record<string, string> = {};
 
   let url = `https://raw.githubusercontent.com/${repo}/${branch}/${path}`;
 
   if (githubToken) {
     headers.Authorization = `Bearer ${githubToken}`;
-    headers.Accept = "application/vnd.github.v3.raw";
+    headers.Accept = 'application/vnd.github.v3.raw';
     url = `https://api.github.com/repos/${repo}/contents/${path}?ref=${branch}`;
   }
 
@@ -280,15 +283,15 @@ export const downloadFile = async (
 
   return {
     base64: uint8ArrayToBase64(buffer),
-    name: path.split("/").at(-1) ?? "file",
+    name: path.split('/').at(-1) ?? 'file',
   };
 };
 
 export const downloadFolder = async (
   repo: string,
-  path: string,
+  path: string
 ): Promise<null | { base64: string; name: string }> => {
-  const branch = await getDefaultBranch(repo).catch(() => "main");
+  const branch = await getDefaultBranch(repo).catch(() => 'main');
   const headers: Record<string, string> = {};
 
   if (githubToken) {
@@ -297,7 +300,7 @@ export const downloadFolder = async (
 
   const response = await fetch(
     `https://api.github.com/repos/${repo}/git/trees/${branch}?recursive=1`,
-    { headers },
+    { headers }
   );
 
   if (!response.ok) {
@@ -312,12 +315,12 @@ export const downloadFolder = async (
     return null;
   }
 
-  const folderPrefix = path.endsWith("/") ? path : `${path}/`;
+  const folderPrefix = path.endsWith('/') ? path : `${path}/`;
   const blobs = data.tree.filter(
     (item) =>
-      item.type === "blob" &&
+      item.type === 'blob' &&
       item.path.startsWith(folderPrefix) &&
-      item.path.length > folderPrefix.length,
+      item.path.length > folderPrefix.length
   );
 
   if (blobs.length === 0) {
@@ -331,7 +334,7 @@ export const downloadFolder = async (
     const rawHeaders: Record<string, string> = { ...headers };
 
     if (githubToken) {
-      rawHeaders.Accept = "application/vnd.github.v3.raw";
+      rawHeaders.Accept = 'application/vnd.github.v3.raw';
       rawUrl = `https://api.github.com/repos/${repo}/contents/${blob.path}?ref=${branch}`;
     }
 
@@ -354,6 +357,6 @@ export const downloadFolder = async (
 
   return {
     base64: uint8ArrayToBase64(zipBuffer),
-    name: path.split("/").filter(Boolean).at(-1) ?? "folder",
+    name: path.split('/').filter(Boolean).at(-1) ?? 'folder',
   };
 };

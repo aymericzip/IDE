@@ -27,7 +27,7 @@ export const QuickOpenDialog = ({
     setOpen(isOpen);
 
     if (!isOpen) {
-      log("Quick open closed");
+      log('Quick open closed');
     }
   };
 
@@ -47,9 +47,9 @@ export const QuickOpenDialog = ({
               No files found
             </Cmdk.Empty>
             {flatFiles.map((file) => {
-              const parentPath = file.path.includes("/")
-                ? file.path.slice(0, file.path.lastIndexOf("/"))
-                : "";
+              const parentPath = file.path.includes('/')
+                ? file.path.slice(0, file.path.lastIndexOf('/'))
+                : '';
 
               return (
                 <Cmdk.Item

@@ -1,6 +1,6 @@
-import { type RefObject, useLayoutEffect, useRef, useState } from "react";
+import { type RefObject, useLayoutEffect, useRef, useState } from 'react';
 
-export type ItemSelectorOrientation = "horizontal" | "vertical";
+export type ItemSelectorOrientation = 'horizontal' | 'vertical';
 
 type HorizontalStyleState = {
   left: number;
@@ -17,7 +17,7 @@ type VerticalStyleState = {
 type StyleState = HorizontalStyleState | VerticalStyleState;
 
 const selectorDefault = (option: HTMLElement) =>
-  option?.getAttribute("aria-selected") === "true";
+  option?.getAttribute('aria-selected') === 'true';
 
 type Options = {
   selector?: (option: HTMLElement, index: number) => boolean;
@@ -30,12 +30,12 @@ export const useItemSelector = (
   {
     selector = selectorDefault,
     isHoverable = false,
-    orientation = "horizontal",
+    orientation = 'horizontal',
   }: Options = {
     selector: selectorDefault,
     isHoverable: false,
-    orientation: "horizontal",
-  },
+    orientation: 'horizontal',
+  }
 ) => {
   const [choiceIndicatorPosition, setChoiceIndicatorPosition] =
     useState<StyleState | null>(null);
@@ -62,7 +62,7 @@ export const useItemSelector = (
 
     if (!targetElement) {
       // Keep previous position but set opacity to 0
-      if (orientation === "vertical") {
+      if (orientation === 'vertical') {
         const verticalPrev =
           lastPositionRef.current as VerticalStyleState | null;
         const newPosition: VerticalStyleState = {
@@ -92,7 +92,7 @@ export const useItemSelector = (
       return;
     }
 
-    if (orientation === "vertical") {
+    if (orientation === 'vertical') {
       const top = targetElement.offsetTop;
       const height = targetElement.offsetHeight;
 
@@ -141,8 +141,8 @@ export const useItemSelector = (
     calculatePosition();
 
     // Event listeners for window events
-    window.addEventListener("resize", calculatePosition);
-    window.addEventListener("DOMContentLoaded", calculatePosition);
+    window.addEventListener('resize', calculatePosition);
+    window.addEventListener('DOMContentLoaded', calculatePosition);
 
     // MutationObserver to watch for 'aria-selected' changes
     const mutationObservers: MutationObserver[] = [];
@@ -152,10 +152,10 @@ export const useItemSelector = (
         const observer = new MutationObserver((mutations) => {
           for (const mutation of mutations) {
             if (
-              mutation.type === "attributes" &&
-              (mutation.attributeName === "aria-selected" ||
-                mutation.attributeName === "data-active" ||
-                mutation.attributeName === "data-indicator")
+              mutation.type === 'attributes' &&
+              (mutation.attributeName === 'aria-selected' ||
+                mutation.attributeName === 'data-active' ||
+                mutation.attributeName === 'data-indicator')
             ) {
               calculatePosition();
               break;
@@ -165,7 +165,7 @@ export const useItemSelector = (
 
         observer.observe(option, {
           attributes: true,
-          attributeFilter: ["aria-selected", "data-active", "data-indicator"],
+          attributeFilter: ['aria-selected', 'data-active', 'data-indicator'],
         });
 
         mutationObservers.push(observer);
@@ -221,10 +221,10 @@ export const useItemSelector = (
 
     if (isHoverable) {
       (optionsRefs.current ?? []).forEach((option) => {
-        option?.addEventListener("mouseenter", handleMouseEnter, {
+        option?.addEventListener('mouseenter', handleMouseEnter, {
           passive: true,
         });
-        option?.addEventListener("mouseleave", handleMouseLeave, {
+        option?.addEventListener('mouseleave', handleMouseLeave, {
           passive: true,
         });
       });
@@ -237,8 +237,8 @@ export const useItemSelector = (
       }
 
       // Cleanup window event listeners
-      window.removeEventListener("resize", calculatePosition);
-      window.removeEventListener("DOMContentLoaded", calculatePosition);
+      window.removeEventListener('resize', calculatePosition);
+      window.removeEventListener('DOMContentLoaded', calculatePosition);
 
       // Disconnect MutationObservers
       mutationObservers.forEach((observer) => {
@@ -252,8 +252,8 @@ export const useItemSelector = (
 
       // Remove hover event listeners
       (optionsRefs.current ?? []).forEach((option) => {
-        option?.removeEventListener("mouseenter", handleMouseEnter);
-        option?.removeEventListener("mouseleave", handleMouseLeave);
+        option?.removeEventListener('mouseenter', handleMouseEnter);
+        option?.removeEventListener('mouseleave', handleMouseLeave);
       });
     };
   }, [

@@ -39,7 +39,7 @@ const renderItems = ({
           path={item.path}
         >
           {renderItems({ items: children, onItemClick, onItemDoubleClick })}
-        </TreeFolder>,
+        </TreeFolder>
       );
     } else {
       nodes.push(
@@ -55,7 +55,7 @@ const renderItems = ({
           }}
           onDoubleClick={() => onItemDoubleClick?.(item)}
           path={item.path}
-        />,
+        />
       );
     }
   }
@@ -73,7 +73,7 @@ export const Tree = ({
   onSelect,
   selectedId: controlledSelectedId,
   ...props
-}: ComponentProps<"nav"> & {
+}: ComponentProps<'nav'> & {
   expandDepth?: number;
   expandExclude?: string[];
   fileActions?: FileActions;
@@ -83,7 +83,7 @@ export const Tree = ({
   selectedId?: null | string;
 }) => {
   const [internalSelectedId, setInternalSelectedId] = useState<null | string>(
-    null,
+    null
   );
   const [selectedIds, setSelectedIds] = useState<Set<string>>(EMPTY_SET);
   const navRef = useRef<HTMLElement>(null);
@@ -112,7 +112,7 @@ export const Tree = ({
       onSelect,
       selectedId,
       selectedIds,
-    ],
+    ]
   );
 
   return (
@@ -126,13 +126,13 @@ export const Tree = ({
           props.className
         )}
         onKeyDownCapture={(event) => {
-          if (![" ", "ArrowDown", "ArrowUp", "Enter"].includes(event.key)) {
+          if (![' ', 'ArrowDown', 'ArrowUp', 'Enter'].includes(event.key)) {
             return;
           }
 
           const target = event.target as HTMLElement;
 
-          if (!target.closest("[role=treeitem]")) {
+          if (!target.closest('[role=treeitem]')) {
             return;
           }
 
@@ -140,15 +140,17 @@ export const Tree = ({
           event.stopPropagation();
 
           const items =
-            event.currentTarget.querySelectorAll<HTMLElement>("[role=treeitem]");
-          const treeItem = target.closest("[role=treeitem]");
+            event.currentTarget.querySelectorAll<HTMLElement>(
+              '[role=treeitem]'
+            );
+          const treeItem = target.closest('[role=treeitem]');
           const index = treeItem
             ? [...items].indexOf(treeItem as HTMLElement)
             : -1;
 
-          if (event.key === "ArrowDown") {
+          if (event.key === 'ArrowDown') {
             items[Math.min(index + 1, items.length - 1)]?.focus();
-          } else if (event.key === "ArrowUp") {
+          } else if (event.key === 'ArrowUp') {
             items[Math.max(index - 1, 0)]?.focus();
           } else {
             target.click();

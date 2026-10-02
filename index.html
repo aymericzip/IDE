@@ -7,9 +7,27 @@
         var t = "dark";
         try { t = localStorage.getItem("theme") || "dark"; } catch {}
         document.documentElement.setAttribute("data-theme", t);
+        if (location.hostname === "localhost" && "serviceWorker" in navigator) {
+          navigator.serviceWorker.getRegistrations().then((regs) => {
+            for (const r of regs) r.unregister();
+          });
+          if ("caches" in window) {
+            caches.keys().then((keys) => {
+              for (const k of keys) caches.delete(k);
+            });
+          }
+        }
       })();
     </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- DNS prefetch fallbacks for browsers without preconnect support -->
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+    <link rel="dns-prefetch" href="https://data.jsdelivr.com" />
+    <link rel="dns-prefetch" href="https://api.github.com" />
+
     <!-- Keep this list to the origins the first load actually hits: extra
          preconnects compete for the same connection budget. -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" />
@@ -25,11 +43,54 @@
       crossorigin
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+
     <title>Intlayer online IDE</title>
     <meta
       name="description"
       content="Intlayer's online IDE opens any GitHub repository in your browser: browse the file tree and read code with syntax highlighting, no clone or install."
     />
+    <link rel="canonical" href="https://ide.intlayer.org" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Intlayer" />
+    <meta property="og:title" content="Intlayer online IDE — In-Browser GitHub Code Editor" />
+    <meta
+      property="og:description"
+      content="Intlayer's online IDE opens any GitHub repository in your browser: browse the file tree and read code with syntax highlighting, no clone or install."
+    />
+    <meta property="og:image" content="https://ide.intlayer.org/api/og" />
+    <meta property="og:image:secure_url" content="https://ide.intlayer.org/api/og" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Intlayer online IDE — In-browser GitHub code editor" />
+    <meta property="og:url" content="https://ide.intlayer.org" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Intlayer online IDE" />
+    <meta
+      name="twitter:description"
+      content="Intlayer's online IDE opens any GitHub repository in your browser: browse the file tree and read code with syntax highlighting, no clone or install."
+    />
+    <meta name="twitter:image" content="https://ide.intlayer.org/api/og" />
+    <meta name="twitter:image:alt" content="Intlayer online IDE — In-browser GitHub code editor" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Intlayer online IDE",
+        "url": "https://ide.intlayer.org",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "All",
+        "description": "Intlayer's online IDE opens any GitHub repository in your browser: browse the file tree and read code with syntax highlighting, no clone or install."
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

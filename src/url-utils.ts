@@ -23,8 +23,8 @@ export const repoFromInput = (input: string): string | null => {
 };
 
 export const repoFromPathname = (pathname: string): string | null => {
-  const trimmed = pathname.replace(/\/+$/, "") || "/";
-  const parts = trimmed.split("/").filter(Boolean);
+  const trimmed = pathname.replace(/\/+$/, '') || '/';
+  const parts = trimmed.split('/').filter(Boolean);
 
   if (parts.length < 2) {
     return null;
@@ -34,7 +34,10 @@ export const repoFromPathname = (pathname: string): string | null => {
   let repo: string;
   const firstPart = parts[0].toLowerCase();
 
-  if (parts.length === 3 && (firstPart === "github" || firstPart === "github.com")) {
+  if (
+    parts.length === 3 &&
+    (firstPart === 'github' || firstPart === 'github.com')
+  ) {
     owner = parts[1];
     repo = parts[2];
   } else if (parts.length === 2) {
@@ -58,15 +61,15 @@ export const repoFromPathname = (pathname: string): string | null => {
 
 export const repoFromSearch = (search: string): string | null => {
   const params = new URLSearchParams(
-    search.startsWith("?") ? search : `?${search}`,
+    search.startsWith('?') ? search : `?${search}`
   );
-  const direct = (params.get("repo") ?? "").trim();
+  const direct = (params.get('repo') ?? '').trim();
 
   if (OWNER_REPO.test(direct)) {
     return direct;
   }
 
-  const url = (params.get("url") ?? "").trim();
+  const url = (params.get('url') ?? '').trim();
   if (!url) {
     return null;
   }
@@ -99,19 +102,19 @@ export const repoFromLocation = (
 
 export const filesFromSearch = (search: string): string[] => {
   const params = new URLSearchParams(
-    search.startsWith("?") ? search : `?${search}`,
+    search.startsWith('?') ? search : `?${search}`
   );
-  const rawFiles = params.get("files") ?? "";
-  const rawFileArgs = params.getAll("file");
+  const rawFiles = params.get('files') ?? '';
+  const rawFileArgs = params.getAll('file');
 
   const allFiles: string[] = [];
 
   if (rawFiles) {
     allFiles.push(
       ...rawFiles
-        .split(",")
+        .split(',')
         .map((file) => file.trim())
-        .filter(Boolean),
+        .filter(Boolean)
     );
   }
 
@@ -120,9 +123,9 @@ export const filesFromSearch = (search: string): string[] => {
     if (trimmed) {
       allFiles.push(
         ...trimmed
-          .split(",")
+          .split(',')
           .map((file) => file.trim())
-          .filter(Boolean),
+          .filter(Boolean)
       );
     }
   }
@@ -132,7 +135,7 @@ export const filesFromSearch = (search: string): string[] => {
 
 export const themeFromSearch = (search: string): string | null => {
   const params = new URLSearchParams(
-    search.startsWith("?") ? search : `?${search}`,
+    search.startsWith('?') ? search : `?${search}`
   );
-  return params.get("theme");
+  return params.get('theme');
 };

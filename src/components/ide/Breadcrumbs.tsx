@@ -1,14 +1,14 @@
-import { useAtomValue } from "jotai";
-import { ChevronRight } from "lucide-react";
-import { useMemo, useState } from "react";
-import { BreadcrumbItem, BreadcrumbLink, BreadcrumbPage } from "../breadcrumb";
-import { cn } from "../lib/utils";
-import { Popover, PopoverContent, PopoverTrigger } from "../popover";
-import { openFileAtom, treeAtom } from "./atoms";
-import { ICON_CLASS } from "./constants";
-import { FileIcon, FolderIcon } from "./Tree/TreeIcons";
-import type { TreeDataItem } from "./types";
-import { findSiblings } from "./utils";
+import { useAtomValue } from 'jotai';
+import { ChevronRight } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { BreadcrumbItem, BreadcrumbLink, BreadcrumbPage } from '../breadcrumb';
+import { cn } from '../lib/utils';
+import { Popover, PopoverContent, PopoverTrigger } from '../popover';
+import { openFileAtom, treeAtom } from './atoms';
+import { ICON_CLASS } from './constants';
+import { FileIcon, FolderIcon } from './Tree/TreeIcons';
+import type { TreeDataItem } from './types';
+import { findSiblings } from './utils';
 
 export const BreadcrumbPickerItem = ({
   close,
@@ -41,8 +41,8 @@ export const BreadcrumbPickerItem = ({
         {item.children ? (
           <ChevronRight
             className={cn(
-              "size-3 shrink-0 transition-transform",
-              isExpanded && "rotate-90",
+              'size-3 shrink-0 transition-transform',
+              isExpanded && 'rotate-90'
             )}
           />
         ) : (
@@ -90,7 +90,7 @@ export const BreadcrumbSegment = ({
 
   const siblings = useMemo(
     () => findSiblings(tree, pathParts, depth),
-    [tree, pathParts, depth],
+    [tree, pathParts, depth]
   );
 
   if (siblings.length === 0) {

@@ -1,5 +1,5 @@
-import type { IDockviewPanelProps } from "dockview-react";
-import { type ReactNode, useEffect, useState } from "react";
+import type { IDockviewPanelProps } from 'dockview-react';
+import { type ReactNode, useEffect, useState } from 'react';
 
 export const ContentPanel = ({
   api,

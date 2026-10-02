@@ -1,25 +1,25 @@
-import { SiGithub } from "@icons-pack/react-simple-icons";
-import type { TreeDataItem, WorkspaceProps, WorkspaceRef } from "idecn";
-import { AlertTriangle, PanelLeft, X } from "lucide-react";
-import { type ComponentType, useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
-import { Button } from "./components/button";
-import { Link } from "./components/link";
-import { SwitchThemeSwitcher } from "./components/switchTheme-switcher";
-import { EXPAND_EXCLUDE } from "./constants";
-import { useSearchParamState } from "./hooks/useSearchParamState";
-import { downloadFile, downloadFolder, fetchFile, fetchTree } from "./repo-api";
-import { repoFromInput } from "./url-utils";
-import "./ide.css";
+import { SiGithub } from '@icons-pack/react-simple-icons';
+import { type TreeDataItem, Workspace, type WorkspaceRef } from 'idecn';
+import { AlertTriangle, PanelLeft, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
+import { Button } from './components/button';
+import { Link } from './components/link';
+import { SwitchThemeSwitcher } from './components/switchTheme-switcher';
+import { EXPAND_EXCLUDE } from './constants';
+import { useSearchParamState } from './hooks/useSearchParamState';
+import { downloadFile, downloadFolder, fetchFile, fetchTree } from './repo-api';
+import { repoFromInput } from './url-utils';
+import './ide.css';
 
 const triggerDownload = (base64: string, filename: string) => {
   const bytes = Uint8Array.from(
     atob(base64),
-    (char) => char.codePointAt(0) ?? 0,
+    (char) => char.codePointAt(0) ?? 0
   );
   const blob = new Blob([bytes]);
   const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
+  const link = document.createElement('a');
 
   link.href = url;
   link.download = filename;
@@ -41,23 +41,12 @@ export const Explorer = ({
   const [tree, setTree] = useState(initialTree);
   const [error, setError] = useState<null | string>(null);
   const [input, setInput] = useState(initialRepo);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const ref = useRef<WorkspaceRef>(null);
-  const [Workspace, setWorkspace] =
-    useState<ComponentType<WorkspaceProps> | null>(null);
 
   const { setParam } = useSearchParamState({
-    file: { type: "string" },
+    file: { type: 'string' },
   });
-
-  useEffect(() => {
-    let cancelled = false;
-    void import("idecn").then((mod) => {
-      if (!cancelled) setWorkspace(() => mod.Workspace);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   useEffect(() => {
     setRepo(initialRepo);
@@ -75,7 +64,7 @@ export const Explorer = ({
       setTree(fetchedTree);
 
       if (fetchedTree.length === 0) {
-        setError("Failed to load repo tree");
+        setError('Failed to load repo tree');
       }
     })();
   }, [initialRepo, initialTree, repo]);
@@ -87,7 +76,7 @@ export const Explorer = ({
     const match = input.match(githubPattern);
 
     if (!match) {
-      setError("Invalid source. Only GitHub repositories are accepted.");
+      setError('Invalid source. Only GitHub repositories are accepted.');
       return;
     }
 
@@ -100,16 +89,16 @@ export const Explorer = ({
     setRepo(parsed);
 
     const params = new URLSearchParams(window.location.search);
-    params.delete("repo");
-    params.delete("url");
+    params.delete('repo');
+    params.delete('url');
 
     const queryString = params.toString();
     const path = `/${parsed}`;
 
     window.history.replaceState(
       null,
-      "",
-      queryString ? `${path}?${queryString}` : path,
+      '',
+      queryString ? `${path}?${queryString}` : path
     );
   };
 
@@ -123,7 +112,13 @@ export const Explorer = ({
           variant="hoverable"
           color="text"
           className="-mr-2 ml-1 size-8 shrink-0 cursor-pointer stroke-1 p-2 hover:bg-accent hover:p-1.5"
-          onClick={() => ref.current?.toggleSidebar()}
+          onClick={() => {
+            if (ref.current?.toggleSidebar) {
+              ref.current.toggleSidebar();
+            } else {
+              setSidebarOpen((open) => !open);
+            }
+          }}
         />
 
         <input
@@ -131,7 +126,7 @@ export const Explorer = ({
           className="ml-4 min-w-0 flex-1 bg-transparent text-xs outline-none"
           onChange={(e) => setInput(e.currentTarget.value)}
           onKeyDown={(e) => {
-            if (e.key === "Enter") submit();
+            if (e.key === 'Enter') submit();
           }}
           placeholder="owner/repo or GitHub URL"
           type="search"
@@ -166,50 +161,40 @@ export const Explorer = ({
           </button>
         </div>
       ) : null}
-      {Workspace ? (
-        <Workspace
-          className="flex-1"
-          expandDepth={2}
-          expandExclude={EXPAND_EXCLUDE}
-          fileActions={{
-            onDownload: async (path) => {
-              const file = await downloadFile(repo, path).catch(() => null);
-              if (file) {
-                triggerDownload(file.base64, file.name);
-                toast(`Downloaded ${file.name}`);
-                return;
-              }
-              const folder = await downloadFolder(repo, path).catch(() => null);
-              if (folder) {
-                triggerDownload(folder.base64, `${folder.name}.zip`);
-                toast(`Downloaded ${folder.name}.zip`);
-                return;
-              }
-              toast.error(`Failed to download "${path}"`);
-            },
-          }}
-          initialFiles={initialFiles}
-          onOpenFile={async (item) => {
-            const content = await fetchFile(repo, item.path).catch(() => null);
-            return content;
-          }}
-          onTabChange={(id) => {
-            setParam("file", id);
-          }}
-          ref={ref}
-          tree={tree}
-        />
-      ) : (
-        <div
-          aria-busy="true"
-          className="flex flex-1 animate-pulse flex-col gap-2 bg-muted/30 p-3"
-          role="status"
-        >
-          <span className="sr-only">Loading editor</span>
-          <div className="h-8 max-w-md rounded-md bg-muted" />
-          <div className="flex min-h-0 flex-1 rounded-md bg-muted" />
-        </div>
-      )}
+      <Workspace
+        className="flex-1"
+        sidebar={sidebarOpen}
+        onSidebarChange={setSidebarOpen}
+        expandDepth={2}
+        expandExclude={EXPAND_EXCLUDE}
+        fileActions={{
+          onDownload: async (path) => {
+            const file = await downloadFile(repo, path).catch(() => null);
+            if (file) {
+              triggerDownload(file.base64, file.name);
+              toast(`Downloaded ${file.name}`);
+              return;
+            }
+            const folder = await downloadFolder(repo, path).catch(() => null);
+            if (folder) {
+              triggerDownload(folder.base64, `${folder.name}.zip`);
+              toast(`Downloaded ${folder.name}.zip`);
+              return;
+            }
+            toast.error(`Failed to download "${path}"`);
+          },
+        }}
+        initialFiles={initialFiles}
+        onOpenFile={async (item) => {
+          const content = await fetchFile(repo, item.path).catch(() => null);
+          return content;
+        }}
+        onTabChange={(id) => {
+          setParam('file', id);
+        }}
+        ref={ref}
+        tree={tree}
+      />
     </div>
   );
 };

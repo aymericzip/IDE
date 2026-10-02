@@ -1,6 +1,6 @@
-import type { FC, HTMLAttributes } from "react";
-import { Spinner } from "./spinner";
-import { cn } from "./lib/utils";
+import type { FC, HTMLAttributes } from 'react';
+import { cn } from './lib/utils';
+import { Spinner } from './spinner';
 
 /**
  * Props for the Loader component
@@ -111,8 +111,8 @@ export const Loader: FC<LoaderProps> = ({
       <div className="relative size-full">
         <div
           className={cn(
-            "absolute top-0 left-0 flex size-full max-h-screen max-w-[100vw] flex-1 items-center justify-center",
-            className,
+            'absolute top-0 left-0 flex size-full max-h-screen max-w-[100vw] flex-1 items-center justify-center',
+            className
           )}
           role="status"
           aria-label="Animated icon, meaning that the website is processing"
@@ -125,8 +125,8 @@ export const Loader: FC<LoaderProps> = ({
     ) : isLoading ? (
       <div
         className={cn(
-          "flex size-full max-h-screen max-w-[100vw] flex-1 items-center justify-center",
-          className,
+          'flex size-full max-h-screen max-w-[100vw] flex-1 items-center justify-center',
+          className
         )}
         role="status"
         aria-label="Animated icon, meaning that the website is processing"

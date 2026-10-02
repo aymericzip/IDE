@@ -1,5 +1,5 @@
-import type { SVGProps } from "react";
-import { cn } from "./lib/utils";
+import type { SVGProps } from 'react';
+import { cn } from './lib/utils';
 
 /**
  * Props for the Spinner component
@@ -70,7 +70,7 @@ export const Spinner = ({ className, strokeWidth = 4 }: SpinnerProps) => (
     stroke="currentColor"
     role="img"
     aria-label="Spinner"
-    className={cn("size-full", className)}
+    className={cn('size-full', className)}
   >
     <g fill="none" fillRule="evenodd" strokeWidth={strokeWidth}>
       <circle cx="22" cy="22" r="1">

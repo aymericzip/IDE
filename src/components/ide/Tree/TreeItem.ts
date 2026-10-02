@@ -50,8 +50,8 @@ export const useTreeItem = ({
       setSelectedIds(nextSelectedIds);
     } else if (event?.shiftKey && selectedId && navRef.current) {
       const elements =
-        navRef.current.querySelectorAll<HTMLElement>("[data-item-id]");
-      const ids = [...elements].map((element) => element.dataset.itemId ?? "");
+        navRef.current.querySelectorAll<HTMLElement>('[data-item-id]');
+      const ids = [...elements].map((element) => element.dataset.itemId ?? '');
       const fromIndex = ids.indexOf(selectedId);
       const toIndex = ids.indexOf(itemId);
 

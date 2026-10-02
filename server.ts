@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync, statSync } from 'node:fs';
 import { join, resolve, sep } from 'node:path';
 import { serve } from 'bun';
+import { handleOgRequest } from './server/og/ogHandler';
 
 const DIST_DIR = join(import.meta.dir, 'dist');
 
@@ -180,6 +181,11 @@ const negotiateContentEncoding = (
  * contents are not, so they must never be pinned for a year.
  */
 const cacheControlFor = (path: string): string => {
+  // Service worker and Workbox runtime scripts must never be served stale.
+  if (path === '/sw.js' || path.startsWith('/workbox-')) {
+    return 'no-cache, no-store, must-revalidate';
+  }
+
   // Vite content-hashes everything under /assets/. Font file names are not
   // hashed, so replacing a font means giving the file a new name.
   if (path.startsWith('/assets/') || path.startsWith('/fonts/')) {
@@ -262,9 +268,57 @@ const INDEX_PATH = join(DIST_DIR, 'index.html');
  */
 const HEALTH_PATH = '/healthz';
 
+const OWNER_REPO = /^[\w.-]+\/[\w.-]+$/;
+const STATIC_SEGMENT =
+  /\.(js|mjs|cjs|css|map|json|ico|svg|png|jpe?g|gif|webp|woff2?|ttf|eot|html?)$/i;
+const RESERVED_PATH_ROOTS = new Set([
+  'assets',
+  '_vite',
+  'api',
+  'fonts',
+  'icons',
+  'healthz',
+]);
+
+const repoFromPathname = (pathname: string): string | null => {
+  const trimmed = pathname.replace(/\/+$/, '') || '/';
+  const parts = trimmed.split('/').filter(Boolean);
+
+  if (parts.length < 2) return null;
+
+  let owner: string;
+  let repo: string;
+  const firstPart = parts[0].toLowerCase();
+
+  if (
+    parts.length === 3 &&
+    (firstPart === 'github' || firstPart === 'github.com')
+  ) {
+    owner = parts[1];
+    repo = parts[2];
+  } else if (parts.length === 2) {
+    owner = parts[0];
+    repo = parts[1];
+  } else {
+    return null;
+  }
+
+  if (RESERVED_PATH_ROOTS.has(owner)) return null;
+  if (STATIC_SEGMENT.test(repo)) return null;
+
+  const candidate = `${owner}/${repo}`;
+  return OWNER_REPO.test(candidate) ? candidate : null;
+};
+
 serve({
   port: Number(process.env.PORT ?? 3000),
   fetch(req) {
+    const url = new URL(req.url);
+
+    if (url.pathname === '/api/og') {
+      return handleOgRequest(req);
+    }
+
     if (!READABLE_METHODS.has(req.method)) {
       return withSecurityHeaders(
         new Response('Method Not Allowed', {
@@ -273,8 +327,6 @@ serve({
         })
       );
     }
-
-    const url = new URL(req.url);
 
     if (url.pathname === HEALTH_PATH) {
       return withSecurityHeaders(
@@ -327,6 +379,50 @@ serve({
     }
 
     // SPA Fallback for routes like /github/user/repo
+    const repoMatch = repoFromPathname(path);
+    if (repoMatch) {
+      let html = readFileSync(INDEX_PATH, 'utf8');
+      const escapedRepo = repoMatch.replace(/"/g, '&quot;');
+      const encodedRepo = encodeURIComponent(repoMatch);
+      const ogUrl = `https://ide.intlayer.org/api/og?repo=${encodedRepo}`;
+      const pageUrl = `https://ide.intlayer.org/${repoMatch}`;
+      const pageTitle = `${escapedRepo} — Intlayer online IDE`;
+
+      html = html
+        .replace(/<title>.*?<\/title>/, `<title>${pageTitle}</title>`)
+        .replace(
+          /<meta\s+property="og:title"\s+content=".*?"\s*\/>/,
+          `<meta property="og:title" content="${pageTitle}" />`
+        )
+        .replace(
+          /<meta\s+name="twitter:title"\s+content=".*?"\s*\/>/,
+          `<meta name="twitter:title" content="${pageTitle}" />`
+        )
+        .replace(
+          /<meta\s+property="og:url"\s+content=".*?"\s*\/>/,
+          `<meta property="og:url" content="${pageUrl}" />`
+        )
+        .replace(
+          /<meta\s+property="og:image"\s+content=".*?"\s*\/>/,
+          `<meta property="og:image" content="${ogUrl}" />`
+        )
+        .replace(
+          /<meta\s+property="og:image:secure_url"\s+content=".*?"\s*\/>/,
+          `<meta property="og:image:secure_url" content="${ogUrl}" />`
+        )
+        .replace(
+          /<meta\s+name="twitter:image"\s+content=".*?"\s*\/>/,
+          `<meta name="twitter:image" content="${ogUrl}" />`
+        );
+
+      const headers = new Headers({
+        'Cache-Control': 'no-cache',
+        'Content-Type': 'text/html; charset=utf-8',
+      });
+
+      return withSecurityHeaders(new Response(html, { headers }));
+    }
+
     const indexStats = statSync(INDEX_PATH);
 
     return serveFile(

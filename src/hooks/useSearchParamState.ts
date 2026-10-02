@@ -1,6 +1,6 @@
-import { useCallback, useMemo, useState, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-type ParamType = "string" | "number" | "boolean" | "stringArray";
+type ParamType = 'string' | 'number' | 'boolean' | 'stringArray';
 
 type ParamConfig = {
   type: ParamType;
@@ -9,30 +9,30 @@ type ParamConfig = {
 
 type ConfigMap = Record<string, ParamConfig>;
 
-type InferType<T extends ParamType> = T extends "string"
+type InferType<T extends ParamType> = T extends 'string'
   ? string
-  : T extends "number"
+  : T extends 'number'
     ? number
-    : T extends "boolean"
+    : T extends 'boolean'
       ? boolean
       : string[];
 
 type StateFromConfig<TConfig extends ConfigMap> = {
-  [K in keyof TConfig]: InferType<TConfig[K]["type"]>;
+  [K in keyof TConfig]: InferType<TConfig[K]['type']>;
 };
 
 const defaultForType = (type: ParamType): unknown => {
   switch (type) {
-    case "string":
-      return "";
-    case "number":
+    case 'string':
+      return '';
+    case 'number':
       return 0;
-    case "boolean":
+    case 'boolean':
       return false;
-    case "stringArray":
+    case 'stringArray':
       return [];
     default:
-      return "";
+      return '';
   }
 };
 
@@ -48,22 +48,22 @@ const parseValue = (val: unknown, cfg: ParamConfig): unknown => {
   }
 
   switch (cfg.type) {
-    case "string":
+    case 'string':
       return String(val);
-    case "number": {
+    case 'number': {
       const parsed = Number(val);
       return Number.isNaN(parsed)
-        ? (cfg.fallbackValue ?? defaultForType("number"))
+        ? (cfg.fallbackValue ?? defaultForType('number'))
         : parsed;
     }
-    case "boolean": {
-      if (typeof val === "boolean") return val;
-      const truthy = ["true", "1", "yes", "on"];
+    case 'boolean': {
+      if (typeof val === 'boolean') return val;
+      const truthy = ['true', '1', 'yes', 'on'];
       return truthy.includes(String(val).toLowerCase());
     }
-    case "stringArray": {
+    case 'stringArray': {
       if (Array.isArray(val)) return val.map(String);
-      if (typeof val === "string") return [val];
+      if (typeof val === 'string') return [val];
       return [];
     }
     default:
@@ -72,18 +72,18 @@ const parseValue = (val: unknown, cfg: ParamConfig): unknown => {
 };
 
 export const useSearchParamState = <TConfig extends ConfigMap>(
-  config: TConfig,
+  config: TConfig
 ) => {
   const getInitialSearch = () =>
-    typeof window !== "undefined" ? window.location.search : "";
+    typeof window !== 'undefined' ? window.location.search : '';
 
   const [searchString, setSearchString] = useState(getInitialSearch);
 
   // Sync state with browser navigation (back/forward buttons)
   useEffect(() => {
     const handlePopState = () => setSearchString(window.location.search);
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   // Parse raw URLSearchParams based on config
@@ -92,7 +92,7 @@ export const useSearchParamState = <TConfig extends ConfigMap>(
     const parsed: Record<string, unknown> = {};
 
     for (const key of Object.keys(config)) {
-      const isArray = config[key].type === "stringArray";
+      const isArray = config[key].type === 'stringArray';
       const val = isArray ? params.getAll(key) : params.get(key);
       // Fallback to undefined if the key isn't in the URL to trigger default logic
       parsed[key] = isArray
@@ -112,8 +112,8 @@ export const useSearchParamState = <TConfig extends ConfigMap>(
     for (const [key, cfg] of Object.entries(config)) {
       computed[key as keyof TConfig] = parseValue(
         searchParams[key],
-        cfg,
-      ) as InferType<TConfig[keyof TConfig]["type"]>;
+        cfg
+      ) as InferType<TConfig[keyof TConfig]['type']>;
     }
 
     return computed as StateFromConfig<TConfig>;
@@ -121,7 +121,7 @@ export const useSearchParamState = <TConfig extends ConfigMap>(
 
   const updateUrl = useCallback(
     (updates: Partial<Record<keyof TConfig, unknown>>) => {
-      if (typeof window === "undefined") return;
+      if (typeof window === 'undefined') return;
 
       const url = new URL(window.location.href);
 
@@ -149,29 +149,29 @@ export const useSearchParamState = <TConfig extends ConfigMap>(
       const newUrl = url.pathname + url.search + url.hash;
 
       // Update browser history natively
-      window.history.replaceState(null, "", newUrl);
+      window.history.replaceState(null, '', newUrl);
 
       // Force React re-render since replaceState doesn't fire the popstate event
       setSearchString(url.search);
     },
-    [config],
+    [config]
   );
 
   const setParam = useCallback(
     <K extends keyof TConfig>(
       key: K,
-      value: StateFromConfig<TConfig>[K] | null,
+      value: StateFromConfig<TConfig>[K] | null
     ) => {
       updateUrl({ [key]: value } as Partial<Record<keyof TConfig, unknown>>);
     },
-    [updateUrl],
+    [updateUrl]
   );
 
   const setParams = useCallback(
     (updates: Partial<StateFromConfig<TConfig>>) => {
       updateUrl(updates as Partial<Record<keyof TConfig, unknown>>);
     },
-    [updateUrl],
+    [updateUrl]
   );
 
   return { params, setParam, setParams } as const;

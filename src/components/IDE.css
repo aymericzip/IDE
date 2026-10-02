@@ -1,7 +1,7 @@
 .monaco-editor,
 .monaco-editor :focus,
 .monaco-editor :focus-visible {
-  outline: none !important;
+  outline: none;
 }
 
 /* Monaco ships `.lines-decorations { background: #fff }` as a literal, with no
@@ -53,7 +53,7 @@
   font-size: inherit;
 }
 .dv-reset .dv-tabs-container > .dv-tab.dv-active-tab {
-  background: var(--color-card, var(--card)) !important;
+  background: var(--color-card, var(--card));
   border-bottom: 1px solid var(--color-text);
   /* Add these two lines for rounded top corners */
   border-top-left-radius: var(--radius);
@@ -91,7 +91,7 @@
 }
 .dv-reset .monaco-editor .current-line,
 .dv-reset .monaco-editor .current-line-margin {
-  border: none !important;
+  border: none;
 }
 .dv-reset .dv-watermark {
   background: transparent;
@@ -101,12 +101,12 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .dv-reset * {
-    transition-duration: 0s !important;
-    animation-duration: 0s !important;
+    transition-duration: 0s;
+    animation-duration: 0s;
   }
 }
 [data-slot="dialog-overlay"] {
-  background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }

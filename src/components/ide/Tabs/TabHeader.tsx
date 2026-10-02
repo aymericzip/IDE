@@ -1,5 +1,5 @@
-import type { IDockviewPanelHeaderProps } from "dockview-react";
-import { useAtom, useAtomValue } from "jotai";
+import type { IDockviewPanelHeaderProps } from 'dockview-react';
+import { useAtom, useAtomValue } from 'jotai';
 import {
   ArrowRightToLine,
   ClipboardCopy,
@@ -9,9 +9,9 @@ import {
   Trash,
   Trash2,
   X,
-} from "lucide-react";
-import { useContext, useEffect, useState } from "react";
-import { toast } from "sonner";
+} from 'lucide-react';
+import { useContext, useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import {
   ContextMenu,
   ContextMenuContent,
@@ -19,12 +19,12 @@ import {
   ContextMenuSeparator,
   ContextMenuShortcut,
   ContextMenuTrigger,
-} from "../../context-menu";
-import { cn } from "../../lib/utils";
-import { pinnedTabsAtom, previewPanelAtom } from "../atoms";
-import { ICON_CLASS_TAB_HOVER } from "../constants";
-import { DockviewApiContext } from "../IDEContext";
-import { FileIcon } from "../Tree/TreeIcons";
+} from '../../context-menu';
+import { cn } from '../../lib/utils';
+import { pinnedTabsAtom, previewPanelAtom } from '../atoms';
+import { ICON_CLASS_TAB_HOVER } from '../constants';
+import { DockviewApiContext } from '../IDEContext';
+import { FileIcon } from '../Tree/TreeIcons';
 
 export const TabHeader = ({ api, params }: IDockviewPanelHeaderProps) => {
   const parameters = params as any;
@@ -41,7 +41,7 @@ export const TabHeader = ({ api, params }: IDockviewPanelHeaderProps) => {
 
   useEffect(() => {
     const disposable = api.onDidActiveChange((event) =>
-      setIsActive(event.isActive),
+      setIsActive(event.isActive)
     );
     return () => disposable.dispose();
   }, [api]);
@@ -50,17 +50,17 @@ export const TabHeader = ({ api, params }: IDockviewPanelHeaderProps) => {
     <ContextMenu>
       <ContextMenuTrigger
         className={cn(
-          "group/tab context-menu-trigger flex h-full select-none items-center gap-[3px] py-[3px] pl-1 text-xs",
+          'group/tab context-menu-trigger flex h-full select-none items-center gap-[3px] py-[3px] pl-1 text-xs',
           parameters?.headerClassName,
           isActive
-            ? ["text-zinc-950 dark:text-zinc-100", parameters?.activeClassName]
+            ? ['text-zinc-950 dark:text-zinc-100', parameters?.activeClassName]
             : [
-                "text-zinc-600 dark:text-zinc-400",
+                'text-zinc-600 dark:text-zinc-400',
                 parameters?.inactiveClassName,
-              ],
+              ]
         )}
-        data-fill={parameters?.headerClassName ? "" : undefined}
-        data-preview={isPreview ? "" : undefined}
+        data-fill={parameters?.headerClassName ? '' : undefined}
+        data-preview={isPreview ? '' : undefined}
         onMouseDown={(event) => {
           if (event.button === 1 && isClosable) {
             event.preventDefault();
@@ -71,7 +71,7 @@ export const TabHeader = ({ api, params }: IDockviewPanelHeaderProps) => {
         {showIcon ? (
           <FileIcon
             className={ICON_CLASS_TAB_HOVER}
-            name={parameters?.iconName ?? api.title ?? ""}
+            name={parameters?.iconName ?? api.title ?? ''}
           />
         ) : null}
         {api.title}
@@ -116,7 +116,7 @@ export const TabHeader = ({ api, params }: IDockviewPanelHeaderProps) => {
           <ContextMenuItem
             onClick={() => {
               const index = dockviewApi.panels.findIndex(
-                (panel) => panel.id === api.id,
+                (panel) => panel.id === api.id
               );
 
               for (let i = dockviewApi.panels.length - 1; i > index; i -= 1) {
@@ -152,7 +152,7 @@ export const TabHeader = ({ api, params }: IDockviewPanelHeaderProps) => {
             onClick={() => {
               navigator.clipboard
                 .writeText(api.id)
-                .then(() => toast("Copied to clipboard"))
+                .then(() => toast('Copied to clipboard'))
                 .catch(() => undefined);
             }}
           >
@@ -163,17 +163,17 @@ export const TabHeader = ({ api, params }: IDockviewPanelHeaderProps) => {
               setPinnedTabs((prev) =>
                 isPinned
                   ? prev.filter((id) => id !== api.id)
-                  : [...prev, api.id],
+                  : [...prev, api.id]
               )
             }
           >
-            {isPinned ? <PinOff /> : <Pin />} {isPinned ? "Unpin" : "Pin"}
+            {isPinned ? <PinOff /> : <Pin />} {isPinned ? 'Unpin' : 'Pin'}
           </ContextMenuItem>
           <ContextMenuSeparator />
           <ContextMenuItem
             onClick={() => {
               const foundPanel = dockviewApi.panels.find(
-                (panel) => panel.id === api.id,
+                (panel) => panel.id === api.id
               );
 
               if (foundPanel) {
@@ -181,9 +181,9 @@ export const TabHeader = ({ api, params }: IDockviewPanelHeaderProps) => {
                   component: foundPanel.view.contentComponent,
                   id: `${foundPanel.id}-split-${Date.now()}`,
                   params: foundPanel.params,
-                  position: { direction: "right", referencePanel: foundPanel },
-                  tabComponent: "default",
-                  title: foundPanel.title ?? "",
+                  position: { direction: 'right', referencePanel: foundPanel },
+                  tabComponent: 'default',
+                  title: foundPanel.title ?? '',
                 });
               }
             }}

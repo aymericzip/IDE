@@ -29,7 +29,7 @@
   --color-background-opposite: var(--foreground);
 
   /* Ink colors for content sitting on a filled surface, independent of theme. */
-  --color-text-light: var(--black);
+  --color-text-light: var(--foreground);
   --color-text-dark: var(--white);
 
   --color-card: var(--card);
@@ -43,8 +43,13 @@
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
 
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
+  /*
+		As there's not really a primary color for intlayer branding yet theses colors will point to default background / foreground colors
+		--color-primary: var(--primary);
+		--color-primary-foreground: var(--primary-foreground);
+	*/
+  --color-primary: var(--foreground);
+  --color-primary-foreground: var(--background);
 
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -83,7 +88,7 @@
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
 
-  --card: oklch(98% 0 271);
+  --card: oklch(98% 0 280);
   --card-hover: oklch(0.97 0 0);
 
   /* The workspace surface the editor sits on. Monaco paints its gutter and
@@ -98,8 +103,8 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
 
-  --primary: oklch(94.3% 0.3 326);
-  --primary-foreground: oklch(0% 0 0);
+  --primary: var(--foreground);
+  --primary-foreground: var(--background);
 
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -144,8 +149,8 @@
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
 
-  --primary: oklch(94.3% 0.051 326);
-  --primary-foreground: oklch(0% 0 0);
+  --primary: var(--foreground);
+  --primary-foreground: var(--background);
 
   --secondary: oklch(0.205 0 0);
   --secondary-foreground: oklch(0.985 0 0);

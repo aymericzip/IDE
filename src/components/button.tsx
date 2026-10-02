@@ -1,41 +1,41 @@
-import { cva, type VariantProps } from "class-variance-authority";
-import type { LucideIcon } from "lucide-react";
-import type { ButtonHTMLAttributes, DetailedHTMLProps, FC } from "react";
-import { ContainerRoundedSize as ButtonRoundedSize } from "./container";
-import { cn } from "./lib/utils";
-import { Loader } from "./loader";
+import { cva, type VariantProps } from 'class-variance-authority';
+import type { LucideIcon } from 'lucide-react';
+import type { ButtonHTMLAttributes, DetailedHTMLProps, FC } from 'react';
+import { ContainerRoundedSize as ButtonRoundedSize } from './container';
+import { cn } from './lib/utils';
+import { Loader } from './loader';
 
 /**
  * Button size variants for different use cases
  */
 export const ButtonSize = {
-  XS: "xs",
-  SM: "sm",
-  MD: "md",
-  LG: "lg",
-  XL: "xl",
-  ICON_SM: "icon-sm",
-  ICON_MD: "icon-md",
-  ICON_LG: "icon-lg",
-  ICON_XL: "icon-xl",
-  CUSTOM: "custom",
+  XS: 'xs',
+  SM: 'sm',
+  MD: 'md',
+  LG: 'lg',
+  XL: 'xl',
+  ICON_SM: 'icon-sm',
+  ICON_MD: 'icon-md',
+  ICON_LG: 'icon-lg',
+  ICON_XL: 'icon-xl',
+  CUSTOM: 'custom',
 } as const;
 
 export type ButtonSize = (typeof ButtonSize)[keyof typeof ButtonSize];
 
-const buttonIconVariants = cva("flex-none shrink-0", {
+const buttonIconVariants = cva('flex-none shrink-0', {
   variants: {
     size: {
-      [ButtonSize.XS]: "size-2",
-      [ButtonSize.SM]: "size-3",
-      [ButtonSize.MD]: "size-4",
-      [ButtonSize.LG]: "size-5",
-      [ButtonSize.XL]: "size-6",
-      [ButtonSize.ICON_SM]: "size-3",
-      [ButtonSize.ICON_MD]: "size-4",
-      [ButtonSize.ICON_LG]: "size-5",
-      [ButtonSize.ICON_XL]: "size-6",
-      [ButtonSize.CUSTOM]: "",
+      [ButtonSize.XS]: 'size-2',
+      [ButtonSize.SM]: 'size-3',
+      [ButtonSize.MD]: 'size-4',
+      [ButtonSize.LG]: 'size-5',
+      [ButtonSize.XL]: 'size-6',
+      [ButtonSize.ICON_SM]: 'size-3',
+      [ButtonSize.ICON_MD]: 'size-4',
+      [ButtonSize.ICON_LG]: 'size-5',
+      [ButtonSize.ICON_XL]: 'size-6',
+      [ButtonSize.CUSTOM]: '',
     },
   },
   defaultVariants: {
@@ -47,15 +47,15 @@ const buttonIconVariants = cva("flex-none shrink-0", {
  * Button visual style variants
  */
 export const ButtonVariant = {
-  DEFAULT: "default",
-  NONE: "none",
-  OUTLINE: "outline",
-  LINK: "link",
-  INVISIBLE_LINK: "invisible-link",
-  HOVERABLE: "hoverable",
-  FADE: "fade",
-  INPUT: "input",
-  GHOST: "ghost",
+  DEFAULT: 'default',
+  NONE: 'none',
+  OUTLINE: 'outline',
+  LINK: 'link',
+  INVISIBLE_LINK: 'invisible-link',
+  HOVERABLE: 'hoverable',
+  FADE: 'fade',
+  INPUT: 'input',
+  GHOST: 'ghost',
 } as const;
 
 export type ButtonVariant = (typeof ButtonVariant)[keyof typeof ButtonVariant];
@@ -64,20 +64,20 @@ export type ButtonVariant = (typeof ButtonVariant)[keyof typeof ButtonVariant];
  * Button color themes that work with the design system
  */
 export const ButtonColor = {
-  PRIMARY: "primary",
-  SECONDARY: "secondary",
-  DESTRUCTIVE: "destructive",
-  NEUTRAL: "neutral",
-  LIGHT: "light",
-  DARK: "dark",
-  TEXT: "text",
-  FOREGROUND: "foreground",
-  CARD: "card",
-  TEXT_INVERSE: "text-inverse",
-  CURRENT: "current",
-  ERROR: "error",
-  SUCCESS: "success",
-  CUSTOM: "custom",
+  PRIMARY: 'primary',
+  SECONDARY: 'secondary',
+  DESTRUCTIVE: 'destructive',
+  NEUTRAL: 'neutral',
+  LIGHT: 'light',
+  DARK: 'dark',
+  TEXT: 'text',
+  FOREGROUND: 'foreground',
+  CARD: 'card',
+  TEXT_INVERSE: 'text-inverse',
+  CURRENT: 'current',
+  ERROR: 'error',
+  SUCCESS: 'success',
+  CUSTOM: 'custom',
 } as const;
 
 export type ButtonColor = (typeof ButtonColor)[keyof typeof ButtonColor];
@@ -86,9 +86,9 @@ export type ButtonColor = (typeof ButtonColor)[keyof typeof ButtonColor];
  * Text alignment options for button content
  */
 export const ButtonTextAlign = {
-  LEFT: "left",
-  CENTER: "center",
-  RIGHT: "right",
+  LEFT: 'left',
+  CENTER: 'center',
+  RIGHT: 'right',
 } as const;
 
 export type ButtonTextAlign =
@@ -98,143 +98,143 @@ export type ButtonTextAlign =
  * Enhanced button variants with improved accessibility and focus states
  */
 export const buttonVariants = cva(
-  "relative inline-flex cursor-pointer items-center justify-center font-medium ring-0 transition-all duration-300 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
+  'relative inline-flex cursor-pointer items-center justify-center font-medium ring-0 transition-all duration-300 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       size: {
-        [ButtonSize.XS]: "min-h-7 px-3 text-xs max-md:py-1",
-        [ButtonSize.SM]: "min-h-7 px-3 text-xs max-md:py-1",
-        [ButtonSize.MD]: "min-h-8 px-6 text-sm max-md:py-2",
-        [ButtonSize.LG]: "min-h-10 px-8 text-lg max-md:py-3",
-        [ButtonSize.XL]: "min-h-11 px-10 text-xl max-md:py-4",
-        [ButtonSize.ICON_SM]: "p-1.5",
-        [ButtonSize.ICON_MD]: "p-1.5",
-        [ButtonSize.ICON_LG]: "p-1.5",
-        [ButtonSize.ICON_XL]: "p-3",
-        [ButtonSize.CUSTOM]: "",
+        [ButtonSize.XS]: 'min-h-7 px-3 text-xs max-md:py-1',
+        [ButtonSize.SM]: 'min-h-7 px-3 text-xs max-md:py-1',
+        [ButtonSize.MD]: 'min-h-8 px-6 text-sm max-md:py-2',
+        [ButtonSize.LG]: 'min-h-10 px-8 text-lg max-md:py-3',
+        [ButtonSize.XL]: 'min-h-11 px-10 text-xl max-md:py-4',
+        [ButtonSize.ICON_SM]: 'p-1.5',
+        [ButtonSize.ICON_MD]: 'p-1.5',
+        [ButtonSize.ICON_LG]: 'p-1.5',
+        [ButtonSize.ICON_XL]: 'p-3',
+        [ButtonSize.CUSTOM]: '',
       },
       color: {
         [ButtonColor.PRIMARY]:
-          "hover-primary-500/20 text-primary ring-primary-500/20 *:text-text-light",
+          'hover-primary-500/20 text-primary ring-primary-500/20 *:text-text-light',
         [ButtonColor.SECONDARY]:
-          "hover-secondary-500/20 text-secondary ring-secondary-500/20 *:text-text-light",
+          'hover-secondary-500/20 text-secondary ring-secondary-500/20 *:text-text-light',
         [ButtonColor.DESTRUCTIVE]:
-          "hover-destructive-500/20 text-destructive ring-destructive-500/20 *:text-text-light",
+          'hover-destructive-500/20 text-destructive ring-destructive-500/20 *:text-text-light',
         [ButtonColor.NEUTRAL]:
-          "text-neutral ring-neutral-500/5 *:text-text-light",
+          'text-neutral ring-neutral-500/5 *:text-text-light',
         [ButtonColor.CARD]:
-          "hover-card-500/20 text-card ring-card-500/20 *:text-text-light",
+          'hover-card-500/20 text-card ring-card-500/20 *:text-text-light',
         [ButtonColor.LIGHT]:
-          "hover-white-500/20 text-white ring-white/20 *:text-text-light",
+          'hover-white-500/20 text-white ring-white/20 *:text-text-light',
         [ButtonColor.DARK]:
-          "text-neutral-800 ring-text-light/50 *:text-text-light",
-        [ButtonColor.TEXT]: "text-text ring-text/20 *:text-text-opposite",
+          'text-neutral-800 ring-text-light/50 *:text-text-light',
+        [ButtonColor.TEXT]: 'text-text ring-text/20 *:text-text-opposite',
         [ButtonColor.FOREGROUND]:
-          "text-foreground ring-foreground/20 *:text-foreground-opposite",
+          'text-foreground ring-foreground/20 *:text-foreground-opposite',
         [ButtonColor.CURRENT]:
-          "hover-current-500/10 text-current ring-current/10 *:text-text-light",
+          'hover-current-500/10 text-current ring-current/10 *:text-text-light',
         [ButtonColor.TEXT_INVERSE]:
-          "text-text-opposite ring-text-opposite/20 *:text-text",
+          'text-text-opposite ring-text-opposite/20 *:text-text',
         [ButtonColor.ERROR]:
-          "hover-error-500/20 text-error ring-error/20 *:text-text-light",
+          'hover-error-500/20 text-error ring-error/20 *:text-text-light',
         [ButtonColor.SUCCESS]:
-          "hover-success-500/20 text-success ring-success/20 *:text-text-light",
-        [ButtonColor.CUSTOM]: "",
+          'hover-success-500/20 text-success ring-success/20 *:text-text-light',
+        [ButtonColor.CUSTOM]: '',
       },
       roundedSize: {
-        [ButtonRoundedSize.NONE]: "rounded-none",
+        [ButtonRoundedSize.NONE]: 'rounded-none',
         [ButtonRoundedSize.SM]:
-          "rounded-lg [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-xl",
+          'rounded-lg [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-xl',
         [ButtonRoundedSize.MD]:
-          "rounded-xl [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-2xl",
+          'rounded-xl [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-2xl',
         [ButtonRoundedSize.LG]:
-          "rounded-2xl [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-3xl",
+          'rounded-2xl [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-3xl',
         [ButtonRoundedSize.XL]:
-          "rounded-3xl [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-4xl",
-        [ButtonRoundedSize["2xl"]]:
-          "rounded-4xl [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-[2.5rem]",
-        [ButtonRoundedSize["3xl"]]:
-          "rounded-[2.5rem] [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-[3rem]",
-        [ButtonRoundedSize["4xl"]]:
-          "rounded-[3rem] [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-[4rem]",
-        [ButtonRoundedSize["5xl"]]:
-          "rounded-[4rem] [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-[5rem]",
-        [ButtonRoundedSize.FULL]: "rounded-full",
+          'rounded-3xl [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-4xl',
+        [ButtonRoundedSize['2xl']]:
+          'rounded-4xl [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-[2.5rem]',
+        [ButtonRoundedSize['3xl']]:
+          'rounded-[2.5rem] [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-[3rem]',
+        [ButtonRoundedSize['4xl']]:
+          'rounded-[3rem] [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-[4rem]',
+        [ButtonRoundedSize['5xl']]:
+          'rounded-[4rem] [corner-shape:squircle] supports-[corner-shape:squircle]:rounded-[5rem]',
+        [ButtonRoundedSize.FULL]: 'rounded-full',
       },
       variant: {
         [ButtonVariant.DEFAULT]: [
-          "bg-current",
-          "hover:bg-current/90",
-          "hover:ring-5",
-          "aria-selected:ring-5",
+          'bg-current',
+          'hover:bg-current/90',
+          'hover:ring-5',
+          'aria-selected:ring-5',
         ],
 
         [ButtonVariant.OUTLINE]: [
-          "rounded-2xl border-[1.3px] border-current bg-current/0 *:text-current!",
-          "hover:bg-current/20 focus-visible:bg-current/20",
-          "hover:ring-5 focus-visible:ring-5",
-          "aria-selected:ring-5",
+          'rounded-2xl border-[1.3px] border-current bg-current/0 *:text-current!',
+          'hover:bg-current/20 focus-visible:bg-current/20',
+          'hover:ring-5 focus-visible:ring-5',
+          'aria-selected:ring-5',
         ],
 
         [ButtonVariant.NONE]:
-          "border-none bg-current/0 text-inherit hover:bg-current/0",
+          'border-none bg-current/0 text-inherit hover:bg-current/0',
 
         [ButtonVariant.LINK]:
-          "h-auto justify-start border-inherit bg-transparent px-1 underline-offset-4 *:text-current! hover:bg-transparent hover:underline",
+          'h-auto justify-start border-inherit bg-transparent px-1 underline-offset-4 *:text-current! hover:bg-transparent hover:underline',
 
         [ButtonVariant.INVISIBLE_LINK]:
-          "h-auto justify-start border-inherit bg-transparent px-1 underline-offset-4 *:text-current! hover:bg-transparent",
+          'h-auto justify-start border-inherit bg-transparent px-1 underline-offset-4 *:text-current! hover:bg-transparent',
 
         [ButtonVariant.HOVERABLE]:
-          "rounded-lg border-none bg-current/0 transition *:text-current! hover:bg-current/20 aria-[current]:bg-current/5",
+          'rounded-lg border-none bg-current/0 transition *:text-current! hover:bg-current/20 aria-[current]:bg-current/5',
 
         [ButtonVariant.FADE]: [
-          "rounded-lg border-none bg-current/10 ring-current/5 transition *:text-current! hover:bg-current/20 aria-[current]:bg-current/5",
-          "hover:ring-5 focus-visible:ring-5",
-          "aria-selected:ring-5",
+          'rounded-lg border-none bg-current/10 ring-current/5 transition *:text-current! hover:bg-current/20 aria-[current]:bg-current/5',
+          'hover:ring-5 focus-visible:ring-5',
+          'aria-selected:ring-5',
         ],
 
         [ButtonVariant.GHOST]:
-          "border-none bg-transparent hover:bg-current/10 focus-visible:bg-current/10",
+          'border-none bg-transparent hover:bg-current/10 focus-visible:bg-current/10',
 
         [ButtonVariant.INPUT]: [
           // base styles
-          "text-text",
-          "w-full select-text resize-none rounded-2xl text-base shadow-none outline-none supports-[corner-shape:squircle]:rounded-4xl",
-          "transition-shadow duration-100 md:text-sm",
-          "ring-0", // base ring
-          "disabled:opacity-50",
+          'text-text',
+          'w-full select-text resize-none rounded-2xl text-base shadow-none outline-none supports-[corner-shape:squircle]:rounded-4xl',
+          'transition-shadow duration-100 md:text-sm',
+          'ring-0', // base ring
+          'disabled:opacity-50',
 
-          "text-text",
-          "bg-neutral-50 dark:bg-neutral-950",
-          "ring-neutral-100 dark:ring-neutral-700",
+          'text-text',
+          'bg-neutral-50 dark:bg-neutral-950',
+          'ring-neutral-100 dark:ring-neutral-700',
 
           // Hover ring (similar spirit to your input)
-          "hover:ring-3", // width
-          "aria-selected:ring-4",
-          "focus-visible:ring-3",
-          "disabled:ring-0",
+          'hover:ring-3', // width
+          'aria-selected:ring-4',
+          'focus-visible:ring-3',
+          'disabled:ring-0',
 
           // Focus ring + animation
-          "focus-visible:outline-none",
+          'focus-visible:outline-none',
 
           // Remove any weird box-shadow
-          "[box-shadow:none] focus:[box-shadow:none]",
+          '[box-shadow:none] focus:[box-shadow:none]',
 
           // aria-invalid border color
-          "aria-invalid:border-error",
+          'aria-invalid:border-error',
         ],
       },
 
       textAlign: {
-        [ButtonTextAlign.LEFT]: "justify-start text-left",
-        [ButtonTextAlign.CENTER]: "justify-center text-center",
-        [ButtonTextAlign.RIGHT]: "justify-end text-right",
+        [ButtonTextAlign.LEFT]: 'justify-start text-left',
+        [ButtonTextAlign.CENTER]: 'justify-center text-center',
+        [ButtonTextAlign.RIGHT]: 'justify-end text-right',
       },
 
       isFullWidth: {
-        true: "w-full",
-        false: "",
+        true: 'w-full',
+        false: '',
       },
     },
     defaultVariants: {
@@ -245,7 +245,7 @@ export const buttonVariants = cva(
       textAlign: ButtonTextAlign.CENTER,
       isFullWidth: false,
     },
-  },
+  }
 );
 
 /**
@@ -300,30 +300,30 @@ export type ButtonProps = DetailedHTMLProps<
     /**
      * Additional description for complex buttons (optional)
      */
-    "aria-describedby"?: string;
+    'aria-describedby'?: string;
 
     /**
      * Expanded state for collapsible sections (optional)
      */
-    "aria-expanded"?: boolean;
+    'aria-expanded'?: boolean;
 
     /**
      * Controls whether the button has popup/menu (optional)
      */
-    "aria-haspopup"?:
+    'aria-haspopup'?:
       | boolean
-      | "true"
-      | "false"
-      | "menu"
-      | "listbox"
-      | "tree"
-      | "grid"
-      | "dialog";
+      | 'true'
+      | 'false'
+      | 'menu'
+      | 'listbox'
+      | 'tree'
+      | 'grid'
+      | 'dialog';
 
     /**
      * Indicates if button controls are currently pressed (for toggle buttons)
      */
-    "aria-pressed"?: boolean;
+    'aria-pressed'?: boolean;
   };
 
 /**
@@ -381,11 +381,11 @@ export const Button: FC<ButtonProps> = ({
   disabled,
   label,
   className,
-  type = "button",
-  "aria-describedby": ariaDescribedBy,
-  "aria-expanded": ariaExpanded,
-  "aria-haspopup": ariaHasPopup,
-  "aria-pressed": ariaPressed,
+  type = 'button',
+  'aria-describedby': ariaDescribedBy,
+  'aria-expanded': ariaExpanded,
+  'aria-haspopup': ariaHasPopup,
+  'aria-pressed': ariaPressed,
   ...props
 }) => {
   const isLink =
@@ -393,16 +393,16 @@ export const Button: FC<ButtonProps> = ({
   const isIconOnly = !children && (Icon || IconRight);
 
   const accessibilityProps = {
-    "aria-label": isIconOnly ? (label ?? undefined) : undefined,
-    "aria-labelledby": !isIconOnly ? undefined : undefined,
-    "aria-describedby": ariaDescribedBy,
-    "aria-expanded": ariaExpanded,
-    "aria-haspopup": ariaHasPopup,
-    "aria-pressed": isActive !== undefined ? isActive : ariaPressed,
-    "aria-busy": isLoading,
-    "aria-current": (isActive ? "page" : undefined) as "page" | undefined,
-    "aria-disabled": disabled || isLoading,
-    "aria-selected": isSelected,
+    'aria-label': isIconOnly ? (label ?? undefined) : undefined,
+    'aria-labelledby': !isIconOnly ? undefined : undefined,
+    'aria-describedby': ariaDescribedBy,
+    'aria-expanded': ariaExpanded,
+    'aria-haspopup': ariaHasPopup,
+    'aria-pressed': isActive !== undefined ? isActive : ariaPressed,
+    'aria-busy': isLoading,
+    'aria-current': (isActive ? 'page' : undefined) as 'page' | undefined,
+    'aria-disabled': disabled || isLoading,
+    'aria-selected': isSelected,
   };
 
   const isSquareButton =
@@ -414,7 +414,7 @@ export const Button: FC<ButtonProps> = ({
   return (
     <button
       disabled={isLoading || disabled}
-      role={isLink ? "link" : "button"}
+      role={isLink ? 'link' : 'button'}
       type={type}
       className={buttonVariants({
         variant,
@@ -434,7 +434,7 @@ export const Button: FC<ButtonProps> = ({
         <Icon
           className={buttonIconVariants({
             size,
-            className: cn(!isSquareButton && "mr-3", iconClassName),
+            className: cn(!isSquareButton && 'mr-3', iconClassName),
           })}
           aria-hidden="true"
         />
@@ -442,17 +442,17 @@ export const Button: FC<ButtonProps> = ({
 
       <div
         className={cn(
-          "flex items-center justify-center transition-[width] duration-300",
-          isLoading && size === ButtonSize.SM && "w-3",
-          isLoading && size === ButtonSize.MD && "w-4",
-          isLoading && size === ButtonSize.LG && "w-6",
-          isLoading && size === ButtonSize.XL && "w-8",
+          'flex items-center justify-center transition-[width] duration-300',
+          isLoading && size === ButtonSize.SM && 'w-3',
+          isLoading && size === ButtonSize.MD && 'w-4',
+          isLoading && size === ButtonSize.LG && 'w-6',
+          isLoading && size === ButtonSize.XL && 'w-8'
         )}
       >
         <Loader
           className={buttonIconVariants({
             size,
-            className: cn(!isSquareButton && "mr-3", iconClassName),
+            className: cn(!isSquareButton && 'mr-3', iconClassName),
           })}
           isLoading={isLoading}
           aria-hidden="true"
@@ -470,7 +470,7 @@ export const Button: FC<ButtonProps> = ({
         <IconRight
           className={buttonIconVariants({
             size,
-            className: cn(!isSquareButton && "ml-3", iconClassName),
+            className: cn(!isSquareButton && 'ml-3', iconClassName),
           })}
           aria-hidden="true"
         />

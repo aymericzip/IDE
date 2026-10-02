@@ -1,7 +1,7 @@
-import { cva, type VariantProps } from "class-variance-authority";
-import type { HTMLAttributes, ReactNode } from "react";
-import { useSwitchSelector } from "./useSwitchSelector";
-import { cn } from "./lib/utils";
+import { cva, type VariantProps } from 'class-variance-authority';
+import type { HTMLAttributes, ReactNode } from 'react';
+import { cn } from './lib/utils';
+import { useSwitchSelector } from './useSwitchSelector';
 
 export type SwitchSelectorChoice<T = boolean> = {
   content: ReactNode;
@@ -10,28 +10,28 @@ export type SwitchSelectorChoice<T = boolean> = {
 export type SwitchSelectorChoices<T> = SwitchSelectorChoice<T>[];
 
 export const defaultChoices: SwitchSelectorChoices<boolean> = [
-  { content: "Off", value: false },
-  { content: "On", value: true },
+  { content: 'Off', value: false },
+  { content: 'On', value: true },
 ];
 
 export const SwitchSelectorColor = {
-  PRIMARY: "primary",
-  SECONDARY: "secondary",
-  NEUTRAL: "neutral",
-  WHITE: "white",
-  BLACK: "black",
-  TEXT: "text",
-  ERROR: "error",
+  PRIMARY: 'primary',
+  SECONDARY: 'secondary',
+  NEUTRAL: 'neutral',
+  WHITE: 'white',
+  BLACK: 'black',
+  TEXT: 'text',
+  ERROR: 'error',
 } as const;
 
 export type SwitchSelectorColor =
   (typeof SwitchSelectorColor)[keyof typeof SwitchSelectorColor];
 
 export const SwitchSelectorSize = {
-  XS: "xs",
-  SM: "sm",
-  MD: "md",
-  LG: "lg",
+  XS: 'xs',
+  SM: 'sm',
+  MD: 'md',
+  LG: 'lg',
 } as const;
 
 export type SwitchSelectorSize =
@@ -54,69 +54,69 @@ export type SwitchSelectorProps<T = boolean> = SwitchSelectorBaseProps<T> &
   VariantProps<typeof choiceVariant>;
 
 export const switchSelectorVariant = cva(
-  "flex h-fit w-fit cursor-pointer flex-row gap-2 rounded-full border-[1.3px] p-[1.5px]",
+  'flex h-fit w-fit cursor-pointer flex-row gap-2 rounded-full border-[1.3px] p-[1.5px]',
   {
     variants: {
       color: {
-        [SwitchSelectorColor.PRIMARY]: "border-primary text-primary",
-        [SwitchSelectorColor.SECONDARY]: "border-secondary text-secondary",
-        [SwitchSelectorColor.NEUTRAL]: "border-neutral text-neutral",
-        [SwitchSelectorColor.WHITE]: "border-white text-white",
-        [SwitchSelectorColor.BLACK]: "border-black text-black",
-        [SwitchSelectorColor.TEXT]: "border-foreground text-foreground",
-        [SwitchSelectorColor.ERROR]: "border-error text-error",
+        [SwitchSelectorColor.PRIMARY]: 'border-primary text-primary',
+        [SwitchSelectorColor.SECONDARY]: 'border-secondary text-secondary',
+        [SwitchSelectorColor.NEUTRAL]: 'border-neutral text-neutral',
+        [SwitchSelectorColor.WHITE]: 'border-white text-white',
+        [SwitchSelectorColor.BLACK]: 'border-black text-black',
+        [SwitchSelectorColor.TEXT]: 'border-foreground text-foreground',
+        [SwitchSelectorColor.ERROR]: 'border-error text-error',
       },
       disabled: {
-        true: "cursor-not-allowed opacity-50",
-        false: "",
+        true: 'cursor-not-allowed opacity-50',
+        false: '',
       },
     },
     defaultVariants: {
       color: SwitchSelectorColor.TEXT,
       disabled: false,
     },
-  },
+  }
 );
 
 export const choiceVariant = cva(
-  "z-1 flex-1 cursor-pointer font-medium text-sm transition-all duration-300 ease-in-out aria-selected:cursor-default data-[indicator=true]:text-background motion-reduce:transition-none",
+  'z-1 flex-1 cursor-pointer font-medium text-sm transition-all duration-300 ease-in-out aria-selected:cursor-default data-[indicator=true]:text-background motion-reduce:transition-none',
   {
     variants: {
       size: {
-        [SwitchSelectorSize.XS]: "px-2 py-0.5 text-xs",
-        [SwitchSelectorSize.SM]: "px-2 py-1 text-xs",
-        [SwitchSelectorSize.MD]: "p-2 text-sm",
-        [SwitchSelectorSize.LG]: "p-4 text-base",
+        [SwitchSelectorSize.XS]: 'px-2 py-0.5 text-xs',
+        [SwitchSelectorSize.SM]: 'px-2 py-1 text-xs',
+        [SwitchSelectorSize.MD]: 'p-2 text-sm',
+        [SwitchSelectorSize.LG]: 'p-4 text-base',
       },
     },
     defaultVariants: {
       size: SwitchSelectorSize.MD,
     },
-  },
+  }
 );
 
 export const indicatorVariant = cva(
-  "absolute top-0 z-0 h-full w-auto rounded-full transition-all duration-300 ease-in-out motion-reduce:transition-none",
+  'absolute top-0 z-0 h-full w-auto rounded-full transition-all duration-300 ease-in-out motion-reduce:transition-none',
   {
     variants: {
       color: {
         [SwitchSelectorColor.PRIMARY]:
-          "bg-primary data-[indicator=true]:text-primary-foreground",
+          'bg-primary data-[indicator=true]:text-primary-foreground',
         [SwitchSelectorColor.SECONDARY]:
-          "bg-secondary data-[indicator=true]:text-secondary-foreground",
+          'bg-secondary data-[indicator=true]:text-secondary-foreground',
         [SwitchSelectorColor.NEUTRAL]:
-          "bg-neutral data-[indicator=true]:text-white",
+          'bg-neutral data-[indicator=true]:text-white',
         [SwitchSelectorColor.WHITE]:
-          "bg-white data-[indicator=true]:text-black",
+          'bg-white data-[indicator=true]:text-black',
         [SwitchSelectorColor.BLACK]:
-          "bg-black data-[indicator=true]:text-white",
+          'bg-black data-[indicator=true]:text-white',
         [SwitchSelectorColor.TEXT]:
-          "bg-foreground data-[indicator=true]:text-background",
+          'bg-foreground data-[indicator=true]:text-background',
         [SwitchSelectorColor.ERROR]:
-          "bg-error data-[indicator=true]:text-white",
+          'bg-error data-[indicator=true]:text-white',
       },
     },
-  },
+  }
 );
 
 /**
@@ -150,7 +150,7 @@ export const SwitchSelector = <T,>(props: SwitchSelectorProps<T>) => {
       hoverable: props.hoverable,
       disabled: props.disabled,
     },
-    "horizontal",
+    'horizontal'
   );
 
   return (
@@ -161,14 +161,14 @@ export const SwitchSelector = <T,>(props: SwitchSelectorProps<T>) => {
         className,
       })}
       role="tablist"
-      aria-disabled={disabled ? "true" : undefined}
+      aria-disabled={disabled ? 'true' : undefined}
     >
       <div className="relative flex size-full flex-row items-center justify-center">
         {choices.map((choice, index) => {
           const { content, value, ...buttonProps } = choice;
 
           const isKeyOfKey =
-            typeof value === "string" || typeof value === "number";
+            typeof value === 'string' || typeof value === 'number';
 
           const isSelected = index === selectedIndex;
           const isIndicatorOwner = index === indicatorIndex;
@@ -181,14 +181,14 @@ export const SwitchSelector = <T,>(props: SwitchSelectorProps<T>) => {
                 choiceVariant({
                   size,
                 }),
-                disabled && "cursor-not-allowed",
-                itemClassName,
+                disabled && 'cursor-not-allowed',
+                itemClassName
               )}
               key={isKeyOfKey ? value : index}
               role="tab"
               onClick={() => handleChange(value)}
-              aria-selected={isSelected ? "true" : undefined}
-              data-indicator={isIndicatorOwner ? "true" : undefined}
+              aria-selected={isSelected ? 'true' : undefined}
+              data-indicator={isIndicatorOwner ? 'true' : undefined}
               disabled={disabled}
               tabIndex={isSelected ? 0 : -1}
               ref={(el) => {
@@ -207,7 +207,7 @@ export const SwitchSelector = <T,>(props: SwitchSelectorProps<T>) => {
             className={cn(
               indicatorVariant({
                 color,
-              }),
+              })
             )}
             style={choiceIndicatorPosition}
             ref={indicatorRef}

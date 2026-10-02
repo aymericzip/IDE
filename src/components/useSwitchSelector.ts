@@ -1,9 +1,9 @@
+import { useEffect, useRef, useState } from 'react';
+import type { SwitchSelectorBaseProps } from './switch-selector';
 import {
   type ItemSelectorOrientation,
   useItemSelector,
-} from "./useItemSelector";
-import { useEffect, useRef, useState } from "react";
-import type { SwitchSelectorBaseProps } from "./switch-selector";
+} from './useItemSelector';
 
 export const useSwitchSelector = <T>(
   {
@@ -14,23 +14,23 @@ export const useSwitchSelector = <T>(
     hoverable = true,
     disabled = false,
   }: SwitchSelectorBaseProps<T>,
-  orientation: ItemSelectorOrientation,
+  orientation: ItemSelectorOrientation
 ) => {
   const [valueState, setValue] = useState<T>(
-    value ?? defaultValue ?? choices[0]?.value,
+    value ?? defaultValue ?? choices[0]?.value
   );
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const optionsRefs = useRef<HTMLButtonElement[]>([]);
   const indicatorRef = useRef<HTMLDivElement | null>(null);
   const { choiceIndicatorPosition } = useItemSelector(optionsRefs, {
-    selector: (el) => el.getAttribute("data-indicator") === "true",
+    selector: (el) => el.getAttribute('data-indicator') === 'true',
     isHoverable: false,
     orientation,
   });
 
   const selectedIndex = choices.findIndex(
-    (choice) => choice.value === valueState,
+    (choice) => choice.value === valueState
   );
 
   // The indicator follows hover if hoverable, otherwise the selected option
@@ -38,7 +38,7 @@ export const useSwitchSelector = <T>(
     hoverable && hoveredIndex !== null ? hoveredIndex : selectedIndex;
 
   const handleChange = (newValue: T) => {
-    console.log("useSwitchSelector handleChange", newValue);
+    console.log('useSwitchSelector handleChange', newValue);
     setValue(newValue);
     onChange?.(newValue);
   };

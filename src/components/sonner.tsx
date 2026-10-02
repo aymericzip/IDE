@@ -4,10 +4,10 @@ import {
   Loader2Icon,
   OctagonXIcon,
   TriangleAlertIcon,
-} from "lucide-react";
-import type { CSSProperties } from "react";
-import { Toaster as Sonner, type ToasterProps } from "sonner";
-import { useTheme } from "../providers";
+} from 'lucide-react';
+import type { CSSProperties } from 'react';
+import { Toaster as Sonner, type ToasterProps } from 'sonner';
+import { useTheme } from '../providers';
 
 export const Toaster = ({ ...props }: ToasterProps) => {
   const { theme } = useTheme();
@@ -24,15 +24,15 @@ export const Toaster = ({ ...props }: ToasterProps) => {
       }}
       style={
         {
-          "--border-radius": "var(--radius)",
-          "--normal-border": "var(--border)",
-          "--normal-bg": "var(--popover)",
-          "--normal-text": "var(--popover-foreground)",
+          '--border-radius': 'var(--radius)',
+          '--normal-border': 'var(--border)',
+          '--normal-bg': 'var(--popover)',
+          '--normal-text': 'var(--popover-foreground)',
         } as CSSProperties
       }
       toastOptions={{
         classNames: {
-          toast: "cn-toast",
+          toast: 'cn-toast',
         },
       }}
       {...props}

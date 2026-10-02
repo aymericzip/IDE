@@ -16,7 +16,9 @@ WORKDIR /app
 # Switch to the non-root user provided by the base image
 USER bun
 
-# Copy only the compiled assets and the server script
+# Copy compiled assets, server code, and node_modules
+COPY --from=builder --chown=bun:bun /app/node_modules ./node_modules
+COPY --from=builder --chown=bun:bun /app/server ./server
 COPY --from=builder --chown=bun:bun /app/dist ./dist
 COPY --from=builder --chown=bun:bun /app/server.ts ./
 

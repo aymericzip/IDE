@@ -1,32 +1,32 @@
-import type { Monaco } from "@monaco-editor/loader";
-import { loader } from "@monaco-editor/react";
+import type { Monaco } from '@monaco-editor/loader';
+import { loader } from '@monaco-editor/react';
 // Side-effect import: points the loader at the bundled Monaco. Must be
 // evaluated before `initMonaco` runs, which is why it sits with the imports.
-import "./monaco-env";
-import { shikiToMonaco, textmateThemeToMonacoTheme } from "@shikijs/monaco";
+import './monaco-env';
+import { shikiToMonaco, textmateThemeToMonacoTheme } from '@shikijs/monaco';
 // `preact/compat` types `isValidElement` as returning `boolean`; preact core
 // types it as a type predicate, which is what narrows `ComponentChild` here.
-import { isValidElement } from "preact";
-import { Children, type ReactNode, useEffect, useRef } from "react";
-import { createHighlighter } from "shiki";
+import { isValidElement } from 'preact';
+import { Children, type ReactNode, useEffect, useRef } from 'react';
+import { createHighlighter } from 'shiki';
 import {
   CORE_LANGS,
   EXT_TO_LANG,
   LANG,
   TAB_TYPE,
   VIRTUAL_PREFIX,
-} from "./constants";
-import type { IconManifest, TabProps, TreeDataItem } from "./types";
+} from './constants';
+import type { IconManifest, TabProps, TreeDataItem } from './types';
 
 let iconManifest: IconManifest | null = null;
 let cachedMonoFont: string | undefined;
 
 export const iconsReady =
-  "location" in globalThis
-    ? import("../_generated/icon-manifest").then(
+  'location' in globalThis
+    ? import('../_generated/icon-manifest').then(
         (mod: { iconManifest: IconManifest }) => {
           iconManifest = mod.iconManifest;
-        },
+        }
       )
     : Promise.resolve();
 
@@ -44,7 +44,7 @@ const SAFE_ICON_NAME = /^[a-zA-Z0-9._-]+$/;
  */
 export const loadIconSvg = async (name: string): Promise<string> => {
   if (!SAFE_ICON_NAME.test(name)) {
-    return "";
+    return '';
   }
 
   const cached = iconSvgCache.get(name);
@@ -58,8 +58,8 @@ export const loadIconSvg = async (name: string): Promise<string> => {
   }
 
   const request = fetch(`${import.meta.env.BASE_URL}icons/${name}.svg`)
-    .then((response) => (response.ok ? response.text() : ""))
-    .catch(() => "")
+    .then((response) => (response.ok ? response.text() : ''))
+    .catch(() => '')
     .then((svg) => {
       iconSvgCache.set(name, svg);
       pendingIconSvgs.delete(name);
@@ -84,7 +84,7 @@ const editorBackgrounds = new Map<string, string>();
  * colour space the browser reports back the way the compositor would.
  */
 const resolveEditorBackground = (
-  theme: "dark" | "light",
+  theme: 'dark' | 'light'
 ): string | undefined => {
   const cached = editorBackgrounds.get(theme);
   if (cached) return cached;
@@ -92,26 +92,26 @@ const resolveEditorBackground = (
   const host = globalThis.document?.body;
   if (!host) return undefined;
 
-  const probe = document.createElement("div");
+  const probe = document.createElement('div');
   probe.dataset.theme = theme;
   probe.style.cssText =
-    "position:absolute;visibility:hidden;pointer-events:none;background-color:var(--editor-background)";
+    'position:absolute;visibility:hidden;pointer-events:none;background-color:var(--editor-background)';
   host.append(probe);
   const computed = getComputedStyle(probe).backgroundColor;
   probe.remove();
 
   if (
     !computed ||
-    computed === "transparent" ||
-    computed === "rgba(0, 0, 0, 0)"
+    computed === 'transparent' ||
+    computed === 'rgba(0, 0, 0, 0)'
   ) {
     return undefined;
   }
 
-  const canvas = document.createElement("canvas");
+  const canvas = document.createElement('canvas');
   canvas.width = 1;
   canvas.height = 1;
-  const context = canvas.getContext("2d");
+  const context = canvas.getContext('2d');
   if (!context) return undefined;
 
   context.fillStyle = computed;
@@ -119,8 +119,8 @@ const resolveEditorBackground = (
 
   const [red, green, blue] = context.getImageData(0, 0, 1, 1).data;
   const hex = `#${[red, green, blue]
-    .map((channel) => channel.toString(16).padStart(2, "0"))
-    .join("")}`;
+    .map((channel) => channel.toString(16).padStart(2, '0'))
+    .join('')}`;
 
   editorBackgrounds.set(theme, hex);
 
@@ -133,17 +133,17 @@ const resolveEditorBackground = (
  * minimap and overview ruler on the right.
  */
 const EDITOR_SURFACE_COLORS = [
-  "editor.background",
-  "editorGutter.background",
-  "editorStickyScroll.background",
-  "editorStickyScrollGutter.background",
-  "minimap.background",
-  "editorOverviewRuler.background",
+  'editor.background',
+  'editorGutter.background',
+  'editorStickyScroll.background',
+  'editorStickyScrollGutter.background',
+  'minimap.background',
+  'editorOverviewRuler.background',
 ] as const;
 
 export const defineThemes = (
   highlighter: Awaited<ReturnType<typeof createHighlighter>>,
-  monaco: { editor: { defineTheme: (name: string, data: unknown) => void } },
+  monaco: { editor: { defineTheme: (name: string, data: unknown) => void } }
 ) => {
   for (const name of highlighter.getLoadedThemes()) {
     const resolved = highlighter.getTheme(name);
@@ -151,18 +151,18 @@ export const defineThemes = (
       colors: Record<string, string>;
     };
 
-    const isDark = resolved.type === "dark";
+    const isDark = resolved.type === 'dark';
     // Falls back to Monaco's own shades if the stylesheet has not landed yet.
     const background =
-      resolveEditorBackground(isDark ? "dark" : "light") ??
-      (isDark ? "#1e1e1e" : "#ffffff");
+      resolveEditorBackground(isDark ? 'dark' : 'light') ??
+      (isDark ? '#1e1e1e' : '#ffffff');
 
     if (isDark) {
-      converted.colors["editor.lineHighlightBackground"] = "#2c2c2c";
-      converted.colors["editorLineNumber.foreground"] = "#858585";
-      converted.colors["minimapSlider.background"] = "#ffffff15";
-      converted.colors["minimapSlider.hoverBackground"] = "#ffffff25";
-      converted.colors["minimapSlider.activeBackground"] = "#ffffff35";
+      converted.colors['editor.lineHighlightBackground'] = '#2c2c2c';
+      converted.colors['editorLineNumber.foreground'] = '#858585';
+      converted.colors['minimapSlider.background'] = '#ffffff15';
+      converted.colors['minimapSlider.hoverBackground'] = '#ffffff25';
+      converted.colors['minimapSlider.activeBackground'] = '#ffffff35';
     }
 
     // Monaco resolves unset colors from its own registry defaults, which leaves
@@ -173,26 +173,27 @@ export const defineThemes = (
       converted.colors[surface] = background;
     }
 
-    converted.colors["editorOverviewRuler.border"] = "#00000000";
-    converted.colors["editorStickyScroll.border"] = "#00000000";
-    converted.colors["editorStickyScroll.shadow"] = "#00000000";
-    converted.colors["scrollbar.shadow"] = "#00000000";
-    converted.colors["scrollbarSlider.background"] = isDark
-      ? "#ffffff15"
-      : "#00000015";
-    converted.colors["scrollbarSlider.hoverBackground"] = isDark
-      ? "#ffffff30"
-      : "#00000030";
-    converted.colors["scrollbarSlider.activeBackground"] = isDark
-      ? "#ffffff50"
-      : "#00000050";
+    converted.colors['editorOverviewRuler.border'] = '#00000000';
+    converted.colors['editorStickyScroll.border'] = '#00000000';
+    converted.colors['editorStickyScroll.shadow'] = '#00000000';
+    converted.colors['scrollbar.shadow'] = '#00000000';
+    converted.colors['scrollbarSlider.background'] = isDark
+      ? '#ffffff15'
+      : '#00000015';
+    converted.colors['scrollbarSlider.hoverBackground'] = isDark
+      ? '#ffffff30'
+      : '#00000030';
+    converted.colors['scrollbarSlider.activeBackground'] = isDark
+      ? '#ffffff50'
+      : '#00000050';
 
     monaco.editor.defineTheme(name, converted);
   }
 };
 
-let highlighterPromise: Promise<Awaited<ReturnType<typeof createHighlighter>>> | null =
-  null;
+let highlighterPromise: Promise<
+  Awaited<ReturnType<typeof createHighlighter>>
+> | null = null;
 
 export const getHighlighter = () => {
   if (highlighterPromise) return highlighterPromise;
@@ -202,22 +203,22 @@ export const getHighlighter = () => {
     // the pure-JS engine, which matters more here: the first paint of a file
     // is bound by main-thread time, not bandwidth.
     langs: [...CORE_LANGS],
-    themes: ["dark-plus", "light-plus"],
+    themes: ['dark-plus', 'light-plus'],
   });
 
   return highlighterPromise;
 };
 
 export const shikiSetup =
-  "location" in globalThis
+  'location' in globalThis
     ? (async () => {
         const highlighter = await getHighlighter();
         const monaco = await initMonaco();
 
         const restoreTheme = () => {
           const dark =
-            document.documentElement.getAttribute("data-theme") !== "light";
-          (monaco as any).editor.setTheme(dark ? "dark-plus" : "light-plus");
+            document.documentElement.getAttribute('data-theme') !== 'light';
+          (monaco as any).editor.setTheme(dark ? 'dark-plus' : 'light-plus');
         };
 
         const applyThemes = () =>
@@ -225,7 +226,7 @@ export const shikiSetup =
             highlighter,
             monaco as {
               editor: { defineTheme: (name: string, data: unknown) => void };
-            },
+            }
           );
 
         shikiToMonaco(highlighter, monaco);
@@ -261,11 +262,11 @@ export const ensureLanguage = async (lang: string) => {
         highlighter,
         monaco as {
           editor: { defineTheme: (name: string, data: unknown) => void };
-        },
+        }
       );
       const dark =
-        document.documentElement.getAttribute("data-theme") !== "light";
-      (monaco as any).editor.setTheme(dark ? "dark-plus" : "light-plus");
+        document.documentElement.getAttribute('data-theme') !== 'light';
+      (monaco as any).editor.setTheme(dark ? 'dark-plus' : 'light-plus');
     } catch (e) {
       console.error(`Failed to load Shiki language: ${lang}`, e);
     }
@@ -273,11 +274,11 @@ export const ensureLanguage = async (lang: string) => {
 };
 
 /** Already-fetched markup for `name`, or an empty string while it loads. */
-export const getSvg = (name: string): string => iconSvgCache.get(name) ?? "";
+export const getSvg = (name: string): string => iconSvgCache.get(name) ?? '';
 
 export const resolveFileIcon = (filename: string): string => {
   if (!iconManifest) {
-    return "";
+    return '';
   }
 
   const lowerFilename = filename.toLowerCase();
@@ -285,15 +286,15 @@ export const resolveFileIcon = (filename: string): string => {
     return iconManifest.fileNames[lowerFilename];
   }
 
-  const extensionWithDot = lowerFilename.includes(".")
-    ? lowerFilename.slice(lowerFilename.indexOf(".") + 1)
-    : "";
+  const extensionWithDot = lowerFilename.includes('.')
+    ? lowerFilename.slice(lowerFilename.indexOf('.') + 1)
+    : '';
 
   if (extensionWithDot && iconManifest.fileExtensions[extensionWithDot]) {
     return iconManifest.fileExtensions[extensionWithDot];
   }
 
-  const lastExtension = lowerFilename.split(".").at(-1) ?? "";
+  const lastExtension = lowerFilename.split('.').at(-1) ?? '';
   if (lastExtension && iconManifest.fileExtensions[lastExtension]) {
     return iconManifest.fileExtensions[lastExtension];
   }
@@ -308,10 +309,10 @@ export const resolveFileIcon = (filename: string): string => {
 
 export const resolveFolderIcon = (
   folderName: string,
-  open: boolean,
+  open: boolean
 ): string => {
   if (!iconManifest) {
-    return "";
+    return '';
   }
 
   const lowerFolderName = folderName.toLowerCase();
@@ -323,9 +324,7 @@ export const resolveFolderIcon = (
     );
   }
 
-  return (
-    iconManifest.folderNames[lowerFolderName] ?? iconManifest.folder
-  );
+  return iconManifest.folderNames[lowerFolderName] ?? iconManifest.folder;
 };
 
 /** Empty until the icon for `filename` has been fetched — see `loadIconSvg`. */
@@ -333,22 +332,22 @@ export const getIconSvg = (filename: string): string =>
   getSvg(resolveFileIcon(filename));
 
 export const langOf = (path: string): string =>
-  LANG[path.split(".").at(-1) ?? ""] ?? "plaintext";
+  LANG[path.split('.').at(-1) ?? ''] ?? 'plaintext';
 
 export const extOf = (path: string) =>
-  path.split(".").at(-1)?.toLowerCase() ?? "";
+  path.split('.').at(-1)?.toLowerCase() ?? '';
 
 export const monoFont = (): string => {
   if (cachedMonoFont !== undefined) return cachedMonoFont;
-  if (typeof document === "undefined") return "";
+  if (typeof document === 'undefined') return '';
   cachedMonoFont = getComputedStyle(document.documentElement)
-    .getPropertyValue("--font-mono")
+    .getPropertyValue('--font-mono')
     .trim();
   return cachedMonoFont;
 };
 
 export const compactFolder = (
-  item: TreeDataItem,
+  item: TreeDataItem
 ): { children: TreeDataItem[]; name: string } => {
   let current = item;
   let merged = item.name;
@@ -386,7 +385,7 @@ export const getTabId = (tab: TabProps) => tab.id ?? tab.title;
 
 export const useAltKeys = (
   bindings: Record<string, () => void>,
-  enabled: boolean,
+  enabled: boolean
 ) => {
   const ref = useRef(bindings);
   useEffect(() => {
@@ -408,25 +407,25 @@ export const useAltKeys = (
       }
     };
 
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
   }, [enabled]);
 };
 
 export const deduplicateTitle = (
   name: string,
   path: string,
-  existingPanels: { id: string; title: string | undefined }[],
+  existingPanels: { id: string; title: string | undefined }[]
 ): string => {
   const hasDuplicate = existingPanels.some(
-    (panel) => panel.title === name && panel.id !== path,
+    (panel) => panel.title === name && panel.id !== path
   );
 
   if (!hasDuplicate) {
     return name;
   }
 
-  const parts = path.split("/");
+  const parts = path.split('/');
   return parts.length >= 2 ? `${parts.at(-2)}/${name}` : name;
 };
 
@@ -451,7 +450,7 @@ export const flattenTree = (items: TreeDataItem[]): TreeDataItem[] => {
 export const findSiblings = (
   tree: TreeDataItem[],
   pathParts: string[],
-  depth: number,
+  depth: number
 ): TreeDataItem[] => {
   let nodes = tree;
 
@@ -470,7 +469,7 @@ export const findSiblings = (
 
 export const resolveLanguageIcon = (language: string): string => {
   if (!iconManifest) {
-    return "";
+    return '';
   }
 
   if (iconManifest.languageIds[language]) {
