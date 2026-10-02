@@ -3,6 +3,8 @@ import { readFileSync, statSync } from 'node:fs';
 import { join, resolve, sep } from 'node:path';
 import { serve } from 'bun';
 import { handleOgRequest } from './server/og/ogHandler';
+import { renderRepoHtml } from './server/seo/renderSeoHead';
+import { getRepoMeta } from './server/seo/repoMeta';
 
 const DIST_DIR = join(import.meta.dir, 'dist');
 
@@ -181,6 +183,10 @@ const negotiateContentEncoding = (
  * contents are not, so they must never be pinned for a year.
  */
 const cacheControlFor = (path: string): string => {
+  // The HTML shell names the current build's hashed bundles. A cached copy
+  // outlives a deploy and then requests bundles that no longer exist (404).
+  if (path.endsWith('.html')) return 'no-cache';
+
   // Service worker and Workbox runtime scripts must never be served stale.
   if (path === '/sw.js' || path.startsWith('/workbox-')) {
     return 'no-cache, no-store, must-revalidate';
@@ -312,7 +318,7 @@ const repoFromPathname = (pathname: string): string | null => {
 
 serve({
   port: Number(process.env.PORT ?? 3000),
-  fetch(req) {
+  async fetch(req) {
     const url = new URL(req.url);
 
     if (url.pathname === '/api/og') {
@@ -378,60 +384,35 @@ serve({
       );
     }
 
-    // SPA Fallback for routes like /github/user/repo
+    // Repository pages get their own title, description, canonical URL and OG
+    // card, so links shared or crawled before the app boots are accurate.
     const repoMatch = repoFromPathname(path);
     if (repoMatch) {
-      let html = readFileSync(INDEX_PATH, 'utf8');
-      const escapedRepo = repoMatch.replace(/"/g, '&quot;');
-      const encodedRepo = encodeURIComponent(repoMatch);
-      const ogUrl = `https://ide.intlayer.org/api/og?repo=${encodedRepo}`;
-      const pageUrl = `https://ide.intlayer.org/${repoMatch}`;
-      const pageTitle = `${escapedRepo} — Intlayer online IDE`;
+      const html = renderRepoHtml(
+        readFileSync(INDEX_PATH, 'utf8'),
+        await getRepoMeta(repoMatch)
+      );
 
-      html = html
-        .replace(/<title>.*?<\/title>/, `<title>${pageTitle}</title>`)
-        .replace(
-          /<meta\s+property="og:title"\s+content=".*?"\s*\/>/,
-          `<meta property="og:title" content="${pageTitle}" />`
-        )
-        .replace(
-          /<meta\s+name="twitter:title"\s+content=".*?"\s*\/>/,
-          `<meta name="twitter:title" content="${pageTitle}" />`
-        )
-        .replace(
-          /<meta\s+property="og:url"\s+content=".*?"\s*\/>/,
-          `<meta property="og:url" content="${pageUrl}" />`
-        )
-        .replace(
-          /<meta\s+property="og:image"\s+content=".*?"\s*\/>/,
-          `<meta property="og:image" content="${ogUrl}" />`
-        )
-        .replace(
-          /<meta\s+property="og:image:secure_url"\s+content=".*?"\s*\/>/,
-          `<meta property="og:image:secure_url" content="${ogUrl}" />`
-        )
-        .replace(
-          /<meta\s+name="twitter:image"\s+content=".*?"\s*\/>/,
-          `<meta name="twitter:image" content="${ogUrl}" />`
-        );
-
-      const headers = new Headers({
-        'Cache-Control': 'no-cache',
-        'Content-Type': 'text/html; charset=utf-8',
-      });
-
-      return withSecurityHeaders(new Response(html, { headers }));
+      return withSecurityHeaders(
+        new Response(req.method === 'HEAD' ? null : html, {
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Content-Type': 'text/html; charset=utf-8',
+          },
+        })
+      );
     }
 
-    const indexStats = statSync(INDEX_PATH);
-
-    return serveFile(
-      req,
-      INDEX_PATH,
-      '/index.html',
-      indexStats.mtimeMs,
-      indexStats.size,
-      'no-cache'
+    // Anything else is not a page: answer 404 so crawlers do not index it as
+    // a duplicate of the home page, but keep the shell so the app still loads.
+    return withSecurityHeaders(
+      new Response(req.method === 'HEAD' ? null : Bun.file(INDEX_PATH), {
+        status: 404,
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Content-Type': 'text/html; charset=utf-8',
+        },
+      })
     );
   },
 });

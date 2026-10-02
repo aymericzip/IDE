@@ -84,6 +84,8 @@ const getVisualLength = (text: string): number =>
   );
 
 export type GenerateOgImageOptions = {
+  /** Small line above the title, such as a repository owner. */
+  eyebrow?: string;
   title?: string;
   description?: string;
   locale?: string;
@@ -91,6 +93,7 @@ export type GenerateOgImageOptions = {
 
 /** Renders the Open Graph card to a PNG buffer. */
 export const generateOgImage = async ({
+  eyebrow,
   title = DEFAULT_OG_TITLE,
   description = DEFAULT_OG_DESCRIPTION,
   locale,
@@ -112,7 +115,9 @@ export const generateOgImage = async ({
     titleFontSize = 56;
   }
 
-  const renderedText = `${cleanTitle} ${description}`;
+  const renderedText = [eyebrow, cleanTitle, description]
+    .filter(Boolean)
+    .join(' ');
   const language =
     getOgLanguageFromLocale(locale) ?? detectOgLanguage(renderedText);
   const fallbackFonts = await loadOgFallbackFonts(renderedText, language);
@@ -157,6 +162,20 @@ export const generateOgImage = async ({
               gap: '16px',
             },
             children: [
+              eyebrow
+                ? {
+                    type: 'span',
+                    props: {
+                      style: {
+                        fontSize: '28px',
+                        fontWeight: 400,
+                        color: '#71717a',
+                        marginBottom: '-8px',
+                      },
+                      children: eyebrow,
+                    },
+                  }
+                : null,
               {
                 type: 'span',
                 props: {

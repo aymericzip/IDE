@@ -221,6 +221,14 @@ export const Workspace = forwardRef<WorkspaceRef, WorkspaceProps>(
       return typeof sidebarSize === 'number' ? sidebarSize : 200;
     });
 
+    /**
+     * Last expanded width in pixels. `expand()` only restores the size captured
+     * by an imperative `collapse()`, and falls back to `minSize` otherwise (a
+     * panel mounted collapsed, or collapsed by dragging) — so re-opening resizes
+     * to this width explicitly instead.
+     */
+    const lastSidebarSizeRef = useRef(memorizedSidebarSize);
+
     const sidebarPanelRef = useRef<PanelImperativeHandle | null>(null);
     const sidebarDivRef = useRef<HTMLDivElement | null>(null);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(
@@ -231,7 +239,7 @@ export const Workspace = forwardRef<WorkspaceRef, WorkspaceProps>(
       if (controlledSidebar === undefined || !sidebarPanelRef.current) return;
       const isCurrentlyCollapsed = sidebarPanelRef.current.isCollapsed();
       if (controlledSidebar && isCurrentlyCollapsed) {
-        sidebarPanelRef.current.expand();
+        sidebarPanelRef.current.resize(lastSidebarSizeRef.current);
         setIsSidebarCollapsed(false);
       } else if (!controlledSidebar && !isCurrentlyCollapsed) {
         sidebarPanelRef.current.collapse();
@@ -243,7 +251,7 @@ export const Workspace = forwardRef<WorkspaceRef, WorkspaceProps>(
       if (!sidebarPanelRef.current) return;
       const isCollapsed = sidebarPanelRef.current.isCollapsed();
       if (isCollapsed) {
-        sidebarPanelRef.current.expand();
+        sidebarPanelRef.current.resize(lastSidebarSizeRef.current);
         setIsSidebarCollapsed(false);
         onSidebarChange?.(true);
         log('Sidebar opened');
@@ -262,6 +270,7 @@ export const Workspace = forwardRef<WorkspaceRef, WorkspaceProps>(
         setIsSidebarCollapsed(collapsed);
         onSidebarChange?.(!collapsed);
         if (!collapsed && panelSize.inPixels > 20) {
+          lastSidebarSizeRef.current = panelSize.inPixels;
           try {
             localStorage.setItem(
               SIDEBAR_SIZE_STORAGE_KEY,

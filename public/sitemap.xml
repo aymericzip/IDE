@@ -1,407 +1,183 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Core -->
   <url>
     <loc>https://ide.intlayer.org/</loc>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-09-29</lastmod>
     <priority>1.0</priority>
   </url>
-
-  <!-- Documentation Templates -->
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-adonis-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-adonis-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-adonisjs-template</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-adonisjs-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-analog-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-analog-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-angular-19-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-angular-19-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-angular-22-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-angular-22-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-astro-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-astro-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-elysia-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-29</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-elysia-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-express-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-express-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-fastify-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-fastify-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-hono-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-hono-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-htmx-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-htmx-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-lynx-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-lynx-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-next-14-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-next-14-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-next-15-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-next-15-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-next-16-no-locale-path-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-next-16-no-locale-path-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-next-16-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-next-16-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-nuxt-4-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-nuxt-4-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-react-cra-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-react-cra-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-react-native-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-react-native-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-react-router-v7-fs-routes-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-react-router-v7-fs-routes-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-react-router-v7-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-react-router-v7-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-remix-3-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-remix-3-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-solid-start-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-solid-start-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-sveltekit-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-sveltekit-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-tanstack-start-solid-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-tanstack-start-solid-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-tanstack-start-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-tanstack-start-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-vanilla-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-vanilla-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-vite-lit-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-vite-lit-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-vite-preact-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-vite-preact-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-vite-react-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-vite-react-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-vite-solid-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-vite-solid-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-vite-svelte-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-vite-svelte-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-vite-vanilla-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-vite-vanilla-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-vite-vue-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/intlayer-vite-vue-template?file=intlayer.config.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/next-i18next-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/next-i18next-template?file=src/app/i18n.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <url>
     <loc>https://ide.intlayer.org/aymericzip/next-intl-template</loc>
-    <changefreq>monthly</changefreq>
+    <lastmod>2026-09-27</lastmod>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://ide.intlayer.org/aymericzip/next-intl-template?file=src/i18n.ts</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
 </urlset>

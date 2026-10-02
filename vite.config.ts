@@ -83,7 +83,15 @@ export default defineConfig(({ command }) => ({
             manifest: false, // Uses public/manifest.json
             workbox: {
               globPatterns: ['**/*.{js,css,html,woff2,ico,png}'],
-              globIgnores: ['**/icons/**', '**/*worker*'],
+              // Social cards and store screenshots are never shown in the app.
+              globIgnores: [
+                '**/icons/**',
+                '**/*worker*',
+                'og-image.png',
+                'cover.png',
+                'screenshot.png',
+                'github-social-preview.png',
+              ],
               maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
               runtimeCaching: [
                 {

@@ -1,3 +1,4 @@
+import { getRepoMeta } from '../seo/repoMeta';
 import { generateOgImage } from './generateOgImage';
 import { THUMBNAIL_JPEG_BASE64 } from './ogAssets';
 
@@ -27,46 +28,7 @@ const getFallbackBuffer = (): ArrayBuffer => {
   return fallbackBuffer;
 };
 
-const repoCache = new Map<string, { description?: string }>();
-
-const fetchRepoDescription = async (
-  repo: string
-): Promise<string | undefined> => {
-  if (repoCache.has(repo)) {
-    return repoCache.get(repo)?.description;
-  }
-
-  try {
-    const headers: Record<string, string> = {
-      'User-Agent': 'Intlayer-IDE',
-      Accept: 'application/vnd.github.v3+json',
-    };
-    const token = process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN;
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3000);
-
-    const res = await fetch(`https://api.github.com/repos/${repo}`, {
-      headers,
-      signal: controller.signal,
-    });
-    clearTimeout(timeout);
-
-    if (res.ok) {
-      const data = (await res.json()) as { description?: string };
-      const description = data.description?.trim();
-      repoCache.set(repo, { description });
-      return description;
-    }
-  } catch {
-    // Ignore fetch error, will fallback
-  }
-
-  return undefined;
-};
+const OWNER_REPO = /^[\w.-]+\/[\w.-]+$/;
 
 export const handleOgRequest = async (request: Request): Promise<Response> => {
   if (request.method === 'OPTIONS') {
@@ -87,25 +49,24 @@ export const handleOgRequest = async (request: Request): Promise<Response> => {
     : undefined;
   const locale = rawLocale ? rawLocale.slice(0, MAX_LOCALE_LENGTH) : undefined;
 
-  if (rawRepo) {
-    const cleanRepo = rawRepo.replace(/^github\.com\//, '').trim();
-    title = cleanRepo.slice(0, MAX_TITLE_LENGTH);
-    if (!description) {
-      const repoDesc = await fetchRepoDescription(cleanRepo);
-      if (repoDesc) {
-        description = repoDesc.slice(0, MAX_DESCRIPTION_LENGTH);
-      } else {
-        description =
-          'In-Browser GitHub Code Editor: browse files and read code with syntax highlighting, no clone or install.';
-      }
-    }
+  // Only an `owner/name` pair reaches the GitHub API: the value is part of
+  // the request path there.
+  let eyebrow: string | undefined;
+  const repo = rawRepo?.replace(/^(https?:\/\/)?github\.com\//i, '');
+  if (repo && OWNER_REPO.test(repo)) {
+    const meta = await getRepoMeta(repo);
+    [eyebrow, title] = repo.split('/');
+    description ??= meta.cardDescription;
   }
 
-  const cacheKey = [title, description, locale].map((v) => v ?? '').join('::');
+  const cacheKey = [eyebrow, title, description, locale]
+    .map((v) => v ?? '')
+    .join('::');
   let bufferPromise = ogImageCache.get(cacheKey);
 
   if (!bufferPromise) {
     bufferPromise = generateOgImage({
+      eyebrow,
       title,
       description,
       locale,

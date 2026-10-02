@@ -43,25 +43,15 @@ const IdeApp = () => {
 
   useEffect(() => {
     if (!initialRepo) return;
-    document.title = `${initialRepo} — Intlayer online IDE`;
-
-    const ogUrl = `https://ide.intlayer.org/api/og?repo=${encodeURIComponent(initialRepo)}`;
-    const pageUrl = `https://ide.intlayer.org/${initialRepo}`;
-    const pageTitle = `${initialRepo} — Intlayer online IDE`;
-
-    const setMeta = (selector: string, attr: string, value: string) => {
-      const meta = document.querySelector(selector);
-      if (meta) {
-        meta.setAttribute(attr, value);
-      }
-    };
-
-    setMeta('meta[property="og:title"]', 'content', pageTitle);
-    setMeta('meta[name="twitter:title"]', 'content', pageTitle);
-    setMeta('meta[property="og:image"]', 'content', ogUrl);
-    setMeta('meta[property="og:image:secure_url"]', 'content', ogUrl);
-    setMeta('meta[name="twitter:image"]', 'content', ogUrl);
-    setMeta('meta[property="og:url"]', 'content', pageUrl);
+    // The server renders `/owner/repo` pages with their own title and meta
+    // tags (`server/seo`). The generic shell — legacy `?repo=` links, or the
+    // service worker's navigation fallback — still carries the home canonical.
+    const canonical = document.querySelector<HTMLLinkElement>(
+      'link[rel="canonical"]'
+    )?.href;
+    if (!canonical?.endsWith(`/${initialRepo}`)) {
+      document.title = `${initialRepo} — Intlayer online IDE`;
+    }
 
     void import('./explorer');
   }, [initialRepo]);
