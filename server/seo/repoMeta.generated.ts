@@ -9,7 +9,7 @@ export const DOC_REPO_META: Readonly<Record<string, DocRepoMeta>> = {
     "docTitle": "AdonisJS i18n - Complete guide to translate your app",
     "docDescription": "Set up Intlayer in AdonisJS: detect the locale per request with middleware, translate API responses and views, and keep content typed.",
     "docUrl": "https://intlayer.org/doc/environment/adonisjs",
-    "updatedAt": "2026-09-27"
+    "updatedAt": "2026-10-04"
   },
   "aymericzip/intlayer-analog-template": {
     "title": "Analog i18n example: intlayer-analog-template source code",
@@ -49,7 +49,7 @@ export const DOC_REPO_META: Readonly<Record<string, DocRepoMeta>> = {
     "docTitle": "Elysia i18n - Complete guide to translate your app",
     "docDescription": "Set up Intlayer in Elysia: detect the locale per request with the plugin, translate API responses and keep content typed on Bun.",
     "docUrl": "https://intlayer.org/doc/environment/elysia",
-    "updatedAt": "2026-09-29"
+    "updatedAt": "2026-10-04"
   },
   "aymericzip/intlayer-express-template": {
     "title": "Express i18n example: intlayer-express-template source code",
@@ -57,7 +57,7 @@ export const DOC_REPO_META: Readonly<Record<string, DocRepoMeta>> = {
     "docTitle": "Express i18n - Complete guide to translate your app",
     "docDescription": "Set up Intlayer in Express: detect the locale per request with middleware, translate API responses and error messages, typed end to end.",
     "docUrl": "https://intlayer.org/doc/environment/express",
-    "updatedAt": "2026-09-27"
+    "updatedAt": "2026-10-04"
   },
   "aymericzip/intlayer-fastify-template": {
     "title": "Fastify i18n example: intlayer-fastify-template source code",
@@ -65,7 +65,7 @@ export const DOC_REPO_META: Readonly<Record<string, DocRepoMeta>> = {
     "docTitle": "Fastify i18n - Complete guide to translate your app",
     "docDescription": "Set up Intlayer in Fastify: detect the locale per request with the plugin, translate API responses and error messages, typed end to end.",
     "docUrl": "https://intlayer.org/doc/environment/fastify",
-    "updatedAt": "2026-09-27"
+    "updatedAt": "2026-10-04"
   },
   "aymericzip/intlayer-hono-template": {
     "title": "Hono i18n example: intlayer-hono-template source code",
@@ -73,7 +73,7 @@ export const DOC_REPO_META: Readonly<Record<string, DocRepoMeta>> = {
     "docTitle": "Hono i18n - Complete guide to translate your app",
     "docDescription": "Set up Intlayer in Hono: detect the locale per request with middleware, translate API responses and run on Node, Bun or edge runtimes.",
     "docUrl": "https://intlayer.org/doc/environment/hono",
-    "updatedAt": "2026-09-27"
+    "updatedAt": "2026-10-04"
   },
   "aymericzip/intlayer-htmx-template": {
     "title": "htmx i18n example: intlayer-htmx-template source code",
@@ -97,7 +97,7 @@ export const DOC_REPO_META: Readonly<Record<string, DocRepoMeta>> = {
     "docTitle": "Next.js 14 i18n - Complete guide to translate your app",
     "docDescription": "Set up Intlayer in Next.js 14 App Router: locale routing middleware, Server and Client Components, and localized metadata and sitemap.",
     "docUrl": "https://intlayer.org/doc/environment/nextjs/14",
-    "updatedAt": "2026-09-27"
+    "updatedAt": "2026-10-08"
   },
   "aymericzip/intlayer-next-15-template": {
     "title": "Next.js 15 i18n example: intlayer-next-15-template source code",
@@ -105,7 +105,7 @@ export const DOC_REPO_META: Readonly<Record<string, DocRepoMeta>> = {
     "docTitle": "Next.js 15 i18n - Complete guide to translate your app",
     "docDescription": "Set up Intlayer in Next.js 15 App Router: locale routing middleware, async params, Server and Client Components, localized metadata and sitemap.",
     "docUrl": "https://intlayer.org/doc/environment/nextjs/15",
-    "updatedAt": "2026-09-27"
+    "updatedAt": "2026-10-08"
   },
   "aymericzip/intlayer-next-16-no-locale-path-template": {
     "title": "Next.js 16 i18n example: intlayer-next-16-no-locale-path-template",
@@ -113,7 +113,7 @@ export const DOC_REPO_META: Readonly<Record<string, DocRepoMeta>> = {
     "docTitle": "Next.js 16 i18n - Complete guide to translate your app",
     "docDescription": "Set up Intlayer in Next.js 16 App Router: locale routing with the proxy, Server and Client Components, localized metadata, sitemap and static pages.",
     "docUrl": "https://intlayer.org/doc/environment/nextjs",
-    "updatedAt": "2026-09-27"
+    "updatedAt": "2026-10-08"
   },
   "aymericzip/intlayer-next-16-template": {
     "title": "Next.js 16 i18n example: intlayer-next-16-template source code",
@@ -121,7 +121,7 @@ export const DOC_REPO_META: Readonly<Record<string, DocRepoMeta>> = {
     "docTitle": "Next.js 16 i18n - Complete guide to translate your app",
     "docDescription": "Set up Intlayer in Next.js 16 App Router: locale routing with the proxy, Server and Client Components, localized metadata, sitemap and static pages.",
     "docUrl": "https://intlayer.org/doc/environment/nextjs",
-    "updatedAt": "2026-09-27"
+    "updatedAt": "2026-10-08"
   },
   "aymericzip/intlayer-nuxt-4-template": {
     "title": "Nuxt i18n example: intlayer-nuxt-4-template source code",
@@ -137,7 +137,7 @@ export const DOC_REPO_META: Readonly<Record<string, DocRepoMeta>> = {
     "docTitle": "Create React App i18n: Complete Translation Guide",
     "docDescription": "Set up Intlayer in a Create React App project: typed content next to components, a locale switcher and translations loaded per locale.",
     "docUrl": "https://intlayer.org/doc/environment/create-react-app",
-    "updatedAt": "2026-09-27"
+    "updatedAt": "2026-10-08"
   },
   "aymericzip/intlayer-react-native-template": {
     "title": "Expo + React Native i18n example: intlayer-react-native-template",
@@ -201,7 +201,7 @@ export const DOC_REPO_META: Readonly<Record<string, DocRepoMeta>> = {
     "docTitle": "TanStack Start i18n - Complete guide to translate your app",
     "docDescription": "Set up Intlayer in TanStack Start: locale route params, SSR-safe translated content, localized head metadata, hreflang and sitemap.",
     "docUrl": "https://intlayer.org/doc/environment/tanstack-start",
-    "updatedAt": "2026-09-27"
+    "updatedAt": "2026-11-02"
   },
   "aymericzip/intlayer-vanilla-template": {
     "title": "Vanilla JS i18n example: intlayer-vanilla-template source code",
@@ -225,7 +225,7 @@ export const DOC_REPO_META: Readonly<Record<string, DocRepoMeta>> = {
     "docTitle": "Vite + Preact i18n - Complete guide to translate your app",
     "docDescription": "Set up Intlayer in a Vite and Preact app: typed per-component content, a locale switcher, localized routes and small bundles.",
     "docUrl": "https://intlayer.org/doc/environment/vite-and-preact",
-    "updatedAt": "2026-09-27"
+    "updatedAt": "2026-10-08"
   },
   "aymericzip/intlayer-vite-react-template": {
     "title": "Vite + React i18n example: intlayer-vite-react-template source code",
@@ -233,7 +233,7 @@ export const DOC_REPO_META: Readonly<Record<string, DocRepoMeta>> = {
     "docTitle": "Vite + React i18n - Complete guide to translate your app",
     "docDescription": "Set up Intlayer in a Vite and React app: typed per-component content, a locale switcher, localized routes and per-locale bundles.",
     "docUrl": "https://intlayer.org/doc/environment/vite-and-react",
-    "updatedAt": "2026-09-27"
+    "updatedAt": "2026-10-08"
   },
   "aymericzip/intlayer-vite-solid-template": {
     "title": "Vite + Solid i18n example: intlayer-vite-solid-template source code",

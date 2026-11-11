@@ -90,12 +90,9 @@
         "useAriaPropsSupportedByRole": "warn"
       },
       "nursery": {
-        "useSortedClasses": {
+        "useTailwindSortedClasses": {
           "level": "warn",
-          "fix": "safe",
-          "options": {
-            "functions": ["cva", "cn", "clsx"]
-          }
+          "fix": "safe"
         }
       }
     }
@@ -134,5 +131,6 @@
         "organizeImports": "on"
       }
     }
-  }
+  },
+  "tailwind": { "mergeFunctions": ["cn", "clsx"], "variantFunctions": ["cva"] }
 }

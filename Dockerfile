@@ -1,6 +1,8 @@
+# syntax=docker/dockerfile:1.28.0
+
 # Stage 1: Builder
 
-FROM oven/bun:1.4.1-alpine AS builder
+FROM oven/bun:1.4.4-alpine AS builder
 WORKDIR /app
 
 COPY package.json bun.lock ./
@@ -10,7 +12,7 @@ COPY . .
 RUN bun run build
 
 # Stage 2: Production Runner
-FROM oven/bun:1.4.1-alpine AS runner
+FROM oven/bun:1.4.4-alpine AS runner
 WORKDIR /app
 
 # Switch to the non-root user provided by the base image

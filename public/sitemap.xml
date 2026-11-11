@@ -2,12 +2,12 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://ide.intlayer.org/</loc>
-    <lastmod>2026-09-29</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-adonis-template</loc>
-    <lastmod>2026-09-27</lastmod>
+    <lastmod>2026-10-04</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
@@ -32,22 +32,22 @@
   </url>
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-elysia-template</loc>
-    <lastmod>2026-09-29</lastmod>
+    <lastmod>2026-10-04</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-express-template</loc>
-    <lastmod>2026-09-27</lastmod>
+    <lastmod>2026-10-04</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-fastify-template</loc>
-    <lastmod>2026-09-27</lastmod>
+    <lastmod>2026-10-04</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-hono-template</loc>
-    <lastmod>2026-09-27</lastmod>
+    <lastmod>2026-10-04</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
@@ -62,22 +62,22 @@
   </url>
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-next-14-template</loc>
-    <lastmod>2026-09-27</lastmod>
+    <lastmod>2026-10-08</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-next-15-template</loc>
-    <lastmod>2026-09-27</lastmod>
+    <lastmod>2026-10-08</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-next-16-no-locale-path-template</loc>
-    <lastmod>2026-09-27</lastmod>
+    <lastmod>2026-10-08</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-next-16-template</loc>
-    <lastmod>2026-09-27</lastmod>
+    <lastmod>2026-10-08</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
@@ -87,7 +87,7 @@
   </url>
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-react-cra-template</loc>
-    <lastmod>2026-09-27</lastmod>
+    <lastmod>2026-10-08</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
@@ -127,7 +127,7 @@
   </url>
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-tanstack-start-template</loc>
-    <lastmod>2026-09-27</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
@@ -142,12 +142,12 @@
   </url>
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-vite-preact-template</loc>
-    <lastmod>2026-09-27</lastmod>
+    <lastmod>2026-10-08</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ide.intlayer.org/aymericzip/intlayer-vite-react-template</loc>
-    <lastmod>2026-09-27</lastmod>
+    <lastmod>2026-10-08</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
