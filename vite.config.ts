@@ -169,6 +169,18 @@ export default defineConfig(({ command }) => ({
     modulePreload: { polyfill: false },
     assetsInlineLimit: 4096,
     rollupOptions: {
+      // react-resizable-panels feature-detects React 19.2's `Activity`, which
+      // preact/compat lacks; it falls back to "keep-mounted" at runtime.
+      onLog(level, log, handler) {
+        if (
+          log.code === 'IMPORT_IS_UNDEFINED' &&
+          log.message.includes('Activity') &&
+          log.id?.includes('react-resizable-panels')
+        ) {
+          return;
+        }
+        handler(level, log);
+      },
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
