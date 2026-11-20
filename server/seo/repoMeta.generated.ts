@@ -113,7 +113,7 @@ export const DOC_REPO_META: Readonly<Record<string, DocRepoMeta>> = {
     "docTitle": "Next.js 16 i18n - Complete guide to translate your app",
     "docDescription": "Set up Intlayer in Next.js 16 App Router: locale routing with the proxy, Server and Client Components, localized metadata, sitemap and static pages.",
     "docUrl": "https://intlayer.org/doc/environment/nextjs",
-    "updatedAt": "2026-10-08"
+    "updatedAt": "2026-11-18"
   },
   "aymericzip/intlayer-next-16-template": {
     "title": "Next.js 16 i18n example: intlayer-next-16-template source code",
@@ -121,7 +121,7 @@ export const DOC_REPO_META: Readonly<Record<string, DocRepoMeta>> = {
     "docTitle": "Next.js 16 i18n - Complete guide to translate your app",
     "docDescription": "Set up Intlayer in Next.js 16 App Router: locale routing with the proxy, Server and Client Components, localized metadata, sitemap and static pages.",
     "docUrl": "https://intlayer.org/doc/environment/nextjs",
-    "updatedAt": "2026-10-08"
+    "updatedAt": "2026-11-18"
   },
   "aymericzip/intlayer-nuxt-4-template": {
     "title": "Nuxt i18n example: intlayer-nuxt-4-template source code",
@@ -177,7 +177,7 @@ export const DOC_REPO_META: Readonly<Record<string, DocRepoMeta>> = {
     "docTitle": "Solid Start i18n - Complete guide to translate your app",
     "docDescription": "Set up Intlayer in SolidStart: server-rendered locale routing, reactive translated content, hreflang and a multilingual sitemap.",
     "docUrl": "https://intlayer.org/doc/environment/solid-start",
-    "updatedAt": "2026-09-27"
+    "updatedAt": "2026-11-18"
   },
   "aymericzip/intlayer-sveltekit-template": {
     "title": "SvelteKit i18n example: intlayer-sveltekit-template source code",
@@ -193,7 +193,7 @@ export const DOC_REPO_META: Readonly<Record<string, DocRepoMeta>> = {
     "docTitle": "TanStack Start + Solid i18n: Complete Translation Guide",
     "docDescription": "Set up Intlayer in TanStack Start with Solid: locale route params, reactive translated content, localized head metadata and hreflang.",
     "docUrl": "https://intlayer.org/doc/environment/tanstack-start/solid",
-    "updatedAt": "2026-09-27"
+    "updatedAt": "2026-11-18"
   },
   "aymericzip/intlayer-tanstack-start-template": {
     "title": "TanStack Start i18n example: intlayer-tanstack-start-template",
@@ -201,7 +201,7 @@ export const DOC_REPO_META: Readonly<Record<string, DocRepoMeta>> = {
     "docTitle": "TanStack Start i18n - Complete guide to translate your app",
     "docDescription": "Set up Intlayer in TanStack Start: locale route params, SSR-safe translated content, localized head metadata, hreflang and sitemap.",
     "docUrl": "https://intlayer.org/doc/environment/tanstack-start",
-    "updatedAt": "2026-11-02"
+    "updatedAt": "2026-11-17"
   },
   "aymericzip/intlayer-vanilla-template": {
     "title": "Vanilla JS i18n example: intlayer-vanilla-template source code",
@@ -241,7 +241,7 @@ export const DOC_REPO_META: Readonly<Record<string, DocRepoMeta>> = {
     "docTitle": "Vite + Solid i18n - Complete guide to translate your app",
     "docDescription": "Set up Intlayer in a Vite and Solid app: reactive translated content, a locale switcher, localized routes and typed dictionaries.",
     "docUrl": "https://intlayer.org/doc/environment/vite-and-solid",
-    "updatedAt": "2026-09-27"
+    "updatedAt": "2026-11-18"
   },
   "aymericzip/intlayer-vite-svelte-template": {
     "title": "Vite + Svelte i18n example: intlayer-vite-svelte-template source code",
