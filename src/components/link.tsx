@@ -298,7 +298,6 @@ export const Link: FC<LinkProps> = (props) => {
     size: sizeProp,
     isExternalLink: isExternalLinkProp,
     isPageSection: isPageSectionProp,
-    href: hrefProp,
     rel: relProp,
     target: targetProp,
     ...otherProps
@@ -307,6 +306,7 @@ export const Link: FC<LinkProps> = (props) => {
   const isExternalLink = isExternalLinkProp ?? checkIsExternalLink(props);
   // `href` is `Signalish<string | undefined>` under preact's JSX types, so it
   // has to be narrowed to the plain-string case before being inspected.
+  const hrefProp = props.href;
   const isPageSection =
     isPageSectionProp ??
     (typeof hrefProp === 'string' && hrefProp.startsWith('#'));
@@ -325,12 +325,12 @@ export const Link: FC<LinkProps> = (props) => {
 
   const target = isExternalLink ? '_blank' : (targetProp ?? '_self');
 
-  const href = hrefProp;
-
   return (
+    // `href` reaches the anchor through `otherProps`: preact 11 pairs `href`
+    // with `role` in a union, and re-passing it on its own breaks that pairing.
+    // biome-ignore lint/a11y/useAriaPropsSupportedByRole: the anchor does get an `href`, via the spread
     <a
       {...otherProps}
-      href={href}
       aria-label={label}
       rel={rel}
       target={target}

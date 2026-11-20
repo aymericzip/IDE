@@ -1,6 +1,6 @@
 import { Popover as PopoverPrimitive } from '@base-ui/react/popover';
 import type * as React from 'react';
-import type { WithRefOf } from './lib/base-ui-props';
+import type { BaseUIProps, WithRefOf } from './lib/base-ui-props';
 import { cn } from './lib/utils';
 
 export const Popover = ({ ...props }: PopoverPrimitive.Root.Props) => {
@@ -21,7 +21,7 @@ export const PopoverContent = ({
   side = 'bottom',
   sideOffset = 4,
   ...props
-}: PopoverPrimitive.Popup.Props &
+}: BaseUIProps<PopoverPrimitive.Popup.Props> &
   Pick<
     PopoverPrimitive.Positioner.Props,
     'align' | 'alignOffset' | 'side' | 'sideOffset'
@@ -38,7 +38,7 @@ export const PopoverContent = ({
         <PopoverPrimitive.Popup
           data-slot="popover-content"
           className={cn(
-            'data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:fade-in-0 data-open:zoom-in-95 data-closed:fade-out-0 data-closed:zoom-out-95 z-50 flex w-72 origin-(--transform-origin) flex-col gap-4 rounded-md bg-popover p-4 text-popover-foreground text-sm shadow-md outline-hidden ring-1 ring-foreground/10 duration-100 data-closed:animate-out data-open:animate-in',
+            'data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:fade-in-0 data-open:zoom-in-95 data-closed:fade-out-0 data-closed:zoom-out-95 bg-popover text-popover-foreground ring-foreground/10 data-closed:animate-out data-open:animate-in z-50 flex w-72 origin-(--transform-origin) flex-col gap-4 rounded-md p-4 text-sm shadow-md ring-1 outline-hidden duration-100',
             className
           )}
           {...props}
@@ -62,7 +62,7 @@ export const PopoverHeader = ({
 export const PopoverTitle = ({
   className,
   ...props
-}: PopoverPrimitive.Title.Props) => {
+}: BaseUIProps<PopoverPrimitive.Title.Props>) => {
   return (
     <PopoverPrimitive.Title
       data-slot="popover-title"
@@ -74,7 +74,7 @@ export const PopoverTitle = ({
 export const PopoverDescription = ({
   className,
   ...props
-}: PopoverPrimitive.Description.Props) => {
+}: BaseUIProps<PopoverPrimitive.Description.Props>) => {
   return (
     <PopoverPrimitive.Description
       data-slot="popover-description"
